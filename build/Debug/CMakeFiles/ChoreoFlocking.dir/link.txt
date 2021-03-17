@@ -1,2 +1,0 @@
-/usr/bin/ar qc libChoreoFlocking.a CMakeFiles/ChoreoFlocking.dir/src/ChoreoFlocking/Application.cpp.o
-/usr/bin/ranlib libChoreoFlocking.a
