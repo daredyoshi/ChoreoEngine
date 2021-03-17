@@ -1,0 +1,4 @@
+/media/dev/ChoreoFlocker/repo/ChoreoFlocker/build/Debug/CMakeFiles/rebuild_cache.dir
+/media/dev/ChoreoFlocker/repo/ChoreoFlocker/build/Debug/CMakeFiles/Sandbox.dir
+/media/dev/ChoreoFlocker/repo/ChoreoFlocker/build/Debug/CMakeFiles/edit_cache.dir
+/media/dev/ChoreoFlocker/repo/ChoreoFlocker/build/Debug/CMakeFiles/ChoreoFlocking.dir
