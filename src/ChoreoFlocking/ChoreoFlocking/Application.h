@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core.h"
 
 namespace ChoreoFlocking{
     class Application {
@@ -8,4 +9,7 @@ namespace ChoreoFlocking{
         virtual ~Application();
         void run();
     };
+
+    // To be defined in CLIENT 
+    Application* CreateApplication();
 }

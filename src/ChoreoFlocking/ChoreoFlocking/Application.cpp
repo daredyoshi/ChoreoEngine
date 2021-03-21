@@ -1,4 +1,5 @@
 #include "Application.h"
+#include <iostream>
 
 
 namespace ChoreoFlocking {
@@ -9,6 +10,8 @@ namespace ChoreoFlocking {
 
     }
     void Application::run(){
-        while(true);
+        while(true){
+            // std::cout << "focking";
+        };
     }
 }

@@ -4,13 +4,14 @@ find_package(glfw3 3.3 REQUIRED)
 # find_package(Assimp REQUIRED)
 # include_directories(${ASSIMP_INCLUDE_DIR})
 include_directories(${ChoreoFlocking_SOURCE_DIR}/src/ChoreoFlocking/include)
+include_directories(${ChoreoFlocking_SOURCE_DIR}/src/ChoreoFlocking/ChoreoFlocking)
 # link_directories(include)
 # find_package( Boost 1.40 COMPONENTS program_options REQUIRED )
 
 # Add the core lib
 set(
     ChoreoFlockingSources 
-    Application.cpp
+    ChoreoFlocking/Application.cpp
     dependencies/glad.c
     dependencies/stb_image.cpp
     )

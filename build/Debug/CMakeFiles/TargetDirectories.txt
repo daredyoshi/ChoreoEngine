@@ -1,8 +1,0 @@
-/media/dev/ChoreoFlocker/repo/ChoreoFlocker/build/Debug/CMakeFiles/rebuild_cache.dir
-/media/dev/ChoreoFlocker/repo/ChoreoFlocker/build/Debug/CMakeFiles/edit_cache.dir
-/media/dev/ChoreoFlocker/repo/ChoreoFlocker/build/Debug/src/ChoreoFlocking/CMakeFiles/rebuild_cache.dir
-/media/dev/ChoreoFlocker/repo/ChoreoFlocker/build/Debug/src/ChoreoFlocking/CMakeFiles/edit_cache.dir
-/media/dev/ChoreoFlocker/repo/ChoreoFlocker/build/Debug/src/ChoreoFlocking/CMakeFiles/ChoreoFlocking.dir
-/media/dev/ChoreoFlocker/repo/ChoreoFlocker/build/Debug/src/Sandbox/CMakeFiles/rebuild_cache.dir
-/media/dev/ChoreoFlocker/repo/ChoreoFlocker/build/Debug/src/Sandbox/CMakeFiles/edit_cache.dir
-/media/dev/ChoreoFlocker/repo/ChoreoFlocker/build/Debug/src/Sandbox/CMakeFiles/Sandbox.dir
