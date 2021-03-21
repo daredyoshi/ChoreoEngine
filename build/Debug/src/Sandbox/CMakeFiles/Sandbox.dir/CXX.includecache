@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../../src/ChoreoFlocking/include/Application.h
+
+/media/dev/ChoreoFlocker/repo/ChoreoFlocker/src/Sandbox/Main.cpp
+iostream
+-
+Application.h
+-
+

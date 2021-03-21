@@ -1,13 +1,11 @@
 #pragma once
 
 
-namespace ChoreoFlocker {
+namespace ChoreoFlocking{
     class Application {
     public:
         Application();
         virtual ~Application();
         void run();
     };
-
-
 }

@@ -1,11 +1,13 @@
 #include "Application.h"
 
 
-namespace ChoreoFlocker {
+namespace ChoreoFlocking {
     Application::Application(){
 
     }
-    
+    Application::~Application(){
+
+    }
     void Application::run(){
         while(true);
     }
