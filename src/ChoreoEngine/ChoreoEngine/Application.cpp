@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-namespace ChoreoFlocking {
+namespace ChoreoEngine {
     Application::Application(){
 
     }

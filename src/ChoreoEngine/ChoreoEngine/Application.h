@@ -2,7 +2,7 @@
 
 #include "Core.h"
 
-namespace ChoreoFlocking{
+namespace ChoreoEngine{
     class Application {
     public:
         Application();
