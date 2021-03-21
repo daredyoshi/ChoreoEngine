@@ -1,9 +1,9 @@
 
-#include "ChoreoFlocking/Application.h"
+#include "ChoreoEngine/Application.h"
 #include <iostream>
-#include <ChoreoFlocking.h>
+#include <ChoreoEngine.h>
 
-class Sandbox : public ChoreoFlocking::Application{
+class Sandbox : public ChoreoEngine::Application{
 public:
     Sandbox(){
     }
@@ -13,6 +13,6 @@ public:
     }
 };
 
-ChoreoFlocking::Application* ChoreoFlocking::CreateApplication(){
+ChoreoEngine::Application* ChoreoEngine::CreateApplication(){
     return new Sandbox();
 }

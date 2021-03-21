@@ -2,8 +2,8 @@
 *.d
 
 *.cache*
-*/build/*
-*/bin/*
+build/*
+bin/*
 # Compiled Object files
 *.slo
 *.lo
