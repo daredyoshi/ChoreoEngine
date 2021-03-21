@@ -1,7 +1,6 @@
 
-#include "ChoreoEngine/Application.h"
 #include <iostream>
-#include <ChoreoEngine.h>
+#include "ChoreoEngine.h"
 
 class Sandbox : public ChoreoEngine::Application{
 public:

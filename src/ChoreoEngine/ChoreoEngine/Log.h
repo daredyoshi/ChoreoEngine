@@ -23,36 +23,36 @@ namespace ChoreoEngine {
 
 // if dist build
 
-#ifdef DEBUG
+#ifdef CE_DEBUG
 // Core log macros
-#define CF_CORE_TRACE(...)      ::ChoreoEngine::Log::GetCoreLogger()->trace(__VA_ARGS__)
-#define CF_CORE_INFO(...)       ::ChoreoEngine::Log::GetCoreLogger()->info(__VA_ARGS__)
-#define CF_CORE_WARN(...)       ::ChoreoEngine::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define CF_CORE_ERROR(...)      ::ChoreoEngine::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define CF_CORE_FATAL(...)      ::ChoreoEngine::Log::GetCoreLogger()->fatal(__VA_ARGS__)
+#define CE_CORE_TRACE(...)      ::ChoreoEngine::Log::GetCoreLogger()->trace(__VA_ARGS__)
+#define CE_CORE_INFO(...)       ::ChoreoEngine::Log::GetCoreLogger()->info(__VA_ARGS__)
+#define CE_CORE_WARN(...)       ::ChoreoEngine::Log::GetCoreLogger()->warn(__VA_ARGS__)
+#define CE_CORE_ERROR(...)      ::ChoreoEngine::Log::GetCoreLogger()->error(__VA_ARGS__)
+#define CE_CORE_FATAL(...)      ::ChoreoEngine::Log::GetCoreLogger()->fatal(__VA_ARGS__)
 
 
 // Client log macros
-#define CF_TRACE(...)           ::ChoreoEngine::Log::GetClientLogger()->trace(__VA_ARGS__)
-#define CF_INFO(...)            ::ChoreoEngine::Log::GetClientLogger()->info(__VA_ARGS__)
-#define CF_WARN(...)            ::ChoreoEngine::Log::GetClientLogger()->warn(__VA_ARGS__)
-#define CF_ERROR(...)           ::ChoreoEngine::Log::GetClientLogger()->error(__VA_ARGS__)
-#define CF_FATAL(...)           ::ChoreoEngine::Log::GetClientLogger()->fatal(__VA_ARGS__)
+#define CE_TRACE(...)           ::ChoreoEngine::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define CE_INFO(...)            ::ChoreoEngine::Log::GetClientLogger()->info(__VA_ARGS__)
+#define CE_WARN(...)            ::ChoreoEngine::Log::GetClientLogger()->warn(__VA_ARGS__)
+#define CE_ERROR(...)           ::ChoreoEngine::Log::GetClientLogger()->error(__VA_ARGS__)
+#define CE_FATAL(...)           ::ChoreoEngine::Log::GetClientLogger()->fatal(__VA_ARGS__)
 
 #else
 
-#define CF_CORE_TRACE(...) 
-#define CF_CORE_INFO(...)  
-#define CF_CORE_WARN(...)  
-#define CF_CORE_ERROR(...) 
-#define CF_CORE_FATAL(...) 
+#define CE_CORE_TRACE(...) 
+#define CE_CORE_INFO(...)  
+#define CE_CORE_WARN(...)  
+#define CE_CORE_ERROR(...) 
+#define CE_CORE_FATAL(...) 
 
 
 // Client log macros
-#define CF_TRACE(...)      
-#define CF_INFO(...)       
-#define CF_WARN(...)       
-#define CF_ERROR(...)      
-#define CF_FATAL(...)      
+#define CE_TRACE(...)      
+#define CE_INFO(...)       
+#define CE_WARN(...)       
+#define CE_ERROR(...)      
+#define CE_FATAL(...)      
 
 #endif

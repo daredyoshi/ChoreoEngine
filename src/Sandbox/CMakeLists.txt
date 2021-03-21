@@ -4,10 +4,9 @@ set(
     SandboxSources
     SandboxApp.cpp
     )
-include_directories(${ChoreoFlocking_SOURCE_DIR}/src/ChoreoFlocking/)
-message(${ChoreoFlocking_SOURCE_DIR}/src/ChoreoFlocking/include)
-link_directories(${ChoreoFlocking_SOURCE_DIR}/src/ChoreoFlocking/src)
+include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/)
+link_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/)
 add_executable(
     Sandbox ${SandboxSources} 
 )
-target_link_libraries(Sandbox PUBLIC ChoreoFlocking)
+target_link_libraries(Sandbox PUBLIC ChoreoEngine)

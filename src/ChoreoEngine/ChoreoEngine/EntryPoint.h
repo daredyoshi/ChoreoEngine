@@ -13,9 +13,9 @@ int main(int argc, char** argv)
     (void)argv;
 
     ChoreoEngine::Log::Init();
-    CF_CORE_WARN("Initiliazed Log!");
+    CE_CORE_WARN("Initiliazed Log!");
     int a{6};
-    CF_INFO("Testing things Var={0}", a);
+    CE_INFO("Testing things Var={0}", a);
     auto app = ChoreoEngine::CreateApplication();
 
     app->run();
