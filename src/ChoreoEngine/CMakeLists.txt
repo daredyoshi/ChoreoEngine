@@ -6,6 +6,7 @@ find_package(spdlog REQUIRED)
 # include_directories(${ASSIMP_INCLUDE_DIR})
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/dependencies)
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/ChoreoEngine)
+include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/)
 # link_directories(include)
 # find_package( Boost 1.40 COMPONENTS program_options REQUIRED )
 
