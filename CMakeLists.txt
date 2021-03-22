@@ -15,6 +15,7 @@ set(msvc_flags "-W3")
 
 # set up a Choreo Debug variable
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCE_DEBUG")
+set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
 
 # ideally you would set these cmake
 set (BUILD_SHARED_LIBS ON)
