@@ -1,6 +1,5 @@
-cmake_minimum_required (VERSION 3.14) 
-project (ChoreoEngine VERSION 0.0.1)
-
+cmake_minimum_required (VERSION 3.16) 
+project (ChoreoEngine VERSION 0.0.1 LANGUAGES CXX)
 # This is so Ycm can find and complete
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 

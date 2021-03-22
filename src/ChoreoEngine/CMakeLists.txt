@@ -20,9 +20,14 @@ set(
 add_library(
     ChoreoEngine ${ChoreoEngineSources}
 )
+
+target_precompile_headers(ChoreoEngine 
+    PRIVATE
+    "cepch.h"
+    )
 # target_compile_features(ChoreoEngine PUBLIC cxx_std_17)
 target_link_libraries(ChoreoEngine PUBLIC glfw OpenGL::GL ${CMAKE_DL_LIBS} ${ASSIMP_LIBRARIES} spdlog::spdlog)
 # target_compile_options(ChoreoEngine PRIVATE
 #     "$<${gcc_like_cxx}:$<BUILD_INTERFACE:${gcc_flags}>>" "$<${msvc_cxx}: $<BUILD_INTERFACE:${msvc_flags}>>"
 #     )
-set_target_properties(ChoreoEngine PROPERTIES LINKER_LANGUAGE CXX)
+
