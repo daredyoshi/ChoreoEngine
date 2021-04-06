@@ -45,7 +45,7 @@ namespace ChoreoEngine {
     };
 
 // this is just to avoid duplicate code for every subclass
-#define EVENT_CLASS_TYPE(type)  static EventType getStaticType() { return EventType::type; } \
+#define EVENT_CLASS_TYPE(type)  static EventType getStaticType() { return EventType::type; }\
                                 virtual EventType getEventType() const override { return getStaticType(); }\
                                 virtual const char* getName() const override { return #type; } 
 

@@ -20,13 +20,9 @@ namespace ChoreoEngine {
             return ss.str();
         }
 
-        // EVENT_CLASS_TYPE(WindowResize)
-        // EVENT_CLASS_CATEGORY(EventCategoryApplication)
-        static EventType getStaticType() { return EventType::WindowResize; } \
-        virtual EventType getEventType() const override { return getStaticType(); }\
-        virtual const char* getName() const override { return "WindowResize"; } 
+        EVENT_CLASS_TYPE(WindowResize)
+        EVENT_CLASS_CATEGORY(EventCategoryApplication)
 
-        virtual int getCategoryFlags() const override { return EventCategoryApplication; }
     private:
         unsigned int m_width;
         unsigned int m_height;

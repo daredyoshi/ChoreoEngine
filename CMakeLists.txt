@@ -1,6 +1,5 @@
-cmake_minimum_required (VERSION 3.14) 
-project (ChoreoEngine VERSION 1.0)
-
+cmake_minimum_required (VERSION 3.16) 
+project (ChoreoEngine VERSION 0.0.1 LANGUAGES CXX)
 # This is so Ycm can find and complete
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -13,8 +12,8 @@ set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
 set(gcc_flags "-Wall;-Werror;-Wunused;-Wno-unused-variable;-Wextra;-Wshadow;-Wshadow;-Wformat=2;-pedantic-errors;-std=c++17")
 set(msvc_flags "-W3")
 
-# set up a Choreo Debug variable and asserts
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCE_DEBUG -DCE_ENABLE_ASSERTS")
+# set up a Choreo Debug variable
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCE_DEBUG")
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
 
 # ideally you would set these cmake
