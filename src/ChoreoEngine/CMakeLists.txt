@@ -12,15 +12,21 @@ include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/ChoreoEngine)
 # Add the core lib
 set(
     ChoreoEngineSources 
-    ChoreoEngine/Application.cpp
-    ChoreoEngine/Log.cpp
     dependencies/glad.c
+    ChoreoEngine/Application.cpp
+    ChoreoEngine/Platform/Linux/LinuxWindow.cpp
+    ChoreoEngine/Log.cpp
     dependencies/stb_image.cpp
     )
 add_library(
     ChoreoEngine ${ChoreoEngineSources}
 )
-# target_compile_features(ChoreoEngine PUBLIC cxx_std_17)
+
+target_precompile_headers(ChoreoEngine 
+    PRIVATE
+    "cepch.h"
+    )
+target_compile_features(ChoreoEngine PUBLIC cxx_std_17)
 target_link_libraries(ChoreoEngine PUBLIC glfw OpenGL::GL ${CMAKE_DL_LIBS} ${ASSIMP_LIBRARIES} spdlog::spdlog)
 # target_compile_options(ChoreoEngine PRIVATE
 #     "$<${gcc_like_cxx}:$<BUILD_INTERFACE:${gcc_flags}>>" "$<${msvc_cxx}: $<BUILD_INTERFACE:${msvc_flags}>>"

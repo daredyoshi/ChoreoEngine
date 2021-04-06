@@ -1,10 +1,12 @@
 #pragma once
 
-#include "ChoreoEngine/Application.h"
-#include "ChoreoEngine/Core.h"
-#include "ChoreoEngine/Log.h"
+#include "Application.h"
+
+#include "Platform/Linux/LinuxWindow.h"
+#include "Core.h"
+#include "Log.h"
 
 
 // --- Entry Point ------------------------
-#include "ChoreoEngine/EntryPoint.h"
+#include "EntryPoint.h"
 // ----------------------------------------

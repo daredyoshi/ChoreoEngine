@@ -2,9 +2,10 @@
 #include <iostream>
 #include "ChoreoEngine.h"
 
+
 class Sandbox : public ChoreoEngine::Application{
 public:
-    Sandbox(){
+    Sandbox(const std::string& name) : Application(name){
     }
 
     ~Sandbox(){
@@ -13,5 +14,5 @@ public:
 };
 
 ChoreoEngine::Application* ChoreoEngine::CreateApplication(){
-    return new Sandbox();
+    return new Sandbox("test");
 }
