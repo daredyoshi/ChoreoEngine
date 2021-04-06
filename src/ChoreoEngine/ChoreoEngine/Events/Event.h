@@ -63,9 +63,12 @@ namespace ChoreoEngine {
         virtual EventType getEventType() const = 0;
         virtual const char* getName() const = 0;
         virtual int getCategoryFlags() const = 0;
+
+        bool getHandled() const { return m_handled; }
         // useful for debugging
         operator std::string() const { return toString(); }
         virtual std::string toString() const { return getName(); }
+
 
         inline bool IsInCategory(EventCategory category){
             return getCategoryFlags() & category;
@@ -92,13 +95,13 @@ namespace ChoreoEngine {
         // If the event that is being dispatched matches the function it will 
         // actually run that function
         template<typename T>
-            bool Dispatch(EventFn<T> func){
-                if (m_event.getEventType() == T::GetStaticType()){
-                    m_event.m_handled = func(*(T*)&m_event);
-                    return true;
-                }
-                return false;
+        bool Dispatch(EventFn<T> func){
+            if (m_event.getEventType() == T::getStaticType()){
+                m_event.m_handled = func(*(T*)&m_event);
+                return true;
             }
+            return false;
+        }
 
     private:
         Event& m_event;

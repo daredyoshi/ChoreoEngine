@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Application.h"
-
-#include "Platform/Linux/LinuxWindow.h"
+#include "Layer.h"
 #include "Core.h"
 #include "Log.h"
 

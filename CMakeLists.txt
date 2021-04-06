@@ -23,13 +23,11 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# At first I tried building glad with ChoreoEngine, but then it 
+# wasn't linking. Seems nice to have it as it's own lib anyway :P
+add_subdirectory(src/dependencies/glad)
 add_subdirectory(src/ChoreoEngine)
 add_subdirectory(src/Sandbox)
 
 
-target_compile_features(Sandbox PUBLIC cxx_std_17)
-target_link_libraries(Sandbox PUBLIC ChoreoEngine)
-target_compile_options(Sandbox PRIVATE
-    "$<${gcc_like_cxx}:$<BUILD_INTERFACE:${gcc_flags}>>" "$<${msvc_cxx}: $<BUILD_INTERFACE:${msvc_flags}>>"
-    )
 

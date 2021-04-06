@@ -1,6 +1,7 @@
 #include "cepch.h"
-#include "LinuxWindow.h"
 
+
+#include "LinuxWindow.h"
 #include "Events/Application.h"
 #include "Events/MouseEvent.h"
 #include "Events/KeyEvent.h"
@@ -32,7 +33,7 @@ namespace ChoreoEngine{
         m_data.width = props.width;
         m_data.height = props.height;
 
-        CE_CORE_INFO("Createing window {0} ({1}, {2})", 
+        CE_CORE_INFO("Creating window {0} ({1}, {2})", 
                 props.title, props.width, props.height); 
 
         if (!s_GLFWInitialized){
@@ -50,6 +51,7 @@ namespace ChoreoEngine{
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             
         m_window = glfwCreateWindow((int)props.width, (int)props.height, "LearnOpenGL", NULL, NULL);
+        glfwMakeContextCurrent(m_window);
 
         if ( m_window == NULL ){
             CE_CORE_ERROR( "Failed to create GLFW window" );
@@ -57,11 +59,10 @@ namespace ChoreoEngine{
         }
         // this was in the open gl tutorial BUT it makes linking problems with le sandbox app
         // initilize glad
-        // if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-        //     CE_CORE_ERROR("Failed to initialize GLAD" );
-        // }
+        if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+            CE_CORE_ERROR("Failed to initialize GLAD" );
+        }
 
-        glfwMakeContextCurrent(m_window);
         // this passes data into the callbacks of the window
         glfwSetWindowUserPointer(m_window, &m_data);
         setVSync(true);
@@ -83,6 +84,8 @@ namespace ChoreoEngine{
         });
 
         glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods){         
+            (void)mods;
+            (void)scancode;
             WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
             switch(action){
@@ -108,6 +111,7 @@ namespace ChoreoEngine{
         });
 
         glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods){  
+            (void)mods;
             WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
             switch(action){

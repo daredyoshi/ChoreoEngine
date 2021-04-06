@@ -12,5 +12,5 @@
 #include <functional>
 #include <algorithm>
 
-#include "Log.h"
 #include <fmt/ostream.h>
+#include "Log.h"
