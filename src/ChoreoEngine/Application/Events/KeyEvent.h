@@ -39,6 +39,22 @@ namespace ChoreoEngine {
         int m_RepeatCount;
     };
 
+   class KeyTypedEvent: public KeyEvent {
+    public:
+        // not sure if we want to keep track of how many times the key has repeated
+        // but this can also just work as a boolean to see wether to re-trigger shits
+        KeyTypedEvent(int keyCode)
+            : KeyEvent(keyCode) {}
+
+
+        std::string toString() const override {
+            std::stringstream ss;
+            ss << "KeyTypedEvent: " << m_KeyCode;
+            return ss.str();
+        }
+        EVENT_CLASS_TYPE(KeyTyped);
+    };
+
 
     class KeyReleasedEvent : public KeyEvent {
     public:

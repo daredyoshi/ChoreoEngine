@@ -7,9 +7,9 @@ set(
     )
 
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine)
-include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/ChoreoEngine)
+include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/Application)
 link_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/)
-link_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/ChoreoEngine)
+link_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/Application)
 
 add_executable(
     Sandbox ${SandboxSources} 

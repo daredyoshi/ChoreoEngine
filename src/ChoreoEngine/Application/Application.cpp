@@ -6,11 +6,15 @@
 
 namespace ChoreoEngine {
 
-#define CE_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
+
+    Application* Application::s_instance = nullptr;
 
     Application::Application(const std::string& name){
+        CE_CORE_ASSERT(s_instance, "Application already exists!");
         m_window = std::unique_ptr<Window>{Window::create(WindowProps(name))};
         m_window->setEventCallback(CE_BIND_EVENT_FN(Application::onEvent));
+
+        s_instance = this;
     }
     Application::~Application(){
 
@@ -18,15 +22,17 @@ namespace ChoreoEngine {
 
     void Application::pushLayer(Layer* layer){
         m_layerStack.pushLayer(layer);
+        layer->onAttach();
     }
 
-    void Application::PushOverlay(Layer* layer){
+    void Application::pushOverlay(Layer* layer){
         m_layerStack.pushOverlay(layer);
+        layer->onAttach();
     }
 
     void Application::onEvent(Event& e){
         EventDispatcher dispatcher(e);
-        dispatcher.Dispatch<WindowCloseEvent>(CE_BIND_EVENT_FN(Application::onWindowClose));
+        dispatcher.dispatch<WindowCloseEvent>(CE_BIND_EVENT_FN(Application::onWindowClose));
         CE_CORE_INFO("{0}", e);         
 
         // work backwards through the layer stack until event is handled

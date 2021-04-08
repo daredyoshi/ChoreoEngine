@@ -20,6 +20,7 @@ class Sandbox : public ChoreoEngine::Application{
 public:
     Sandbox(const std::string& name) : Application(name){
         pushLayer( new ExampleLayer() );
+        pushOverlay(new ChoreoEngine::ImGuiLayer());
     }
 
     ~Sandbox(){
