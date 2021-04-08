@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "Input.h"
 
 
 namespace ChoreoEngine {
@@ -52,6 +53,9 @@ namespace ChoreoEngine {
             // draw layers from begin (lowest) to end (highest/ui)
             for (Layer* layer : m_layerStack)
                 layer->onUpdate();
+
+            auto[x, y] = Input::getMousePosition();
+            CE_CORE_TRACE("{0}, {1}", x, y);
 
             m_window->onUpdate(); 
         };

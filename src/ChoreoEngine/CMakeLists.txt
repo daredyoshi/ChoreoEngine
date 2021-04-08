@@ -16,6 +16,7 @@ set(
     Application/LayerStack.cpp
     Application/ImGui/ImGuiLayer.cpp
     Application/Platform/Linux/LinuxWindow.cpp
+    Application/Platform/Linux/LinuxInput.cpp
     Application/Platform/OpenGL/imgui_impl_opengl3.cpp
     Application/Log.cpp
     )
