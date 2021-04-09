@@ -8,6 +8,7 @@ set(
 
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine)
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/Application)
+include_directories(${ChoreoEngine_SOURCE_DIR}/src/dependencies/imgui/)
 link_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/)
 link_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/Application)
 
@@ -19,4 +20,4 @@ target_compile_options(Sandbox PRIVATE
     "$<${gcc_like_cxx}:$<BUILD_INTERFACE:${gcc_flags}>>" "$<${msvc_cxx}: $<BUILD_INTERFACE:${msvc_flags}>>"
     )
 target_compile_features(Sandbox PUBLIC cxx_std_17)
-target_link_libraries(Sandbox PUBLIC ChoreoEngine)
+target_link_libraries(Sandbox PUBLIC imgui ChoreoEngine)

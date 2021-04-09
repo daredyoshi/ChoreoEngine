@@ -18,6 +18,8 @@ namespace ChoreoEngine {
         virtual void onDetach() {}
         // layer updated (per frame)
         virtual void onUpdate() {}
+        // imgui render layer
+        virtual void onImGuiRender() {}
         // layer recieves/intercepts event. 
         virtual void onEvent(Event& event);
 

@@ -3,89 +3,51 @@
 #include "ImGui/ImGuiLayer.h"
 #include "Application.h"
 #include "KeyCodes.h"
-#include "Platform/OpenGL/imgui_impl_opengl3.h"
+// The macro is defined in the cmake
+// #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <imgui.h>
+#include "backends/imgui_impl_opengl3.h"
+#include "backends/imgui_impl_glfw.h"
 
 // TEMPORARY until OpenGL layer
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 
 namespace ChoreoEngine {
     ImGuiLayer::ImGuiLayer(){}
-    
     ImGuiLayer::~ImGuiLayer(){}
 
-
-    void ImGuiLayer::onUpdate(){
-
-        ImGuiIO& io = ImGui::GetIO(); 
-        Application& app = Application::get(); 
-        io.DisplaySize = ImVec2(app.getWindow().getWidth(), app.getWindow().getHeight());
-
-        float time = app.getWindow().getTime();
-        io.DeltaTime = m_time > 0.0 ? (time - m_time) : (1.0f / 60.0f); 
-        m_time = time;
-
-
-        ImGui_ImplOpenGL3_NewFrame();
-        
-
-        ImGui::NewFrame();
-
-        static bool show = true;
-        ImGui::ShowDemoWindow(&show);
-
-        ImGui::Render();
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        
-    }
-
-    void ImGuiLayer::onEvent(Event& event){
-        EventDispatcher dispatcher(event);
-        dispatcher.dispatch<MouseButtonPressedEvent>(CE_BIND_EVENT_FN(ImGuiLayer::onMouseButtonPressedEvent));
-        dispatcher.dispatch<MouseButtonReleasedEvent>(CE_BIND_EVENT_FN(ImGuiLayer::onMouseButtonReleasedEvent));
-        dispatcher.dispatch<MouseMovedEvent>(CE_BIND_EVENT_FN(ImGuiLayer::onMouseMovedEvent));
-        dispatcher.dispatch<MouseScrollEvent>(CE_BIND_EVENT_FN(ImGuiLayer::onMouseScrolledEvent));
-        dispatcher.dispatch<KeyReleasedEvent>(CE_BIND_EVENT_FN(ImGuiLayer::onKeyReleasedEvent));
-        dispatcher.dispatch<KeyTypedEvent>(CE_BIND_EVENT_FN(ImGuiLayer::onKeyTypedEvent));
-        dispatcher.dispatch<KeyPressedEvent>(CE_BIND_EVENT_FN(ImGuiLayer::onKeyPressedEvent));
-        dispatcher.dispatch<WindowResizeEvent>(CE_BIND_EVENT_FN(ImGuiLayer::onWindowResizeEvent));
-    }
-
     void ImGuiLayer::onAttach(){
+        // Setup Dear ImGui context
+        IMGUI_CHECKVERSION();
         ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+        //io.ConfigViewportsNoAutoMerge = true;
+        //io.ConfigViewportsNoTaskBarIcon = true;
+
+        // Setup Dear ImGui style
         ImGui::StyleColorsDark();
+        //ImGui::StyleColorsClassic();
 
-        ImGuiIO& io = ImGui::GetIO();
-        io.BackendFlags = ImGuiBackendFlags_HasMouseCursors;
-        io.BackendFlags = ImGuiBackendFlags_HasSetMousePos;
+        // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+        ImGuiStyle& style = ImGui::GetStyle();
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            style.WindowRounding = 0.0f;
+            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        }
+        
+        Application& app = Application::get();
+        GLFWwindow* window = static_cast<GLFWwindow*>(app.getWindow().getNativeWindow());
 
-        // TEMPORARY: SHOULD USE CHOREO ENGINE KEYKODES
-        io.KeyMap[ImGuiKey_Tab] = CE_KEY_TAB;
-        io.KeyMap[ImGuiKey_LeftArrow] = CE_KEY_LEFT;
-        io.KeyMap[ImGuiKey_RightArrow] = CE_KEY_RIGHT;
-        io.KeyMap[ImGuiKey_UpArrow] = CE_KEY_UP;
-        io.KeyMap[ImGuiKey_DownArrow] = CE_KEY_DOWN;
-        io.KeyMap[ImGuiKey_PageUp] = CE_KEY_PAGE_UP;
-        io.KeyMap[ImGuiKey_PageDown] = CE_KEY_PAGE_DOWN;
-        io.KeyMap[ImGuiKey_Home] = CE_KEY_HOME;
-        io.KeyMap[ImGuiKey_End] = CE_KEY_END;
-        io.KeyMap[ImGuiKey_Insert] = CE_KEY_INSERT;
-        io.KeyMap[ImGuiKey_Delete] = CE_KEY_DELETE;
-        io.KeyMap[ImGuiKey_Backspace] = CE_KEY_BACKSPACE;
-        io.KeyMap[ImGuiKey_Space] = CE_KEY_SPACE;
-        io.KeyMap[ImGuiKey_Enter] = CE_KEY_ENTER;
-        io.KeyMap[ImGuiKey_Escape] = CE_KEY_ESCAPE;
-        io.KeyMap[ImGuiKey_KeyPadEnter] = CE_KEY_KP_ENTER;
-        io.KeyMap[ImGuiKey_A] = CE_KEY_A;
-        io.KeyMap[ImGuiKey_C] = CE_KEY_C;
-        io.KeyMap[ImGuiKey_V] = CE_KEY_V;
-        io.KeyMap[ImGuiKey_X] = CE_KEY_X;
-        io.KeyMap[ImGuiKey_Y] = CE_KEY_Y;
-        io.KeyMap[ImGuiKey_Z] = CE_KEY_Z;
-
-        ImGui_ImplOpenGL3_Init("#version 410");
+        // Setup Platform/Renderer backends
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplOpenGL3_Init("#version 130");
 
         // Temporary until we implement proper dpi scaling
         // The proper way is to recompile the fonts as described here
@@ -98,81 +60,38 @@ namespace ChoreoEngine {
     }
 
     void ImGuiLayer::onDetach(){
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
 
     }
 
-	bool ImGuiLayer::onKeyPressedEvent(KeyPressedEvent& e)
-	{
+    void ImGuiLayer::begin(){
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+    }
+
+    void ImGuiLayer::end(){
         ImGuiIO& io = ImGui::GetIO();
-        io.KeysDown[ e.getKeyCode() ] = true;
-		return true;
-	}
+        Application& app = Application::get();
+        io.DisplaySize = ImVec2(app.getWindow().getWidth(), app.getWindow().getHeight());
 
-	bool ImGuiLayer::onKeyReleasedEvent(KeyReleasedEvent& e)
-	{
-        ImGuiIO& io = ImGui::GetIO();
-        io.KeysDown[ e.getKeyCode() ] = false; 
+        // Rendering 
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        // this is also temporary until we support key down queries
-        io.KeyCtrl = io.KeysDown[CE_KEY_LEFT_CONTROL] || io.KeysDown[CE_KEY_RIGHT_CONTROL];
-        io.KeyShift= io.KeysDown[CE_KEY_LEFT_SHIFT] || io.KeysDown[CE_KEY_RIGHT_SHIFT];
-        io.KeyAlt= io.KeysDown[CE_KEY_LEFT_ALT] || io.KeysDown[CE_KEY_RIGHT_ALT];
-        io.KeySuper = io.KeysDown[CE_KEY_LEFT_SUPER] || io.KeysDown[CE_KEY_RIGHT_SUPER];
+        if(io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable){
+            GLFWwindow* backup_current_context = glfwGetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backup_current_context);
+        }
+    }
 
-		return false;
-	}
+    void ImGuiLayer::onImGuiRender(){
+        static bool show = true;
+        ImGui::ShowDemoWindow(&show);
 
-	bool ImGuiLayer::onKeyTypedEvent(KeyTypedEvent& e)
-	{
-        ImGuiIO& io = ImGui::GetIO();
-        int keycode = e.getKeyCode();
-        if (keycode > 0 && keycode < 0x100000)
-            io.AddInputCharacter((unsigned short)keycode);
-
-		return false;
-	}
-
-	bool ImGuiLayer::onMouseButtonPressedEvent(MouseButtonPressedEvent& e)
-	{
-        ImGuiIO& io = ImGui::GetIO();
-        io.MouseDown[ e.getMouseButton() ] = true;
-        // other layers could potentially need / handle this
-        // we could also try detecting if the mouse if over a button and
-        // then intercept the click only then but this is too much effort.
-        // right now.
-		return false;
-	}
-
-	bool ImGuiLayer::onMouseButtonReleasedEvent(MouseButtonReleasedEvent& e)
-	{
-        ImGuiIO& io = ImGui::GetIO();
-        io.MouseDown[ e.getMouseButton() ] = false;
-		return false;
-	}
-
-	bool ImGuiLayer::onMouseMovedEvent(MouseMovedEvent& e)
-	{
-        ImGuiIO& io = ImGui::GetIO();
-        io.MousePos = ImVec2(e.getX(), e.getY());
-		return false;
-	}
-
-	bool ImGuiLayer::onMouseScrolledEvent(MouseScrollEvent& e)
-	{
-        ImGuiIO& io = ImGui::GetIO();
-        io.MouseWheel= e.getYOffset();
-        io.MouseWheelH= e.getXOffset();
-		return false;
-	}
-
-	bool ImGuiLayer::onWindowResizeEvent(WindowResizeEvent& e)
-	{
-        ImGuiIO& io = ImGui::GetIO();
-        io.DisplaySize = ImVec2(e.getWidth(), e.getHeight());
-        io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f); 
-        // this should be set somewhere else
-        glViewport(0, 0, e.getWidth(), e.getHeight());
-		return false;
-	}
-
+    }
 }

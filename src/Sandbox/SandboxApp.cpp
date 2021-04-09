@@ -1,22 +1,20 @@
 
 #include <iostream>
 #include "ChoreoEngine.h"
+#include "imgui.h"
 
 class ExampleLayer : public ChoreoEngine::Layer{
 public:
     ExampleLayer()
         : Layer("Example"){}
 
-    void onUpdate() override{
-
-        if (ChoreoEngine::Input::isKeyPressed(CE_KEY_TAB)) 
-            CE_INFO("Tab key is pressed");
+    
+    virtual void onImGuiRender() override {
+        ImGui::Begin("ChoreoGrapher::Test");
+        ImGui::Text("HelloWorld");
+        ImGui::End();
     }
 
-    void onEvent(ChoreoEngine::Event& event) override{
-        (void)event;
-        // CE_TRACE("{0}", event);
-    }
 };
 
 class Sandbox : public ChoreoEngine::Application{
@@ -32,5 +30,5 @@ public:
 };
 
 ChoreoEngine::Application* ChoreoEngine::CreateApplication(){
-    return new Sandbox("test");
+    return new Sandbox("ChoreoGrapher");
 }

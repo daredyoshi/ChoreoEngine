@@ -52,7 +52,7 @@ namespace ChoreoEngine{
         glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             
-        m_window = glfwCreateWindow((int)props.width, (int)props.height, "LearnOpenGL", NULL, NULL);
+        m_window = glfwCreateWindow((int)props.width, (int)props.height, m_data.title.c_str(), NULL, NULL);
         glfwMakeContextCurrent(m_window);
 
         if ( m_window == NULL ){

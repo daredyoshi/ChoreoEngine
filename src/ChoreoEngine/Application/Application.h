@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "Events/Application.h"
 #include "LayerStack.h"
+#include "ImGui/ImGuiLayer.h"
 #include "Window.h"
 #include <memory>
 
@@ -23,6 +24,7 @@ namespace ChoreoEngine{
     private:
         bool onWindowClose(WindowCloseEvent& e);
         std::unique_ptr<Window> m_window;
+        ImGuiLayer* m_imGuiLayer;
         bool m_running{true};
         LayerStack m_layerStack;
 
