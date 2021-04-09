@@ -151,6 +151,10 @@ namespace ChoreoEngine{
 
     }
 
+    float LinuxWindow::getTime() const { 
+        return (float)glfwGetTime();
+    }
+
     void LinuxWindow::shutdown(){
         glfwDestroyWindow(m_window);
     }

@@ -8,11 +8,14 @@ public:
         : Layer("Example"){}
 
     void onUpdate() override{
-        // CE_INFO("ExampleLayer::Update");
+
+        if (ChoreoEngine::Input::isKeyPressed(CE_KEY_TAB)) 
+            CE_INFO("Tab key is pressed");
     }
 
     void onEvent(ChoreoEngine::Event& event) override{
-        CE_TRACE("{0}", event);
+        (void)event;
+        // CE_TRACE("{0}", event);
     }
 };
 
