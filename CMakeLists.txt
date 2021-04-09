@@ -26,6 +26,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # At first I tried building glad with ChoreoEngine, but then it 
 # wasn't linking. Seems nice to have it as it's own lib anyway :P
 add_subdirectory(src/dependencies/glad)
+add_subdirectory(src/dependencies/imgui)
 add_subdirectory(src/dependencies/glm)
 add_subdirectory(src/ChoreoEngine)
 add_subdirectory(src/Sandbox)

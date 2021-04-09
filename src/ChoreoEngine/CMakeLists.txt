@@ -1,13 +1,8 @@
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
-find_package(glm REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(imgui REQUIRED)
 
-include_directories(${GLM_INCLUDE_DIRS})
-include_directories(${GLM_LIBRARY_DIRS})
-include_directories(${GLM_DEFINITIONS})
 
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/Application)
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/)
