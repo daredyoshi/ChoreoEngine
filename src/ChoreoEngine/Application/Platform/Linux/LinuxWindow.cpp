@@ -48,6 +48,8 @@ namespace ChoreoEngine{
         // Set glfw to use open gl version 3.3 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
+        // scale to monitor dpi
+        glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             
         m_window = glfwCreateWindow((int)props.width, (int)props.height, "LearnOpenGL", NULL, NULL);

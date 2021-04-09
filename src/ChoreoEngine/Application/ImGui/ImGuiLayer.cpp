@@ -15,6 +15,7 @@ namespace ChoreoEngine {
     
     ImGuiLayer::~ImGuiLayer(){}
 
+
     void ImGuiLayer::onUpdate(){
 
         ImGuiIO& io = ImGui::GetIO(); 
@@ -25,7 +26,10 @@ namespace ChoreoEngine {
         io.DeltaTime = m_time > 0.0 ? (time - m_time) : (1.0f / 60.0f); 
         m_time = time;
 
+
         ImGui_ImplOpenGL3_NewFrame();
+        
+
         ImGui::NewFrame();
 
         static bool show = true;
@@ -82,6 +86,15 @@ namespace ChoreoEngine {
         io.KeyMap[ImGuiKey_Z] = CE_KEY_Z;
 
         ImGui_ImplOpenGL3_Init("#version 410");
+
+        // Temporary until we implement proper dpi scaling
+        // The proper way is to recompile the fonts as described here
+        // https://github.com/ocornut/imgui/blob/master/docs/FAQ.md#q-how-should-i-handle-dpi-in-my-application
+        // You scale font by loading them at a different size
+        // https://github.com/ocornut/imgui/blob/master/docs/FONTS.md
+        // But I don't want to do that yet BECAUSE I'm not sure how to distribute fonts yet...
+        io.FontGlobalScale = 1.5;
+        
     }
 
     void ImGuiLayer::onDetach(){
