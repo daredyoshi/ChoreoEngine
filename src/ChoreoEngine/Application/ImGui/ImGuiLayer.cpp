@@ -1,8 +1,8 @@
-#include "ImGuiLayer.h"
+#include "Application/ImGui/ImGuiLayer.h"
 
-#include "ImGui/ImGuiLayer.h"
-#include "Application.h"
-#include "KeyCodes.h"
+#include "Application/ImGui/ImGuiLayer.h"
+#include "Application/Application.h"
+#include "Application/KeyCodes.h"
 // The macro is defined in the cmake
 // #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <imgui.h>

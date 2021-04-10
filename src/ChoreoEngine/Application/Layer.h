@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core.h"
-#include "Events/Event.h"
+#include "Application/Core.h"
+#include "Application/Events/Event.h"
 
 namespace ChoreoEngine {
     // This class is intended to be inherited from so that 

@@ -1,7 +1,7 @@
 #include "cepch.h"
-#include "Application.h"
+#include "Application/Application.h"
+#include "Application/Input.h"
 #include "glad/glad.h"
-#include "Input.h"
 
 
 namespace ChoreoEngine {

@@ -2,8 +2,8 @@
 
 #include "cepch.h"
 
-#include "Core.h"
-#include "Events/Event.h"
+#include "Application/Core.h"
+#include "Application/Events/Event.h"
 
 namespace ChoreoEngine {
     struct WindowProps{

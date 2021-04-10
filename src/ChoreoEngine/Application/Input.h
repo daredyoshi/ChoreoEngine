@@ -1,7 +1,7 @@
 #pragma once
 
 #include <utility>
-#include "Core.h"
+#include "Application/Core.h"
 
 
 namespace ChoreoEngine {

@@ -4,7 +4,6 @@ find_package(glfw3 3.3 REQUIRED)
 find_package(spdlog REQUIRED)
 
 
-include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/Application)
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/)
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/Application/Platform/OpenGL/)
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine/dependencies/imgui/backends/)
@@ -18,12 +17,10 @@ set(
     Application/Layer.cpp
     Application/LayerStack.cpp
     Application/ImGui/ImGuiLayer.cpp
-    # Application/ImGui/ImGuiBuild.cpp
     Application/Platform/Linux/LinuxWindow.cpp
     Application/Platform/Linux/LinuxInput.cpp
     ../dependencies/imgui/backends/imgui_impl_opengl3.cpp
     ../dependencies/imgui/backends/imgui_impl_glfw.cpp
-    # Application/Platform/OpenGL/imgui_impl_opengl3.cpp
     Application/Log.cpp
     )
 add_library(

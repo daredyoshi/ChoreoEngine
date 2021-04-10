@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core.h"
-#include "Events/Application.h"
-#include "LayerStack.h"
-#include "ImGui/ImGuiLayer.h"
-#include "Window.h"
+#include "Application/Core.h"
+#include "Application/Events/Application.h"
+#include "Application/LayerStack.h"
+#include "Application/ImGui/ImGuiLayer.h"
+#include "Application/Window.h"
 #include <memory>
 
 namespace ChoreoEngine{

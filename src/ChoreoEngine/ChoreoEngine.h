@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Application.h"
-#include "Layer.h"
-#include "Core.h"
-#include "Log.h"
-#include "Input.h"
-#include "KeyCodes.h"
-#include "ImGui/ImGuiLayer.h"
+#include "Application/Application.h"
+#include "Application/Layer.h"
+#include "Application/Core.h"
+#include "Application/Log.h"
+#include "Application/Input.h"
+#include "Application/KeyCodes.h"
+#include "Application/ImGui/ImGuiLayer.h"
 
 
 // --- Entry Point ------------------------
-#include "EntryPoint.h"
+#include "Application/EntryPoint.h"
 // ----------------------------------------

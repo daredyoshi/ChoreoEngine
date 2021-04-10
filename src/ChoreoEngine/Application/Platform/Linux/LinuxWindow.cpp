@@ -1,10 +1,9 @@
-#include "cepch.h"
 
 
-#include "LinuxWindow.h"
-#include "Events/Application.h"
-#include "Events/MouseEvent.h"
-#include "Events/KeyEvent.h"
+#include "Application/Platform/Linux/LinuxWindow.h"
+#include "Application/Events/Application.h"
+#include "Application/Events/MouseEvent.h"
+#include "Application/Events/KeyEvent.h"
 
 namespace ChoreoEngine{
     static bool s_GLFWInitialized{ false };

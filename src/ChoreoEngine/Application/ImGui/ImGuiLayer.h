@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Layer.h"
-#include "Events/MouseEvent.h"
-#include "Events/Application.h"
-#include "Events/KeyEvent.h"
+#include "Application/Layer.h"
+#include "Application/Events/MouseEvent.h"
+#include "Application/Events/Application.h"
+#include "Application/Events/KeyEvent.h"
 
 namespace ChoreoEngine {
     class ImGuiLayer: public Layer{

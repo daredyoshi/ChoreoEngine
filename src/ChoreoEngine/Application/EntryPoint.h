@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Application.h"
-#include "Log.h"
+#include "Application/Application.h"
+#include "Application/Log.h"
 #include <stdio.h>
 
 // this will be implemented in the client using our library

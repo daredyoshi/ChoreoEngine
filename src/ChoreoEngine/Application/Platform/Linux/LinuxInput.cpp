@@ -1,6 +1,5 @@
-#include "cepch.h"
-#include "LinuxInput.h"
-#include "Application.h"
+#include "Application/Platform/Linux/LinuxInput.h"
+#include "Application/Application.h"
 
 #include <GLFW/glfw3.h>
 
