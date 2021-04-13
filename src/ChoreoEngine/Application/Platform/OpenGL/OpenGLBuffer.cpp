@@ -7,11 +7,11 @@
 // Vertex Buffer ////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-ChoreoEngine::OpenGLVertexBuffer::OpenGLVertexBuffer( float* vertices, uint32_t count)
+ChoreoEngine::OpenGLVertexBuffer::OpenGLVertexBuffer( float* vertices, uint32_t size)
 {
     glCreateBuffers(1, &m_rendererId);
     this->bind();
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * count, vertices, GL_STATIC_DRAW);    
+    glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);    
 }
 
 ChoreoEngine::OpenGLVertexBuffer::~OpenGLVertexBuffer(){

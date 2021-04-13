@@ -21,7 +21,7 @@ namespace ChoreoEngine{
 
         glfwMakeContextCurrent(m_windowHandle);
         int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-        CE_CORE_ASSERT(ststus, "Failed to initizlize Glad!");
+        CE_CORE_ASSERT(status, "Failed to initizlize Glad!");
         CE_CORE_INFO("Open GL Renderer:"); 
         CE_CORE_INFO("   Vendor {0}", glGetString(GL_VENDOR));
         CE_CORE_INFO("   Renderer {0}", glGetString(GL_RENDERER));

@@ -21,10 +21,12 @@ set(
     Application/Platform/Linux/LinuxInput.cpp
     Application/Platform/OpenGL/OpenGLContext.cpp
     Application/Platform/OpenGL/OpenGLBuffer.cpp
+    Application/Platform/OpenGL/OpenGLVertexArray.cpp
     Application/Renderer/GraphicsContext.cpp
     Application/Renderer/Renderer.cpp
     Application/Renderer/Buffer.cpp
     Application/Renderer/Shader.cpp
+    Application/Renderer/VertexArray.cpp
     ../dependencies/imgui/backends/imgui_impl_opengl3.cpp
     ../dependencies/imgui/backends/imgui_impl_glfw.cpp
     Application/Log.cpp

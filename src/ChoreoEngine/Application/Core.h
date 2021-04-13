@@ -1,8 +1,9 @@
 #pragma once
 
 #ifdef CE_ENABLE_ASSERTS 
- 	#define CE_ASSERT(x, ...) { if(!(x)) { CE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } } 
- 	#define CE_CORE_ASSERT(x, ...) { if(!(x)) { CE_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } } 
+    #include <signal.h>
+ 	#define CE_ASSERT(x, ...) { if(!(x)) { CE_ERROR("Assertion Failed: {0}", __VA_ARGS__); raise(SIGTRAP); } } 
+ 	#define CE_CORE_ASSERT(x, ...) { if(!(x)) { CE_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); raise(SIGTRAP); } } 
  #else 
  	#define CE_ASSERT(x, ...) 
  	#define CE_CORE_ASSERT(x, ...) 

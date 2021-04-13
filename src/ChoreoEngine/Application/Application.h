@@ -9,6 +9,8 @@
 
 #include "Application/Renderer/Shader.h"
 #include "Application/Renderer/Buffer.h"
+#include "Application/Renderer/VertexArray.h"
+
 
 namespace ChoreoEngine{
     class Application {
@@ -31,10 +33,11 @@ namespace ChoreoEngine{
         bool m_running{true};
         LayerStack m_layerStack;
 
-        unsigned int m_vertexArray;
-        std::unique_ptr<VertexBuffer> m_vertexBuffer;
-        std::unique_ptr<IndexBuffer> m_indexBuffer;
-        std::unique_ptr<Shader> m_shader;
+        std::shared_ptr<VertexArray> m_vertexArray;
+        std::shared_ptr<Shader> m_shader;
+
+        std::shared_ptr<VertexArray> m_SquareVA;
+        std::shared_ptr<Shader> m_SquareShader;
 
         static Application* s_instance;
     };
