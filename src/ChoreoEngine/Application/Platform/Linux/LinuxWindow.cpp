@@ -1,9 +1,13 @@
 
 
 #include "Application/Platform/Linux/LinuxWindow.h"
+#include "Application/Platform/OpenGL/OpenGLContext.h"
 #include "Application/Events/Application.h"
 #include "Application/Events/MouseEvent.h"
 #include "Application/Events/KeyEvent.h"
+#include "Application/Renderer/GraphicsContext.h"
+
+
 
 namespace ChoreoEngine{
     static bool s_GLFWInitialized{ false };
@@ -35,6 +39,7 @@ namespace ChoreoEngine{
         CE_CORE_INFO("Creating window {0} ({1}, {2})", 
                 props.title, props.width, props.height); 
 
+
         if (!s_GLFWInitialized){
             int success = glfwInit();
             CE_CORE_ASSERT(success, "Could not initialize GLFW!");            
@@ -44,24 +49,14 @@ namespace ChoreoEngine{
             s_GLFWInitialized = true;
         } 
 
-        // Set glfw to use open gl version 3.3 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
-        // scale to monitor dpi
-        glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             
         m_window = glfwCreateWindow((int)props.width, (int)props.height, m_data.title.c_str(), NULL, NULL);
-        glfwMakeContextCurrent(m_window);
+        m_context = new OpenGLContext(m_window);
+        m_context->Init();
 
         if ( m_window == NULL ){
             CE_CORE_ERROR( "Failed to create GLFW window" );
             glfwTerminate();
-        }
-        // this was in the open gl tutorial BUT it makes linking problems with le sandbox app
-        // initilize glad
-        if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-            CE_CORE_ERROR("Failed to initialize GLAD" );
         }
 
         // this passes data into the callbacks of the window
@@ -163,7 +158,7 @@ namespace ChoreoEngine{
     void LinuxWindow::onUpdate(){
          
         glfwPollEvents();
-        glfwSwapBuffers(m_window);
+        m_context->SwapBuffers();
     }
 
     void LinuxWindow::setVSync(bool enabled){

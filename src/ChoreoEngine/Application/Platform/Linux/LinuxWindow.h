@@ -1,5 +1,6 @@
 #include "cepch.h"
 #include "Application/Window.h"
+#include "Application/Renderer/GraphicsContext.h"
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
@@ -29,6 +30,7 @@ namespace ChoreoEngine {
         virtual void shutdown();
 
         GLFWwindow* m_window;
+        GraphicsContext* m_context;
 
         struct WindowData{
             std::string title;
