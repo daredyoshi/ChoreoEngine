@@ -1,7 +1,21 @@
 #include "cepch.h"
 #include "Renderer.h"
+#include "RenderCommand.h"
 
 namespace ChoreoEngine{
-    // you can set this at runtime too
-    RendererAPI Renderer::s_rendererAPI = RendererAPI::OpenGL;
+
+	void Renderer::beginScene()
+	{
+	}
+
+	void Renderer::endScene()
+	{
+	}
+
+	void Renderer::submit(const std::shared_ptr<VertexArray>& vertexArray)
+	{
+        vertexArray->bind();
+        RenderCommand::DrawIndexed(vertexArray);
+	}
+
 }
