@@ -23,10 +23,12 @@ set(
     Application/Platform/OpenGL/OpenGLBuffer.cpp
     Application/Platform/OpenGL/OpenGLVertexArray.cpp
     Application/Platform/OpenGL/OpenGLRendererAPI.cpp
+    Application/Platform/OpenGL/OpenGLShader.cpp
     Application/Renderer/GraphicsContext.cpp
     Application/Renderer/Renderer.cpp
     Application/Renderer/Buffer.cpp
     Application/Renderer/Shader.cpp
+    Application/Renderer/Camera.cpp
     Application/Renderer/VertexArray.cpp
     Application/Renderer/RenderCommand.cpp
     Application/Renderer/RendererAPI.cpp

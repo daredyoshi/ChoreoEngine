@@ -1,25 +1,32 @@
 
 #include <iostream>
 #include "ChoreoEngine.h"
+#include "Events/Event.h"
+#include "Events/KeyEvent.h"
+#include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 class ExampleLayer : public ChoreoEngine::Layer{
 public:
     ExampleLayer()
-        : Layer("Example"){}
+        : 
+         Layer("Example") ,
+         m_cam{ChoreoEngine::OrthographicCamera{-5.0f, 5.0f, -5.0f, 5.0f}},
+         m_squarePos{0}
+         {}
 
     virtual void onAttach() override {
-
         // Vertex Array
         m_vertexArray.reset(ChoreoEngine::VertexArray::create());
 
 
         float vertices[ 3 * 6] = {
-            // positions                // colors
-            -0.5f, -0.5f, 0.0f,         1.0f, 1.0f, 1.0f,
-            0.5f, -0.5, 0.0f,           0.0f, 1.0f, 0.0f, 
-            0.0f, 0.5f, 0.0f,           0.5f, 1.0f, 0.5f
+            // positions               
+            -0.5f, -0.5f, 0.0f,        
+            0.5f, -0.5, 0.0f,           
+            0.0f, 0.5f, 0.0f,          
         };
 
         std::shared_ptr<ChoreoEngine::VertexBuffer> vertexBuffer;
@@ -28,7 +35,6 @@ public:
         // this is the order in which the data interweaves
         ChoreoEngine::BufferLayout layout = {
             { ChoreoEngine::ShaderDataType::Float3, "a_Position" },
-            { ChoreoEngine::ShaderDataType::Float3, "a_Color"}
         };
         vertexBuffer->setLayout(layout);
 
@@ -48,10 +54,10 @@ public:
 
         float squareVertices[ 3 * 6] = {
             // positions                
-            -0.5f, -0.5f, 0.0f,         
-            0.5f, -0.5, 0.0f,            
-            0.5f, 0.5f, 0.0f,           
-            -0.5f, 0.5f, 0.0f,           
+            -0.01f,  -0.01f, 0.0f,         
+             0.01f,  -0.01f,  0.0f,            
+             0.01f,   0.01f, 0.0f,           
+            -0.01f,   0.01f, 0.0f,           
         };
         m_SquareVA.reset(ChoreoEngine::VertexArray::create());
 
@@ -74,14 +80,16 @@ public:
 #version 330 core
 
 layout(location=0) in vec3 a_Position;
-layout(location=1) in vec3 a_Color;
 
-out vec3 v_color;
+uniform mat4 u_viewProjection;
+uniform mat4 u_xform;
+
+
+
 
 void main(){
-    v_color = a_Color;
     
-    gl_Position = vec4(a_Position + 0.2, 1.0); 
+    gl_Position = u_viewProjection * u_xform * vec4(a_Position , 1.0); 
 }
         )";
 
@@ -89,72 +97,102 @@ void main(){
 #version 330 core
 
 layout(location=0) out vec4 color;
-in vec3 v_color;
+uniform vec3 u_Color;
 
 void main(){
 
-    color = vec4(v_color, 1.0);
+    color = vec4(u_Color, 1.0);
 }
         )";
 
-        m_shader.reset(new ChoreoEngine::Shader(vertexSrc, fragmentSrc));
+        m_shader.reset(ChoreoEngine::Shader::create(vertexSrc, fragmentSrc));
+        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->uploadUniformFloat3("u_Color", m_squareCol);
 
-        std::string vertexSrc2 = R"(
-#version 330 core
-
-layout(location=0) in vec3 a_Position;
-
-
-void main(){
-    gl_Position = vec4(a_Position, 1.0); 
-}
-        )";
-
-        std::string fragmentSrc2= R"(
-#version 330 core
-
-layout(location=0) out vec4 color;
-
-void main(){
-
-    color = vec4(1.0, 1.0, 0.1, 1.0);
-}
-        )";
-
-        m_SquareShader.reset(new ChoreoEngine::Shader(vertexSrc2, fragmentSrc2));
     }
 
-    virtual void onUpdate() override {
+    virtual void onUpdate(ChoreoEngine::TimeStep& timestep) override {
         ChoreoEngine::RenderCommand::setClearColor(glm::vec4{ 0.1f, 0.1f, 0.1f, 1 });
         ChoreoEngine::RenderCommand::clear();
 
-        ChoreoEngine::Renderer::beginScene();
-        // this can be a mesh, or something else with overloaded fn
+        // CE_TRACE("Delta Time: {0}s ({1}ms)", timestep.getSeconds(), timestep.getMilliseconds());
 
-        m_SquareShader->Bind();
+        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_LEFT)){
+            m_camPos.x += m_camSpeed * timestep; 
+        }
+        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_RIGHT)){
+            m_camPos.x -= m_camSpeed* timestep; 
+        }
+        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_DOWN)){
+            m_camPos.y += m_camSpeed* timestep; 
+        }
+        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_UP)){
+            m_camPos.y -= m_camSpeed* timestep; 
+        }
+        
+        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_L)){
+            m_squarePos.x += m_camSpeed * timestep; 
+        }
+        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_H)){
+            m_squarePos.x -= m_camSpeed* timestep; 
+        }
+        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_K)){
+            m_squarePos.y -= m_camSpeed* timestep; 
+        }
+        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_J)){
+            m_squarePos.y += m_camSpeed* timestep; 
+        }
+        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_SPACE)){
+            m_cam.setRotation(timestep* m_cam.getRotation() + m_camSpeed * 5.0); 
+        }
+
+        // test camera movement
+        m_cam.setPosition(m_camPos);
+        // m_cam.setRotation(45.0f);
+
+
+        ChoreoEngine::Renderer::beginScene(m_cam);
+
+        // Material concept
+        // ChoreoEngine::MaterialRef material = new ChoreoEngine::Material(m_shader);
+        // material->set("u_color", redColor);
+
         // this would go on a seperate thread at some point
         // this will go into materials that will go into meshes
-        ChoreoEngine::Renderer::submit(m_SquareVA);
+        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->bind();
+        ChoreoEngine::Renderer::submit(m_shader, m_vertexArray);
 
-        m_shader->Bind();
-        ChoreoEngine::Renderer::submit(m_vertexArray);
+        for (int y{0}; y<20; y++){
+            for (int x{0}; x<20; x++){
+                std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->uploadUniformFloat3("u_Color", m_squareCol);
+
+                glm::vec3 offset{x * 0.11f, y * 0.11f, 0.0f};
+                glm::mat4 xform = glm::translate(glm::mat4{1}, m_squarePos + offset);
+                ChoreoEngine::Renderer::submit(m_shader, m_SquareVA, xform);
+            }
+        }
 
         ChoreoEngine::Renderer::endScene();
-        CE_INFO("test udpate");
     }
     
     virtual void onImGuiRender() override {
-        ImGui::Begin("ChoreoGrapher::Test");
-        ImGui::Text("HelloWorld");
+        ImGui::Begin("Settings");
+        ImGui::ColorEdit3("Square Color", glm::value_ptr(m_squareCol));
         ImGui::End();
     }
+
 
 private:
     std::shared_ptr<ChoreoEngine::VertexArray> m_vertexArray;
     std::shared_ptr<ChoreoEngine::Shader> m_shader;
 
     std::shared_ptr<ChoreoEngine::VertexArray> m_SquareVA;
-    std::shared_ptr<ChoreoEngine::Shader> m_SquareShader;
+
+    ChoreoEngine::OrthographicCamera m_cam;
+    glm::vec3 m_camPos{0};
+    float m_camSpeed{1.0};
+
+    glm::vec3 m_squarePos{0};
+    glm::vec3 m_squareCol{0};
 
 };
 

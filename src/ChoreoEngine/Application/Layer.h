@@ -2,6 +2,7 @@
 
 #include "Application/Core.h"
 #include "Application/Events/Event.h"
+#include "Application/Timestep.h"
 
 namespace ChoreoEngine {
     // This class is intended to be inherited from so that 
@@ -17,7 +18,7 @@ namespace ChoreoEngine {
         // layer removed from layer stack
         virtual void onDetach() {}
         // layer updated (per frame)
-        virtual void onUpdate() {}
+        virtual void onUpdate(TimeStep& timestep) {(void)timestep;}
         // imgui render layer
         virtual void onImGuiRender() {}
         // layer recieves/intercepts event. 

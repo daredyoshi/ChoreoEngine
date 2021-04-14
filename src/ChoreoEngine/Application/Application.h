@@ -32,6 +32,7 @@ namespace ChoreoEngine{
         ImGuiLayer* m_imGuiLayer;
         bool m_running{true};
         LayerStack m_layerStack;
+        float m_lastFrameTime;
 
 
         static Application* s_instance;

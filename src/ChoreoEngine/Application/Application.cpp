@@ -5,6 +5,9 @@
 #include "Application/Input.h"
 #include <memory>
 
+// temporary
+#include <GLFW/glfw3.h> 
+
 
 namespace ChoreoEngine {
 
@@ -51,9 +54,14 @@ namespace ChoreoEngine {
     void Application::run(){
         while(m_running){
 
+            // take this through and api layer
+            float time = (float)glfwGetTime();
+            TimeStep timestep {time - m_lastFrameTime};
+            m_lastFrameTime = time;
+
             // draw layers from begin (lowest) to end (highest/ui)
             for (Layer* layer : m_layerStack)
-                layer->onUpdate();
+                layer->onUpdate(timestep);
 
             // this will eventuall be executed no the render thread
             m_imGuiLayer->begin();
@@ -63,7 +71,7 @@ namespace ChoreoEngine {
             m_imGuiLayer->end();
 
             // auto[x, y] = Input::getMousePosition();
-
+            float deltaTime{0};
 
             m_window->onUpdate(); 
         };

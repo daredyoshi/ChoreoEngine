@@ -1,20 +1,27 @@
 #include "cepch.h"
 #include "Renderer.h"
 #include "RenderCommand.h"
+#include "Application/Platform/OpenGL/OpenGLShader.h"
+#include <memory>
 
 namespace ChoreoEngine{
 
-	void Renderer::beginScene()
-	{
+    Renderer::SceneData* Renderer::m_sceneData = new Renderer::SceneData;
+
+	void Renderer::beginScene(OrthographicCamera& cam){
+        m_sceneData->viewPrjectionMatrix = cam.getViewProjectionMatrix();
 	}
 
-	void Renderer::endScene()
-	{
+	void Renderer::endScene(){
 	}
 
-	void Renderer::submit(const std::shared_ptr<VertexArray>& vertexArray)
-	{
+	void Renderer::submit(const std::shared_ptr<Shader>& shader, 
+            const std::shared_ptr<VertexArray>& vertexArray, 
+            const glm::mat4& xform){
         vertexArray->bind();
+        shader->bind();
+        std::dynamic_pointer_cast<OpenGLShader>(shader)->uploadUniformMat4("u_viewProjection", m_sceneData->viewPrjectionMatrix);
+        std::dynamic_pointer_cast<OpenGLShader>(shader)->uploadUniformMat4("u_xform", xform);
         RenderCommand::DrawIndexed(vertexArray);
 	}
 

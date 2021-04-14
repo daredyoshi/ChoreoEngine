@@ -1,15 +1,16 @@
 #pragma once
-
 #include "cepch.h"
 
 namespace ChoreoEngine {
     class Shader{
     public:
-        Shader(const std::string& vertexSrc, const std::string& fragmentSrc);
-        ~Shader();
+        ~Shader() {};
 
-        void Bind() const;
-        void Unbind() const;
+        virtual void bind() const = 0;
+        virtual void unbind() const = 0;
+
+        static Shader* create(const std::string& vertexSrc, const std::string& fragmentSrc);
+
 
     private:
         uint32_t m_rendererId;
