@@ -18,10 +18,12 @@
 #include "Application/Renderer/Camera.h"
 #include "Application/Renderer/VertexArray.h"
 #include "Application/Renderer/Texture.h"
+// #include "Application/Renderer/Shader.h"
 
 
-// temp
+//temp 
 #include "Application/Platform/OpenGL/OpenGLShader.h"
+#include "Application/Platform/OpenGL/OpenGLTexture.h"
 
 
 // --- Entry Point ------------------------

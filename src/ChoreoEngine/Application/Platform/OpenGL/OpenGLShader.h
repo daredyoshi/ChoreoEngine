@@ -2,11 +2,15 @@
 
 #include "Application/Renderer/Shader.h"
 #include <glm/glm.hpp>
+#include <unordered_map>
 
+//TODO: REMOVE
+typedef unsigned int GLenum;
 
 namespace ChoreoEngine {
     class OpenGLShader : public Shader{
     public:
+        OpenGLShader(const std::string& path);
         OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
         ~OpenGLShader();
 
@@ -23,6 +27,10 @@ namespace ChoreoEngine {
         void uploadUniformMat3(const std::string& name, const glm::mat3& val);
 
     private:
+        std::string readFile(const std::string& path);
+        // this will split up a single shader file into all the shaders within
+        std::unordered_map<GLenum, std::string> preProcess(const std::string& shaderSrc);
+        void compile(const std::unordered_map<GLenum, std::string>& shaderSources);
         uint32_t m_rendererId;
         unsigned int m_vertexShader;
     };

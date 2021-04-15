@@ -1,93 +1,137 @@
 #include "OpenGLShader.h"
-#include "glad/glad.h"
+#include <fstream>
 #include <glm/gtc/type_ptr.hpp>
+#include <glad/glad.h>
+#include <unordered_map>
+
+static GLenum stringToShaderType(const std::string& type){
+   if (type == "vertex") return GL_VERTEX_SHADER;
+   if (type == "fragment" || type == "pixel") return GL_FRAGMENT_SHADER;
+
+   CE_CORE_ASSERT(false, "Unknown shader type!");
+   return 0;
+}
+
+ChoreoEngine::OpenGLShader::OpenGLShader(const std::string& path){
+    auto shaderSources = preProcess(path);
+    compile(shaderSources);
+}
+
+std::unordered_map<GLenum, std::string> ChoreoEngine::OpenGLShader::preProcess(const std::string& path)
+{
+    std::string source = readFile(path);
+    std::unordered_map<GLenum, std::string> shaderSources;
+
+    // find the first occurance of type
+    const char* typeToken = "#type";
+    size_t typeTokenLength = strlen(typeToken);
+    size_t pos = source.find(typeToken, 0);
+    // from taht position gather all the src into the map of the corresponding type
+    while(pos!= std::string::npos){
+        size_t eol = source.find_first_of("\r\n", pos);
+        CE_CORE_ASSERT(eol != std::string::npos, "Syntax Error");
+        // there must be a space beween #type typename
+        size_t begin = pos + typeTokenLength + 1;
+        // get the type name
+        std::string type = source.substr(begin, eol - begin);
+
+        // add more here later when we support them
+        GLenum shaderType = stringToShaderType(type);
+        CE_CORE_ASSERT(shaderType!=0, "Invalid shader type specification");
+
+        // find the next line and type token 
+        size_t nextLinePos = source.find_first_of("\r\n", eol);
+        pos = source.find(typeToken, nextLinePos);
+        // dump everything between them into output
+        shaderSources[shaderType] = source.substr(nextLinePos, 
+                pos - (nextLinePos == std::string::npos ? source.size() - 1 : nextLinePos));
+    }
 
 
+	return shaderSources;
+}
 
+
+std::string ChoreoEngine::OpenGLShader::readFile(const std::string& path){
+
+    // this should probably be refactored to a per-platform filesystem
+    std::string result;
+    std::ifstream in(path, std::ios::in | std::ios::binary);
+    if(in){
+        // figure out how long to make the resut string
+        in.seekg(0, std::ios::end);
+        result.resize(in.tellg());
+        // go back to beginning and read in result string
+        in.seekg(0, std::ios::beg);
+        in.read(&result[0], result.size());
+        in.close();
+    } 
+    else{
+        CE_CORE_ERROR("Could not load file {0}", path);
+    }
+    return result;
+}
 
 ChoreoEngine::OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc)
 {
-    // Create an empty vertex shader handle
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    std::unordered_map<GLenum, std::string> shaderSources;
+    shaderSources[GL_VERTEX_SHADER] = vertexSrc;
+    shaderSources[GL_FRAGMENT_SHADER] = fragmentSrc;
 
-    // Send the vertex shader source code to GL
-    // Note that std::string's .c_str is NULL character terminated.
-    const GLchar *source = (const GLchar *)vertexSrc.c_str();
-    glShaderSource(vertexShader, 1, &source, 0);
+    compile(shaderSources);
+}
 
-    // Compile the vertex shader
-    glCompileShader(vertexShader);
-
-    GLint isCompiled = 0;
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &isCompiled);
-    if(isCompiled == GL_FALSE)
-    {
-        GLint maxLength = 0;
-        glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &maxLength);
-
-        // The maxLength includes the NULL character
-        std::vector<GLchar> infoLog(maxLength);
-        glGetShaderInfoLog(vertexShader, maxLength, &maxLength, &infoLog[0]);
-        
-        // We don't need the shader anymore.
-        glDeleteShader(vertexShader);
-
-        // Use the infoLog as you see fit.
-        CE_CORE_ERROR("{0}", infoLog.data());
-        CE_CORE_ERROR("Vertex Shader Compilation failure");
-        // In this simple program, we'll just leave
-        return;
-    }
-
-    // Create an empty fragment shader handle
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // Send the fragment shader source code to GL
-    // Note that std::string's .c_str is NULL character terminated.
-    source = (const GLchar *)fragmentSrc.c_str();
-    glShaderSource(fragmentShader, 1, &source, 0);
-
-    // Compile the fragment shader
-    glCompileShader(fragmentShader);
-
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &isCompiled);
-    if (isCompiled == GL_FALSE)
-    {
-        GLint maxLength = 0;
-        glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &maxLength);
-
-        // The maxLength includes the NULL character
-        std::vector<GLchar> infoLog(maxLength);
-        glGetShaderInfoLog(fragmentShader, maxLength, &maxLength, &infoLog[0]);
-        
-        // We don't need the shader anymore.
-        glDeleteShader(fragmentShader);
-        // Either of them. Don't leak shaders.
-        glDeleteShader(vertexShader);
-
-        // Use the infoLog as you see fit.
-        CE_CORE_ERROR("{0}", infoLog.data());
-        CE_CORE_ERROR("Fragment Shader Compilation failure");
-        
-        // In this simple program, we'll just leave
-        return;
-    }
-
+void ChoreoEngine::OpenGLShader::compile(const std::unordered_map<GLenum, std::string>& shaderSources){
     // Vertex and fragment shaders are successfully compiled.
     // Now time to link them together into a program.
     // Get a program object.
-    m_rendererId= glCreateProgram();
+    GLuint program =glCreateProgram(); 
+    std::vector<GLenum> glShaderIds(shaderSources.size());
 
-    // Attach our shaders to our program
-    glAttachShader(m_rendererId, vertexShader);
-    glAttachShader(m_rendererId, fragmentShader);
+    for (auto& kv : shaderSources){
+        GLenum type = kv.first;
+        const std::string& source = kv.second;
+
+        // Create an empty shader handle
+        GLuint shader = glCreateShader(type);
+
+        // Send the vertex shader source code to GL
+        // Note that std::string's .c_str is NULL character terminated.
+        const GLchar *sourceCStr = source.c_str();
+        glShaderSource(shader, 1, &sourceCStr, 0);
+
+        // Compile the vertex shader
+        glCompileShader(shader);
+
+        GLint isCompiled = 0;
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+        if(isCompiled == GL_FALSE)
+        {
+            GLint maxLength = 0;
+            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+
+            // The maxLength includes the NULL character
+            std::vector<GLchar> infoLog(maxLength);
+            glGetShaderInfoLog(shader, maxLength, &maxLength, &infoLog[0]);
+            
+            // We don't need the shader anymore.
+            glDeleteShader(shader);
+
+            // Use the infoLog as you see fit.
+            CE_CORE_ERROR("{0}", infoLog.data());
+            CE_CORE_ASSERT(false, "Shader Compilation failure");
+            break;
+        }
+        glAttachShader(program, shader);
+        glShaderIds.push_back(shader);
+    }
 
     // Link our m_rendererId
-    glLinkProgram(m_rendererId);
+    glLinkProgram(program);
 
     // Note the different functions here: glGetProgram* instead of glGetShader*.
     GLint isLinked = 0;
-    glGetProgramiv(m_rendererId, GL_LINK_STATUS, (int *)&isLinked);
+    glGetProgramiv(program, GL_LINK_STATUS, (int *)&isLinked);
     if (isLinked == GL_FALSE)
     {
         GLint maxLength = 0;
@@ -100,8 +144,9 @@ ChoreoEngine::OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std
         // We don't need the m_rendererId anymore.
         glDeleteProgram(m_rendererId);
         // Don't leak shaders either.
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
+        for(auto id : glShaderIds){
+            glDeleteShader(id);
+        }
 
         // Use the infoLog as you see fit.
         CE_CORE_ERROR("{0}", infoLog.data());
@@ -111,9 +156,13 @@ ChoreoEngine::OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std
         return;
     }
 
+    // to prevent geting a valid program withou shaders
+    m_rendererId= program;
+
     // Always detach shaders after a successful link.
-    glDetachShader(m_rendererId, vertexShader);
-    glDetachShader(m_rendererId, fragmentShader); 
+    for(auto id : glShaderIds){
+        glDeleteShader(id);
+    }
 }
 
 ChoreoEngine::OpenGLShader::~OpenGLShader()

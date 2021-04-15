@@ -1,11 +1,6 @@
 
 #include <iostream>
-#include "Application.h"
 #include "ChoreoEngine.h"
-#include "Events/Event.h"
-#include "Events/KeyEvent.h"
-#include "Platform/OpenGL/OpenGLTexture.h"
-#include "Renderer/Texture.h"
 #include "glm/fwd.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
@@ -48,40 +43,10 @@ public:
         squareIB.reset(ChoreoEngine::IndexBuffer::create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
         m_SquareVA->setIndexBuffer(squareIB);
 
+        const std::string shaderSrcPath{ChoreoEngine::Application::get().getRootDir() + "assets/shaders/Texture.glsl"} ;
+        CE_INFO("Shader Source Path = {0}",  shaderSrcPath);
+        m_shader = ChoreoEngine::Shader::create(shaderSrcPath);
 
-        std::string vertexSrc = R"(
-#version 330 core
-
-layout(location=0) in vec3 a_Position;
-layout(location=1) in vec2 a_Uv;
-
-uniform mat4 u_viewProjection;
-uniform mat4 u_xform;
-
-out vec2 v_Uv;
-
-
-void main(){
-    v_Uv = a_Uv;
-    gl_Position = u_viewProjection * u_xform * vec4(a_Position , 1.0); 
-}
-        )";
-
-        std::string fragmentSrc= R"(
-#version 330 core
-
-layout(location=0) out vec4 color;
-
-in vec2 v_Uv;
-uniform sampler2D u_texture;
-
-void main(){
-
-    color = texture(u_texture, v_Uv);
-}
-        )";
-
-        m_shader.reset(ChoreoEngine::Shader::create(vertexSrc, fragmentSrc));
         CE_CORE_INFO("Cwd = {0}", ChoreoEngine::Application::get().getRootDir());
         m_texture = ChoreoEngine::Texture2D::create(ChoreoEngine::Application::get().getRootDir() + "assets/textures/ghoul.jpg");
         m_choreoLogo= ChoreoEngine::Texture2D::create(ChoreoEngine::Application::get().getRootDir() + "assets/textures/graphic.png");
