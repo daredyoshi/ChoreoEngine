@@ -16,6 +16,7 @@ namespace ChoreoEngine {
                 const Ref<VertexArray>& vertexArray, 
                 const glm::mat4& xform=glm::mat4{1});
 
+        static void init();
         inline static RendererAPI::API getAPI() { return RendererAPI::getAPI(); }
         struct SceneData{
             glm::mat4 viewPrjectionMatrix;

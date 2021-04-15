@@ -5,6 +5,7 @@
 #include "Events/KeyEvent.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
 #include "Renderer/Texture.h"
+#include "glm/fwd.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
 #include <glm/glm.hpp>
@@ -81,6 +82,7 @@ void main(){
 
         m_shader.reset(ChoreoEngine::Shader::create(vertexSrc, fragmentSrc));
         m_texture = ChoreoEngine::Texture2D::create("/media/dev/ChoreoEngine/repo/ChoreoEngine/src/Sandbox/assets/textures/ghoul.jpg");
+        m_choreoLogo= ChoreoEngine::Texture2D::create("/media/dev/ChoreoEngine/repo/ChoreoEngine/src/Sandbox/assets/textures/graphic.png");
 
         std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->bind();
         std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->uploadUniformInt("u_texture", 0);
@@ -147,6 +149,8 @@ void main(){
 
         glm::mat4 xform = glm::translate(glm::mat4{1}, m_squarePos );
         ChoreoEngine::Renderer::submit(m_shader, m_SquareVA, xform);
+        std::dynamic_pointer_cast<ChoreoEngine::OpenGLTexture2D>(m_choreoLogo)->bind(0);
+        ChoreoEngine::Renderer::submit(m_shader, m_SquareVA, xform);
         ChoreoEngine::Renderer::endScene();
     }
     
@@ -171,6 +175,7 @@ private:
     glm::vec3 m_squareCol{0.8, 0.2, 0.2};
 
     ChoreoEngine::Ref<ChoreoEngine::Texture2D> m_texture;
+    ChoreoEngine::Ref<ChoreoEngine::Texture2D> m_choreoLogo;
 };
 
 class Sandbox : public ChoreoEngine::Application{

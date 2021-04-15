@@ -1,9 +1,10 @@
-#include "cepch.h"
 #include "Application/Renderer/Buffer.h"
+#include "cepch.h"
 #include "Application/Application.h"
 #include "Application/Renderer/Renderer.h"
 #include "Application/Input.h"
 #include <memory>
+#include "Renderer/Renderer.h"
 
 // temporary
 #include <GLFW/glfw3.h> 
@@ -21,6 +22,8 @@ namespace ChoreoEngine {
 
         m_window = Scope<Window>{Window::create(WindowProps(name))};
         m_window->setEventCallback(CE_BIND_EVENT_FN(Application::onEvent));
+
+        Renderer::init();
 
     }
     Application::~Application(){

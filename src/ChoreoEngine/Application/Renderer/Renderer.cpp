@@ -25,4 +25,8 @@ namespace ChoreoEngine{
         RenderCommand::DrawIndexed(vertexArray);
 	}
 
+    void Renderer::init(){
+        RenderCommand::init();
+    }
+
 }

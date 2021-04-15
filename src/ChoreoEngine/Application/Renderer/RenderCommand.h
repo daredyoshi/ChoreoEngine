@@ -15,6 +15,10 @@ namespace ChoreoEngine{
         inline static void DrawIndexed( const Ref<VertexArray>& vertexArray ){
             s_rendererAPI->drawIndexed(vertexArray);
         }
+
+        inline static void init(){
+            s_rendererAPI->init();
+        }
     private:
         static RendererAPI* s_rendererAPI;
     };
