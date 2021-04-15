@@ -13,7 +13,7 @@ public:
     ExampleLayer()
         : 
          Layer("Example") ,
-         m_cam{ChoreoEngine::OrthographicCamera{-5.0f, 5.0f, -5.0f, 5.0f}},
+         m_cam{ChoreoEngine::OrthographicCamera{-1.0f, 1.0f, -1.0f, 1.0f}},
          m_squarePos{0}
          {}
 
@@ -22,56 +22,31 @@ public:
         m_vertexArray.reset(ChoreoEngine::VertexArray::create());
 
 
-        float vertices[ 3 * 6] = {
-            // positions               
-            -0.5f, -0.5f, 0.0f,        
-            0.5f, -0.5, 0.0f,           
-            0.0f, 0.5f, 0.0f,          
-        };
-
-        std::shared_ptr<ChoreoEngine::VertexBuffer> vertexBuffer;
-        vertexBuffer.reset(ChoreoEngine::VertexBuffer::create(vertices,  sizeof(vertices)));
-
-        // this is the order in which the data interweaves
-        ChoreoEngine::BufferLayout layout = {
-            { ChoreoEngine::ShaderDataType::Float3, "a_Position" },
-        };
-        vertexBuffer->setLayout(layout);
-
-        // it's important to set the buffer AFTER the layout has been setj
-        m_vertexArray->addVertexBuffer(vertexBuffer);
-
-        // index buffer
-        uint32_t indices[3] = { 0, 1, 2 };
-        std::shared_ptr<ChoreoEngine::IndexBuffer> indexBuffer;
-        indexBuffer.reset(ChoreoEngine::IndexBuffer::create(indices, sizeof(indices) / sizeof(uint32_t)));
-
-        m_vertexArray->setIndexBuffer(indexBuffer);
-
 
 
         // square test
 
-        float squareVertices[ 3 * 6] = {
+        float squareVertices[ 5 * 6] = {
             // positions                
-            -0.01f,  -0.01f, 0.0f,         
-             0.01f,  -0.01f,  0.0f,            
-             0.01f,   0.01f, 0.0f,           
-            -0.01f,   0.01f, 0.0f,           
+            -0.5f,  -0.5f,   0.0f,   0.0f, 0.0f,      
+             0.5f,  -0.5f,   0.0f,   1.0f, 0.0f,         
+             0.5f,   0.5f,   0.0f,   1.0f, 1.0f,        
+            -0.5f,   0.5f,   0.0f,   0.0f, 1.0f        
         };
         m_SquareVA.reset(ChoreoEngine::VertexArray::create());
 
-        std::shared_ptr<ChoreoEngine::VertexBuffer> squareVB;
+        ChoreoEngine::Ref<ChoreoEngine::VertexBuffer> squareVB;
         squareVB.reset((ChoreoEngine::VertexBuffer::create(squareVertices, sizeof(squareVertices))));
         
         squareVB->setLayout({
-            { ChoreoEngine::ShaderDataType::Float3, "a_Position" }
+            { ChoreoEngine::ShaderDataType::Float3, "a_Position" },
+            { ChoreoEngine::ShaderDataType::Float2, "a_Uv" }
         });
         m_SquareVA->addVertexBuffer(squareVB);
 
         // index buffer
         uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
-        std::shared_ptr<ChoreoEngine::IndexBuffer> squareIB;
+        ChoreoEngine::Ref<ChoreoEngine::IndexBuffer> squareIB;
         squareIB.reset(ChoreoEngine::IndexBuffer::create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
         m_SquareVA->setIndexBuffer(squareIB);
 
@@ -80,15 +55,16 @@ public:
 #version 330 core
 
 layout(location=0) in vec3 a_Position;
+layout(location=1) in vec2 a_Uv;
 
 uniform mat4 u_viewProjection;
 uniform mat4 u_xform;
 
-
+out vec2 v_Uv;
 
 
 void main(){
-    
+    v_Uv = a_Uv;
     gl_Position = u_viewProjection * u_xform * vec4(a_Position , 1.0); 
 }
         )";
@@ -99,9 +75,11 @@ void main(){
 layout(location=0) out vec4 color;
 uniform vec3 u_Color;
 
+in vec2 v_Uv;
+
 void main(){
 
-    color = vec4(u_Color, 1.0);
+    color = vec4(v_Uv, 0.0, 1.0);
 }
         )";
 
@@ -159,18 +137,16 @@ void main(){
         // this would go on a seperate thread at some point
         // this will go into materials that will go into meshes
         std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->bind();
-        ChoreoEngine::Renderer::submit(m_shader, m_vertexArray);
 
         for (int y{0}; y<20; y++){
             for (int x{0}; x<20; x++){
-                std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->uploadUniformFloat3("u_Color", m_squareCol);
 
-                glm::vec3 offset{x * 0.11f, y * 0.11f, 0.0f};
-                glm::mat4 xform = glm::translate(glm::mat4{1}, m_squarePos + offset);
-                ChoreoEngine::Renderer::submit(m_shader, m_SquareVA, xform);
             }
         }
+        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->uploadUniformFloat3("u_Color", m_squareCol);
 
+        glm::mat4 xform = glm::translate(glm::mat4{1}, m_squarePos );
+        ChoreoEngine::Renderer::submit(m_shader, m_SquareVA, xform);
         ChoreoEngine::Renderer::endScene();
     }
     
@@ -182,17 +158,17 @@ void main(){
 
 
 private:
-    std::shared_ptr<ChoreoEngine::VertexArray> m_vertexArray;
-    std::shared_ptr<ChoreoEngine::Shader> m_shader;
+    ChoreoEngine::Ref<ChoreoEngine::VertexArray> m_vertexArray;
+    ChoreoEngine::Ref<ChoreoEngine::Shader> m_shader;
 
-    std::shared_ptr<ChoreoEngine::VertexArray> m_SquareVA;
+    ChoreoEngine::Ref<ChoreoEngine::VertexArray> m_SquareVA;
 
     ChoreoEngine::OrthographicCamera m_cam;
     glm::vec3 m_camPos{0};
     float m_camSpeed{1.0};
 
     glm::vec3 m_squarePos{0};
-    glm::vec3 m_squareCol{0};
+    glm::vec3 m_squareCol{0.8, 0.2, 0.2};
 
 };
 

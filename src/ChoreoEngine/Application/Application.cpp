@@ -19,7 +19,7 @@ namespace ChoreoEngine {
         CE_CORE_ASSERT(!s_instance, "Application already exists!");
         s_instance = this;
 
-        m_window = std::unique_ptr<Window>{Window::create(WindowProps(name))};
+        m_window = Scope<Window>{Window::create(WindowProps(name))};
         m_window->setEventCallback(CE_BIND_EVENT_FN(Application::onEvent));
 
     }
@@ -40,7 +40,8 @@ namespace ChoreoEngine {
     void Application::onEvent(Event& e){
         EventDispatcher dispatcher(e);
         dispatcher.dispatch<WindowCloseEvent>(CE_BIND_EVENT_FN(Application::onWindowClose));
-        CE_CORE_INFO("{0}", e);         
+        // debug all events
+        // CE_CORE_INFO("{0}", e);         
 
         // work backwards through the layer stack until event is handled
         // begin is lowest level, end is highest (ui) level

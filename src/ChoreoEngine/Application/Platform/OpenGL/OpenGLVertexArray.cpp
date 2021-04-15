@@ -35,7 +35,7 @@ ChoreoEngine::OpenGLVertexArray::~OpenGLVertexArray()
     glDeleteVertexArrays(1, &m_rendererId);
 }
 
-void ChoreoEngine::OpenGLVertexArray::addVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer) 
+void ChoreoEngine::OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) 
 {
     CE_CORE_ASSERT(vertexBuffer->getLayout().getElements().size(), "Vertex Buffer layout has not been set!");
 
@@ -63,7 +63,7 @@ void ChoreoEngine::OpenGLVertexArray::bind() const
     glBindVertexArray(m_rendererId);
 }
 
-void ChoreoEngine::OpenGLVertexArray::setIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer) 
+void ChoreoEngine::OpenGLVertexArray::setIndexBuffer(const Ref<IndexBuffer>& indexBuffer) 
 {
     glBindVertexArray(m_rendererId);
     indexBuffer->bind();

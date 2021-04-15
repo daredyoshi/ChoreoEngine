@@ -5,8 +5,8 @@
 
 namespace ChoreoEngine{
 
-    std::shared_ptr<spdlog::logger> Log::m_CoreLogger;        
-    std::shared_ptr<spdlog::logger> Log::m_ClientLogger;        
+    Ref<spdlog::logger> Log::m_CoreLogger;        
+    Ref<spdlog::logger> Log::m_ClientLogger;        
 
     void Log::Init(){
         spdlog::set_pattern("%^[%T] %n: %v%$");

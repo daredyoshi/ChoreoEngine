@@ -11,8 +11,8 @@ namespace ChoreoEngine {
 
         static void Init();
 
-        inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return m_CoreLogger; }
-        inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return m_ClientLogger; }
+        inline static Ref<spdlog::logger>& GetCoreLogger() { return m_CoreLogger; }
+        inline static Ref<spdlog::logger>& GetClientLogger() { return m_ClientLogger; }
 
     private:
         static std::shared_ptr<spdlog::logger> m_CoreLogger;        

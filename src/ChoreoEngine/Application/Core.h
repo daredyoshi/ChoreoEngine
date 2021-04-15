@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #ifdef CE_ENABLE_ASSERTS 
     #include <signal.h>
  	#define CE_ASSERT(x, ...) { if(!(x)) { CE_ERROR("Assertion Failed: {0}", __VA_ARGS__); raise(SIGTRAP); } } 
@@ -16,3 +18,13 @@
 #define BIT(x) (1 << x)
 
 #define CE_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
+
+// in case we want to sitch away from unique_ptr or shared_ptr at some point
+// we could make a class out of these if we wanted to
+namespace ChoreoEngine {
+    template<typename T>
+    using Scope = std::unique_ptr<T>;
+
+    template<typename T>
+    using Ref = std::shared_ptr<T>;
+}
