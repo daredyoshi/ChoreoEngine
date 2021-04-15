@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include "Application.h"
 #include "ChoreoEngine.h"
 #include "Events/Event.h"
 #include "Events/KeyEvent.h"
@@ -81,8 +82,9 @@ void main(){
         )";
 
         m_shader.reset(ChoreoEngine::Shader::create(vertexSrc, fragmentSrc));
-        m_texture = ChoreoEngine::Texture2D::create("/media/dev/ChoreoEngine/repo/ChoreoEngine/src/Sandbox/assets/textures/ghoul.jpg");
-        m_choreoLogo= ChoreoEngine::Texture2D::create("/media/dev/ChoreoEngine/repo/ChoreoEngine/src/Sandbox/assets/textures/graphic.png");
+        CE_CORE_INFO("Cwd = {0}", ChoreoEngine::Application::get().getRootDir());
+        m_texture = ChoreoEngine::Texture2D::create(ChoreoEngine::Application::get().getRootDir() + "assets/textures/ghoul.jpg");
+        m_choreoLogo= ChoreoEngine::Texture2D::create(ChoreoEngine::Application::get().getRootDir() + "assets/textures/graphic.png");
 
         std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->bind();
         std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->uploadUniformInt("u_texture", 0);
@@ -180,7 +182,7 @@ private:
 
 class Sandbox : public ChoreoEngine::Application{
 public:
-    Sandbox(const std::string& name) : Application(name){
+    Sandbox(const std::string& rootDir, const std::string& name) : Application(rootDir, name){
         pushLayer( new ExampleLayer() );
         pushOverlay(new ChoreoEngine::ImGuiLayer());
     }
@@ -192,6 +194,6 @@ public:
 
 // overwrite the application creator to create sandbox
 // entry point is in Application/EntryPoint.h
-ChoreoEngine::Application* ChoreoEngine::CreateApplication(){
-    return new Sandbox("ChoreoGrapher");
+ChoreoEngine::Application* ChoreoEngine::CreateApplication(const std::string& rootDir){
+    return new Sandbox(rootDir, "ChoreoGrapher");
 }

@@ -15,7 +15,7 @@
 namespace ChoreoEngine{
     class Application {
     public:
-        Application(const std::string& name);
+        Application(const std::string& rootDir, const std::string& name);
         virtual ~Application();
         void run();
         void onEvent(Event& e);
@@ -24,9 +24,11 @@ namespace ChoreoEngine{
         void pushOverlay(Layer* layer);
 
         inline static Application& get() { return *s_instance; }
+        inline const std::string& getRootDir() const { return m_cwd; }
         inline Window& getWindow() const { return *m_window; } 
 
     private:
+        const std::string& m_cwd;
         bool onWindowClose(WindowCloseEvent& e);
         Scope<Window> m_window;
         ImGuiLayer* m_imGuiLayer;
@@ -39,5 +41,5 @@ namespace ChoreoEngine{
     };
 
     // To be defined in CLIENT 
-    Application* CreateApplication();
+    Application* CreateApplication(const std::string& rootDir);
 }

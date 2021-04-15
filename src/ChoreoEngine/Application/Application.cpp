@@ -16,7 +16,8 @@ namespace ChoreoEngine {
     Application* Application::s_instance = nullptr;
 
 
-    Application::Application(const std::string& name){
+    Application::Application(const std::string& cwd, const std::string& name)
+        : m_cwd{cwd} {
         CE_CORE_ASSERT(!s_instance, "Application already exists!");
         s_instance = this;
 
