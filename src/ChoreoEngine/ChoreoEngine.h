@@ -17,6 +17,7 @@
 #include "Application/Renderer/Buffer.h"
 #include "Application/Renderer/Camera.h"
 #include "Application/Renderer/VertexArray.h"
+#include "Application/Renderer/Texture.h"
 
 
 // temp

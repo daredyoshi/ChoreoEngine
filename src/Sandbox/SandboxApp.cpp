@@ -3,6 +3,8 @@
 #include "ChoreoEngine.h"
 #include "Events/Event.h"
 #include "Events/KeyEvent.h"
+#include "Platform/OpenGL/OpenGLTexture.h"
+#include "Renderer/Texture.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
 #include <glm/glm.hpp>
@@ -18,14 +20,8 @@ public:
          {}
 
     virtual void onAttach() override {
-        // Vertex Array
-        m_vertexArray.reset(ChoreoEngine::VertexArray::create());
-
-
-
 
         // square test
-
         float squareVertices[ 5 * 6] = {
             // positions                
             -0.5f,  -0.5f,   0.0f,   0.0f, 0.0f,      
@@ -33,7 +29,7 @@ public:
              0.5f,   0.5f,   0.0f,   1.0f, 1.0f,        
             -0.5f,   0.5f,   0.0f,   0.0f, 1.0f        
         };
-        m_SquareVA.reset(ChoreoEngine::VertexArray::create());
+        m_SquareVA = ChoreoEngine::VertexArray::create();
 
         ChoreoEngine::Ref<ChoreoEngine::VertexBuffer> squareVB;
         squareVB.reset((ChoreoEngine::VertexBuffer::create(squareVertices, sizeof(squareVertices))));
@@ -73,19 +69,22 @@ void main(){
 #version 330 core
 
 layout(location=0) out vec4 color;
-uniform vec3 u_Color;
 
 in vec2 v_Uv;
+uniform sampler2D u_texture;
 
 void main(){
 
-    color = vec4(v_Uv, 0.0, 1.0);
+    color = texture(u_texture, v_Uv);
 }
         )";
 
         m_shader.reset(ChoreoEngine::Shader::create(vertexSrc, fragmentSrc));
-        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->uploadUniformFloat3("u_Color", m_squareCol);
+        m_texture = ChoreoEngine::Texture2D::create("/media/dev/ChoreoEngine/repo/ChoreoEngine/src/Sandbox/assets/textures/ghoul.jpg");
 
+        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->bind();
+        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->uploadUniformInt("u_texture", 0);
+        // std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->uploadUniformFloat3("u_Color", m_squareCol);
     }
 
     virtual void onUpdate(ChoreoEngine::TimeStep& timestep) override {
@@ -137,6 +136,7 @@ void main(){
         // this would go on a seperate thread at some point
         // this will go into materials that will go into meshes
         std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->bind();
+        std::dynamic_pointer_cast<ChoreoEngine::OpenGLTexture2D>(m_texture)->bind(0);
 
         for (int y{0}; y<20; y++){
             for (int x{0}; x<20; x++){
@@ -170,6 +170,7 @@ private:
     glm::vec3 m_squarePos{0};
     glm::vec3 m_squareCol{0.8, 0.2, 0.2};
 
+    ChoreoEngine::Ref<ChoreoEngine::Texture2D> m_texture;
 };
 
 class Sandbox : public ChoreoEngine::Application{

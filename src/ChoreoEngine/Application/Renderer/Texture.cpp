@@ -1,15 +1,13 @@
-#include "VertexArray.h"
 #include "cepch.h"
+#include "Texture.h"
 #include "Renderer.h"
-#include "Application/Platform/OpenGL/OpenGLVertexArray.h"
-
+#include "Application/Platform/OpenGL/OpenGLTexture.h"
 
 namespace ChoreoEngine {
-
-    Ref<VertexArray> VertexArray::create(){
+    Ref<Texture2D> Texture2D::create(const std::string& path){
         switch ( Renderer::getAPI() ){
             case RendererAPI::API::None: CE_CORE_ASSERT(false, "RendererAPI:None is currently not supported!");
-            case RendererAPI::API::OpenGL: return CreateRef<OpenGLVertexArray>();
+            case RendererAPI::API::OpenGL: return CreateRef<OpenGLTexture2D>(path);
         }
 
         CE_CORE_ASSERT(false, "Unknown RendererAPI!");
