@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include "Application/Renderer/Shader.h"
 #include "ChoreoEngine.h"
 #include "glm/fwd.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -45,14 +46,14 @@ public:
 
         const std::string shaderSrcPath{ChoreoEngine::Application::get().getRootDir() + "assets/shaders/Texture.glsl"} ;
         CE_INFO("Shader Source Path = {0}",  shaderSrcPath);
-        m_shader = ChoreoEngine::Shader::create(shaderSrcPath);
+        ChoreoEngine::Ref<ChoreoEngine::Shader> shader = m_shaderLibrary.load("MyShader", shaderSrcPath);
 
         CE_CORE_INFO("Cwd = {0}", ChoreoEngine::Application::get().getRootDir());
         m_texture = ChoreoEngine::Texture2D::create(ChoreoEngine::Application::get().getRootDir() + "assets/textures/ghoul.jpg");
         m_choreoLogo= ChoreoEngine::Texture2D::create(ChoreoEngine::Application::get().getRootDir() + "assets/textures/graphic.png");
 
-        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->bind();
-        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->uploadUniformInt("u_texture", 0);
+        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(shader)->bind();
+        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(shader)->uploadUniformInt("u_texture", 0);
         // std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->uploadUniformFloat3("u_Color", m_squareCol);
     }
 
@@ -89,8 +90,8 @@ public:
         }
         if(ChoreoEngine::Input::isKeyPressed(CE_KEY_SPACE)){
             m_cam.setRotation(timestep* m_cam.getRotation() + m_camSpeed * 5.0); 
-        }
 
+        }
         // test camera movement
         m_cam.setPosition(m_camPos);
         // m_cam.setRotation(45.0f);
@@ -104,7 +105,8 @@ public:
 
         // this would go on a seperate thread at some point
         // this will go into materials that will go into meshes
-        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->bind();
+        ChoreoEngine::Ref<ChoreoEngine::Shader> shader = m_shaderLibrary.get("MyShader");
+        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(shader)->bind();
         std::dynamic_pointer_cast<ChoreoEngine::OpenGLTexture2D>(m_texture)->bind(0);
 
         for (int y{0}; y<20; y++){
@@ -112,12 +114,12 @@ public:
 
             }
         }
-        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(m_shader)->uploadUniformFloat3("u_Color", m_squareCol);
+        std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(shader)->uploadUniformFloat3("u_Color", m_squareCol);
 
         glm::mat4 xform = glm::translate(glm::mat4{1}, m_squarePos );
-        ChoreoEngine::Renderer::submit(m_shader, m_SquareVA, xform);
+        ChoreoEngine::Renderer::submit(shader, m_SquareVA, xform);
         std::dynamic_pointer_cast<ChoreoEngine::OpenGLTexture2D>(m_choreoLogo)->bind(0);
-        ChoreoEngine::Renderer::submit(m_shader, m_SquareVA, xform);
+        ChoreoEngine::Renderer::submit(shader, m_SquareVA, xform);
         ChoreoEngine::Renderer::endScene();
     }
     
@@ -130,7 +132,7 @@ public:
 
 private:
     ChoreoEngine::Ref<ChoreoEngine::VertexArray> m_vertexArray;
-    ChoreoEngine::Ref<ChoreoEngine::Shader> m_shader;
+    ChoreoEngine::ShaderLibrary m_shaderLibrary;
 
     ChoreoEngine::Ref<ChoreoEngine::VertexArray> m_SquareVA;
 

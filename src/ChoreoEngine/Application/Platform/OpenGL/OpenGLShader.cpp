@@ -15,6 +15,28 @@ static GLenum stringToShaderType(const std::string& type){
 ChoreoEngine::OpenGLShader::OpenGLShader(const std::string& path){
     auto shaderSources = preProcess(path);
     compile(shaderSources);
+
+
+    // figure out the name from the filepath
+    // assets/shaders/Texture.shader.glsl
+    auto lastSlash = path.find_last_of("/\\");
+    // what if there are no slashes in filename?
+    lastSlash = lastSlash == std::string::npos ? 0 : lastSlash+1;
+    auto lastDot = path.rfind(".");
+    // filenames do not need extentions. 
+    // Get the count of the substring
+    auto count =lastDot == std::string::npos ? path.size() - lastSlash : lastSlash - lastSlash;  
+    m_name = path.substr(lastSlash, count);
+}
+
+ChoreoEngine::OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+    :m_name{name}
+{
+    std::unordered_map<GLenum, std::string> shaderSources;
+    shaderSources[GL_VERTEX_SHADER] = vertexSrc;
+    shaderSources[GL_FRAGMENT_SHADER] = fragmentSrc;
+
+    compile(shaderSources);
 }
 
 std::unordered_map<GLenum, std::string> ChoreoEngine::OpenGLShader::preProcess(const std::string& path)
@@ -72,22 +94,16 @@ std::string ChoreoEngine::OpenGLShader::readFile(const std::string& path){
     return result;
 }
 
-ChoreoEngine::OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc)
-{
-    std::unordered_map<GLenum, std::string> shaderSources;
-    shaderSources[GL_VERTEX_SHADER] = vertexSrc;
-    shaderSources[GL_FRAGMENT_SHADER] = fragmentSrc;
-
-    compile(shaderSources);
-}
-
 void ChoreoEngine::OpenGLShader::compile(const std::unordered_map<GLenum, std::string>& shaderSources){
     // Vertex and fragment shaders are successfully compiled.
     // Now time to link them together into a program.
     // Get a program object.
     GLuint program =glCreateProgram(); 
-    std::vector<GLenum> glShaderIds(shaderSources.size());
+    CE_CORE_ASSERT(shaderSources.size() <=5, "Maximum no. of shaders is 5! You provided {0}", shaderSources.size());
+    // 5 is the maximum no. of shaers ever
+    std::array<GLenum, 5> glShaderIds{};
 
+    unsigned int glShaderIDIdx{0};
     for (auto& kv : shaderSources){
         GLenum type = kv.first;
         const std::string& source = kv.second;
@@ -123,7 +139,7 @@ void ChoreoEngine::OpenGLShader::compile(const std::unordered_map<GLenum, std::s
             break;
         }
         glAttachShader(program, shader);
-        glShaderIds.push_back(shader);
+        glShaderIds[glShaderIDIdx++] = shader;
     }
 
     // Link our m_rendererId

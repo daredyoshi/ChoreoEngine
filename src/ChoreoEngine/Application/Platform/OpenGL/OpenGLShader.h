@@ -11,11 +11,13 @@ namespace ChoreoEngine {
     class OpenGLShader : public Shader{
     public:
         OpenGLShader(const std::string& path);
-        OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
+        OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
         ~OpenGLShader();
 
-        void bind() const;
-        void unbind() const;
+        void bind() const override;
+        void unbind() const override;
+
+        const std::string& getName() const override { return m_name; };
 
         void uploadUniformInt(const std::string& name, const int val);
 
@@ -33,6 +35,7 @@ namespace ChoreoEngine {
         void compile(const std::unordered_map<GLenum, std::string>& shaderSources);
         uint32_t m_rendererId;
         unsigned int m_vertexShader;
+        std::string m_name;
     };
 }
 
