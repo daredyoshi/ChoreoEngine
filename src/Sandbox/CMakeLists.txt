@@ -4,7 +4,9 @@ set(
 
     SandboxSources
     SandboxApp.cpp
+    src/Sandbox2D.cpp
     )
+
 
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoEngine)
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/dependencies/imgui/)

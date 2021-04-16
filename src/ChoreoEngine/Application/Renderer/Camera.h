@@ -8,6 +8,7 @@ namespace ChoreoEngine {
     class OrthographicCamera{
     public:
         OrthographicCamera(float left, float right, float bottom, float top);
+        void setProjection(float left, float right, float bottom, float top);
 
         const glm::vec3& getPosition() const { return m_position; }
         void setPosition(const glm::vec3& position) { m_position = position; recalculateViewMatrix();}
@@ -32,4 +33,5 @@ namespace ChoreoEngine {
         float m_rotation { 0.0f };
 
     };
+
 }

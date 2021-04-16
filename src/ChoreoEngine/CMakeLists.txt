@@ -23,6 +23,7 @@ set(
 
     Application/Application.cpp
     Application/Layer.cpp
+    Application/CameraController.cpp
     Application/LayerStack.cpp
     Application/ImGui/ImGuiLayer.cpp
     Application/Platform/Linux/LinuxWindow.cpp

@@ -5,6 +5,7 @@
 #include "Application/Core.h"
 #include "Application/Log.h"
 #include "Application/Input.h"
+#include "Application/CameraController.h"
 #include "Application/KeyCodes.h"
 #include "Application/ImGui/ImGuiLayer.h"
 
@@ -26,6 +27,3 @@
 #include "Application/Platform/OpenGL/OpenGLTexture.h"
 
 
-// --- Entry Point ------------------------
-#include "Application/EntryPoint.h"
-// ----------------------------------------

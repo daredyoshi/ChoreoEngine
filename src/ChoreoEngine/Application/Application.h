@@ -30,9 +30,11 @@ namespace ChoreoEngine{
     private:
         const std::string& m_cwd;
         bool onWindowClose(WindowCloseEvent& e);
+        bool onWindowResize(WindowResizeEvent& e);
         Scope<Window> m_window;
         ImGuiLayer* m_imGuiLayer;
         bool m_running{true};
+        bool m_minimized{false};
         LayerStack m_layerStack;
         float m_lastFrameTime;
 

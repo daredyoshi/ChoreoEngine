@@ -50,9 +50,13 @@ namespace ChoreoEngine{
         } 
 
             
+        // set X11 flags
+        glfwWindowHint(GLFW_FLOATING, GLFW_TRUE) ;
+        glfwWindowHintString(GLFW_X11_CLASS_NAME, "ChoreoEngine") ;
         m_window = glfwCreateWindow((int)props.width, (int)props.height, m_data.title.c_str(), NULL, NULL);
         m_context = new OpenGLContext(m_window);
         m_context->Init();
+
 
         if ( m_window == NULL ){
             CE_CORE_ERROR( "Failed to create GLFW window" );

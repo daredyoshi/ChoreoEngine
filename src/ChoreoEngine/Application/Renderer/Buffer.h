@@ -30,11 +30,11 @@ namespace ChoreoEngine {
             case ShaderDataType::Float4:      return 4 * 4;
             case ShaderDataType::Mat3:        return 4 * 3 * 3;
             case ShaderDataType::Mat4:        return 4 * 4 * 4;
-            case ShaderDataType::Int:       return 4;
-            case ShaderDataType::Int2:      return 4 * 2;
-            case ShaderDataType::Int3:      return 4 * 3;
-            case ShaderDataType::Int4:      return 4 * 4;
-            case ShaderDataType::Bool:      return 1;
+            case ShaderDataType::Int:         return 4;
+            case ShaderDataType::Int2:        return 4 * 2;
+            case ShaderDataType::Int3:        return 4 * 3;
+            case ShaderDataType::Int4:        return 4 * 4;
+            case ShaderDataType::Bool:        return 1;
             default:
                                             return 0;
         }
@@ -125,7 +125,7 @@ namespace ChoreoEngine {
         virtual void setLayout(const BufferLayout& layout) = 0; 
         virtual const BufferLayout& getLayout() const = 0;
 
-        static VertexBuffer* create(float* vertices, uint32_t count);
+        static Ref<VertexBuffer> create(float* vertices, uint32_t count);
 
         
     };
@@ -139,7 +139,7 @@ namespace ChoreoEngine {
 
         virtual uint32_t getCount() const = 0;
 
-        static IndexBuffer* create(uint32_t* indices, uint32_t count);
+        static Ref<IndexBuffer> create(uint32_t* indices, uint32_t count);
     };
 
 }

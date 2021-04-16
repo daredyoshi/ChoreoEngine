@@ -44,6 +44,7 @@ namespace ChoreoEngine {
     void Application::onEvent(Event& e){
         EventDispatcher dispatcher(e);
         dispatcher.dispatch<WindowCloseEvent>(CE_BIND_EVENT_FN(Application::onWindowClose));
+        dispatcher.dispatch<WindowResizeEvent>(CE_BIND_EVENT_FN(Application::onWindowResize));
         // debug all events
         // CE_CORE_INFO("{0}", e);         
 
@@ -64,9 +65,11 @@ namespace ChoreoEngine {
             TimeStep timestep {time - m_lastFrameTime};
             m_lastFrameTime = time;
 
-            // draw layers from begin (lowest) to end (highest/ui)
-            for (Layer* layer : m_layerStack)
-                layer->onUpdate(timestep);
+            if(!m_minimized){
+                // draw layers from begin (lowest) to end (highest/ui)
+                for (Layer* layer : m_layerStack)
+                    layer->onUpdate(timestep);
+            }
 
             // this will eventuall be executed no the render thread
             m_imGuiLayer->begin();
@@ -87,4 +90,16 @@ namespace ChoreoEngine {
         m_running = false;
         return true;
     }
+
+    bool Application::onWindowResize(WindowResizeEvent& e){
+        (void)e;
+        if(e.getWidth() == 0 || e.getHeight() == 0){
+            m_minimized = true;
+            return false;
+        }
+        m_minimized = false;
+        Renderer::onWindowResize(e.getWidth(), e.getHeight());
+
+        return false;
     }
+}

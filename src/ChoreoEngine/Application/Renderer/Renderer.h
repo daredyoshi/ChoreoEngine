@@ -9,6 +9,8 @@
 namespace ChoreoEngine {
     class Renderer {
     public:
+        static void init();
+        static void onWindowResize(uint32_t width, uint32_t height);
         static void beginScene(OrthographicCamera& cam);
         static void endScene();
 
@@ -16,7 +18,6 @@ namespace ChoreoEngine {
                 const Ref<VertexArray>& vertexArray, 
                 const glm::mat4& xform=glm::mat4{1});
 
-        static void init();
         inline static RendererAPI::API getAPI() { return RendererAPI::getAPI(); }
         struct SceneData{
             glm::mat4 viewPrjectionMatrix;

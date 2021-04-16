@@ -1,19 +1,21 @@
 
 #include <iostream>
-#include "Application/Renderer/Shader.h"
 #include "ChoreoEngine.h"
+#include "Application/EntryPoint.h"
 #include "glm/fwd.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "src/Sandbox2D.h"
+
 class ExampleLayer : public ChoreoEngine::Layer{
 public:
     ExampleLayer()
         : 
          Layer("Example") ,
-         m_cam{ChoreoEngine::OrthographicCamera{-1.0f, 1.0f, -1.0f, 1.0f}},
+         m_camController{1280.0f / 780.0f, true},
          m_squarePos{0}
          {}
 
@@ -30,7 +32,7 @@ public:
         m_SquareVA = ChoreoEngine::VertexArray::create();
 
         ChoreoEngine::Ref<ChoreoEngine::VertexBuffer> squareVB;
-        squareVB.reset((ChoreoEngine::VertexBuffer::create(squareVertices, sizeof(squareVertices))));
+        squareVB = ChoreoEngine::VertexBuffer::create(squareVertices, sizeof(squareVertices));
         
         squareVB->setLayout({
             { ChoreoEngine::ShaderDataType::Float3, "a_Position" },
@@ -41,7 +43,7 @@ public:
         // index buffer
         uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
         ChoreoEngine::Ref<ChoreoEngine::IndexBuffer> squareIB;
-        squareIB.reset(ChoreoEngine::IndexBuffer::create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+        squareIB = ChoreoEngine::IndexBuffer::create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
         m_SquareVA->setIndexBuffer(squareIB);
 
         const std::string shaderSrcPath{ChoreoEngine::Application::get().getRootDir() + "assets/shaders/Texture.glsl"} ;
@@ -63,47 +65,24 @@ public:
 
         // CE_TRACE("Delta Time: {0}s ({1}ms)", timestep.getSeconds(), timestep.getMilliseconds());
 
-        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_LEFT)){
-            m_camPos.x += m_camSpeed * timestep; 
-        }
-        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_RIGHT)){
-            m_camPos.x -= m_camSpeed* timestep; 
-        }
-        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_DOWN)){
-            m_camPos.y += m_camSpeed* timestep; 
-        }
-        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_UP)){
-            m_camPos.y -= m_camSpeed* timestep; 
-        }
         
-        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_L)){
-            m_squarePos.x += m_camSpeed * timestep; 
-        }
-        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_H)){
-            m_squarePos.x -= m_camSpeed* timestep; 
-        }
-        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_K)){
-            m_squarePos.y -= m_camSpeed* timestep; 
-        }
-        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_J)){
-            m_squarePos.y += m_camSpeed* timestep; 
-        }
-        if(ChoreoEngine::Input::isKeyPressed(CE_KEY_SPACE)){
-            m_cam.setRotation(timestep* m_cam.getRotation() + m_camSpeed * 5.0); 
+        // if(ChoreoEngine::Input::isKeyPressed(CE_KEY_L)){
+        //     m_squarePos.x += m_camSpeed * timestep; 
+        // }
+        // if(ChoreoEngine::Input::isKeyPressed(CE_KEY_H)){
+        //     m_squarePos.x -= m_camSpeed* timestep; 
+        // }
+        // if(ChoreoEngine::Input::isKeyPressed(CE_KEY_K)){
+        //     m_squarePos.y -= m_camSpeed* timestep; 
+        // }
+        // if(ChoreoEngine::Input::isKeyPressed(CE_KEY_J)){
+        //     m_squarePos.y += m_camSpeed* timestep; 
+        // }
 
-        }
-        // test camera movement
-        m_cam.setPosition(m_camPos);
-        // m_cam.setRotation(45.0f);
+        m_camController.onUpdate(timestep);
+        ChoreoEngine::Renderer::beginScene(m_camController.getCamera());
 
-
-        ChoreoEngine::Renderer::beginScene(m_cam);
-
-        // Material concept
-        // ChoreoEngine::MaterialRef material = new ChoreoEngine::Material(m_shader);
-        // material->set("u_color", redColor);
-
-        // this would go on a seperate thread at some point
+                // this would go on a seperate thread at some point
         // this will go into materials that will go into meshes
         ChoreoEngine::Ref<ChoreoEngine::Shader> shader = m_shaderLibrary.get("MyShader");
         std::dynamic_pointer_cast<ChoreoEngine::OpenGLShader>(shader)->bind();
@@ -122,23 +101,29 @@ public:
         ChoreoEngine::Renderer::submit(shader, m_SquareVA, xform);
         ChoreoEngine::Renderer::endScene();
     }
+
+    virtual void onEvent(ChoreoEngine::Event& e) override{
+        m_camController.onEvent(e);
+
+        if (e.getEventType() == ChoreoEngine::EventType::WindowResize){
+                auto& re = (ChoreoEngine::WindowResizeEvent&) e;
+        }
+    }
     
     virtual void onImGuiRender() override {
-        ImGui::Begin("Settings");
+        ImGui::Begin("ChoreoEngine::Settings");
         ImGui::ColorEdit3("Square Color", glm::value_ptr(m_squareCol));
         ImGui::End();
+        ImGui::ShowDemoWindow();
     }
 
 
 private:
-    ChoreoEngine::Ref<ChoreoEngine::VertexArray> m_vertexArray;
     ChoreoEngine::ShaderLibrary m_shaderLibrary;
 
     ChoreoEngine::Ref<ChoreoEngine::VertexArray> m_SquareVA;
 
-    ChoreoEngine::OrthographicCamera m_cam;
-    glm::vec3 m_camPos{0};
-    float m_camSpeed{1.0};
+    ChoreoEngine::OrthographicCameraController m_camController;
 
     glm::vec3 m_squarePos{0};
     glm::vec3 m_squareCol{0.8, 0.2, 0.2};
@@ -150,7 +135,8 @@ private:
 class Sandbox : public ChoreoEngine::Application{
 public:
     Sandbox(const std::string& rootDir, const std::string& name) : Application(rootDir, name){
-        pushLayer( new ExampleLayer() );
+        // pushLayer( new ExampleLayer() );
+        pushLayer(new Sandbox2D());
         pushOverlay(new ChoreoEngine::ImGuiLayer());
     }
 
@@ -161,6 +147,7 @@ public:
 
 // overwrite the application creator to create sandbox
 // entry point is in Application/EntryPoint.h
+
 ChoreoEngine::Application* ChoreoEngine::CreateApplication(const std::string& rootDir){
     return new Sandbox(rootDir, "ChoreoGrapher");
 }
