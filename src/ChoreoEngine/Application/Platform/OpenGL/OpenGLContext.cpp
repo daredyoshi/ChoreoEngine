@@ -12,6 +12,7 @@ namespace ChoreoEngine{
 
 	void ChoreoEngine::OpenGLContext::Init() 
 	{
+        CE_PROFILE_FUNCTION ();
         // Set glfw to use open gl version 3.3 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 

@@ -13,6 +13,7 @@ static GLenum stringToShaderType(const std::string& type){
 }
 
 ChoreoEngine::OpenGLShader::OpenGLShader(const std::string& path){
+    CE_PROFILE_FUNCTION();  
     auto shaderSources = preProcess(path);
     compile(shaderSources);
 
@@ -32,6 +33,7 @@ ChoreoEngine::OpenGLShader::OpenGLShader(const std::string& path){
 ChoreoEngine::OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
     :m_name{name}
 {
+    CE_PROFILE_FUNCTION();  
     std::unordered_map<GLenum, std::string> shaderSources;
     shaderSources[GL_VERTEX_SHADER] = vertexSrc;
     shaderSources[GL_FRAGMENT_SHADER] = fragmentSrc;
@@ -41,6 +43,7 @@ ChoreoEngine::OpenGLShader::OpenGLShader(const std::string& name, const std::str
 
 std::unordered_map<GLenum, std::string> ChoreoEngine::OpenGLShader::preProcess(const std::string& path)
 {
+    CE_PROFILE_FUNCTION();  
     std::string source = readFile(path);
     std::unordered_map<GLenum, std::string> shaderSources;
 
@@ -76,6 +79,7 @@ std::unordered_map<GLenum, std::string> ChoreoEngine::OpenGLShader::preProcess(c
 
 std::string ChoreoEngine::OpenGLShader::readFile(const std::string& path){
 
+    CE_PROFILE_FUNCTION();  
     // this should probably be refactored to a per-platform filesystem
     std::string result;
     std::ifstream in(path, std::ios::in | std::ios::binary);
@@ -95,6 +99,7 @@ std::string ChoreoEngine::OpenGLShader::readFile(const std::string& path){
 }
 
 void ChoreoEngine::OpenGLShader::compile(const std::unordered_map<GLenum, std::string>& shaderSources){
+    CE_PROFILE_FUNCTION();  
     // Vertex and fragment shaders are successfully compiled.
     // Now time to link them together into a program.
     // Get a program object.
@@ -183,33 +188,40 @@ void ChoreoEngine::OpenGLShader::compile(const std::unordered_map<GLenum, std::s
 
 ChoreoEngine::OpenGLShader::~OpenGLShader()
 {
+    CE_PROFILE_FUNCTION();  
     glDeleteProgram(m_rendererId);
 }
 
 void ChoreoEngine::OpenGLShader::bind() const
 {
+    CE_PROFILE_FUNCTION();  
     glUseProgram(m_rendererId);
 }
 void ChoreoEngine::OpenGLShader::unbind() const
 {
+    CE_PROFILE_FUNCTION();  
     glUseProgram(0); 
 }
 
 void ChoreoEngine::OpenGLShader::setFloat3(const std::string& name, const glm::vec3& val)const 
 {
+    CE_PROFILE_FUNCTION();  
     uploadUniformFloat3(name, val);
 }
 
 void ChoreoEngine::OpenGLShader::setFloat4(const std::string& name, const glm::vec4& val)const
 {
+    CE_PROFILE_FUNCTION();  
     uploadUniformFloat4(name, val);
 }
 void ChoreoEngine::OpenGLShader::setMat4(const std::string& name, const glm::mat4& val) const 
 {
+    CE_PROFILE_FUNCTION();  
     uploadUniformMat4(name, val);
 }
 
 void ChoreoEngine::OpenGLShader::setInt(const std::string& name, const int val) const{
+    CE_PROFILE_FUNCTION();  
     uploadUniformInt(name, val);
 } 
 void ChoreoEngine::OpenGLShader::uploadUniformFloat4(const std::string& name, const glm::vec4& val) const

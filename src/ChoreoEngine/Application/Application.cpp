@@ -18,6 +18,8 @@ namespace ChoreoEngine {
 
     Application::Application(const std::string& cwd, const std::string& name)
         : m_cwd{cwd} {
+        CE_PROFILE_FUNCTION();
+
         CE_CORE_ASSERT(!s_instance, "Application already exists!");
         s_instance = this;
 
@@ -31,16 +33,19 @@ namespace ChoreoEngine {
     }
 
     void Application::pushLayer(Layer* layer){
+        CE_PROFILE_FUNCTION();  
         m_layerStack.pushLayer(layer);
         layer->onAttach();
     }
 
     void Application::pushOverlay(Layer* layer){
+        CE_PROFILE_FUNCTION();  
         m_layerStack.pushOverlay(layer);
         layer->onAttach();
     }
 
     void Application::onEvent(Event& e){
+        CE_PROFILE_FUNCTION();  
         EventDispatcher dispatcher(e);
         dispatcher.dispatch<WindowCloseEvent>(CE_BIND_EVENT_FN(Application::onWindowClose));
         dispatcher.dispatch<WindowResizeEvent>(CE_BIND_EVENT_FN(Application::onWindowResize));
@@ -57,7 +62,9 @@ namespace ChoreoEngine {
          
     }
     void Application::run(){
+        CE_PROFILE_FUNCTION();  
         while(m_running){
+            CE_PROFILE_SCOPE("RunLoop");
 
             // take this through and api layer
             float time = (float)glfwGetTime();
@@ -65,17 +72,22 @@ namespace ChoreoEngine {
             m_lastFrameTime = time;
 
             if(!m_minimized){
-                // draw layers from begin (lowest) to end (highest/ui)
-                for (Layer* layer : m_layerStack)
-                    layer->onUpdate(timestep);
+                {
+                    CE_PROFILE_SCOPE("LayerStack::Updating all Layers");
+                    // draw layers from begin (lowest) to end (highest/ui)
+                    for (Layer* layer : m_layerStack)
+                        layer->onUpdate(timestep);
+                }
+                // this will eventuall be executed no the render thread
+                m_imGuiLayer->begin();
+                {
+                    CE_PROFILE_SCOPE("LayerStack::Updating all ImGuiLayers");
+                    // draw layers from begin (lowest) to end (highest/ui)
+                    for (Layer* layer : m_layerStack)
+                        layer->onImGuiRender();
+                }
+                m_imGuiLayer->end();
             }
-
-            // this will eventuall be executed no the render thread
-            m_imGuiLayer->begin();
-            // draw layers from begin (lowest) to end (highest/ui)
-            for (Layer* layer : m_layerStack)
-                layer->onImGuiRender();
-            m_imGuiLayer->end();
 
             // auto[x, y] = Input::getMousePosition();
             float deltaTime{0};
@@ -91,6 +103,7 @@ namespace ChoreoEngine {
     }
 
     bool Application::onWindowResize(WindowResizeEvent& e){
+        CE_PROFILE_FUNCTION();  
         (void)e;
         if(e.getWidth() == 0 || e.getHeight() == 0){
             m_minimized = true;

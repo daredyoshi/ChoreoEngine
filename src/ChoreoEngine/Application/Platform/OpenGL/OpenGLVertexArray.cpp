@@ -27,16 +27,19 @@ static GLenum ShaderDataTypeToOpenGLBaseType(ChoreoEngine::ShaderDataType type){
 
 ChoreoEngine::OpenGLVertexArray::OpenGLVertexArray() 
 {
+    CE_PROFILE_FUNCTION();  
     glCreateVertexArrays(1, &m_rendererId);
 }
 
 ChoreoEngine::OpenGLVertexArray::~OpenGLVertexArray() 
 {
+    CE_PROFILE_FUNCTION();  
     glDeleteVertexArrays(1, &m_rendererId);
 }
 
 void ChoreoEngine::OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) 
 {
+    CE_PROFILE_FUNCTION();  
     CE_CORE_ASSERT(vertexBuffer->getLayout().getElements().size(), "Vertex Buffer layout has not been set!");
 
     glBindVertexArray(m_rendererId);
@@ -60,11 +63,13 @@ void ChoreoEngine::OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer>& v
 
 void ChoreoEngine::OpenGLVertexArray::bind() const 
 {
+    CE_PROFILE_FUNCTION();  
     glBindVertexArray(m_rendererId);
 }
 
 void ChoreoEngine::OpenGLVertexArray::setIndexBuffer(const Ref<IndexBuffer>& indexBuffer) 
 {
+    CE_PROFILE_FUNCTION();  
     glBindVertexArray(m_rendererId);
     indexBuffer->bind();
 
@@ -73,6 +78,7 @@ void ChoreoEngine::OpenGLVertexArray::setIndexBuffer(const Ref<IndexBuffer>& ind
 
 void ChoreoEngine::OpenGLVertexArray::unbind() const 
 {
+    CE_PROFILE_FUNCTION();  
     glBindVertexArray(0);
 }
 

@@ -7,6 +7,7 @@
 ChoreoEngine::OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
     :  m_width{width}, m_height{height}{
 
+    CE_PROFILE_FUNCTION();  
     m_internalFormat = GL_RGBA8 ;
     m_dataFormat = GL_RGBA;
         
@@ -22,6 +23,7 @@ ChoreoEngine::OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
 
 
 void ChoreoEngine::OpenGLTexture2D::setdata(void* data, uint32_t size) {
+    CE_PROFILE_FUNCTION();  
     // make sure the images is the same size
     uint32_t bpc = m_dataFormat == GL_RGBA ? 4 : 3; // bytes per chanel
     CE_CORE_ASSERT(size == m_width * m_height * bpc, "Size does not match Texture size!");
@@ -31,11 +33,16 @@ void ChoreoEngine::OpenGLTexture2D::setdata(void* data, uint32_t size) {
 
 ChoreoEngine::OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
     : m_path(path) { 
+    CE_PROFILE_FUNCTION();  
     int width, height, channels;
+    stbi_uc* data = nullptr;
     stbi_set_flip_vertically_on_load(1);
-    stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-
+    {
+        CE_PROFILE_SCOPE(" stbi_load = OpenGLTexture2D::OpenGLTexture2D(const std::string& path)");
+        data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+    }
     CE_CORE_ASSERT(data, "Failed to load image");
+
 
     m_width = width;
     m_height = height;
@@ -70,11 +77,13 @@ ChoreoEngine::OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 }
 
 ChoreoEngine::OpenGLTexture2D::~OpenGLTexture2D(){
+    CE_PROFILE_FUNCTION();  
     glDeleteTextures(1, &m_rendererId);
 }
 
 void ChoreoEngine::OpenGLTexture2D::bind(uint32_t slot) const  
 {
+    CE_PROFILE_FUNCTION();  
     glBindTextureUnit(slot, m_rendererId);
 }
 

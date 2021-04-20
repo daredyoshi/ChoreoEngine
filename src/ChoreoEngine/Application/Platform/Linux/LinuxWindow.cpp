@@ -32,6 +32,8 @@ namespace ChoreoEngine{
     }
 
     void LinuxWindow::init(const WindowProps& props){
+        CE_PROFILE_FUNCTION();
+
         m_data.title = props.title;
         m_data.width = props.width;
         m_data.height = props.height;
@@ -41,6 +43,7 @@ namespace ChoreoEngine{
 
 
         if (!s_GLFWInitialized){
+            CE_PROFILE_SCOPE("glfwInit");
             int success = glfwInit();
             CE_CORE_ASSERT(success, "Could not initialize GLFW!");            
 
@@ -53,7 +56,10 @@ namespace ChoreoEngine{
         // set X11 flags
         glfwWindowHint(GLFW_FLOATING, GLFW_TRUE) ;
         glfwWindowHintString(GLFW_X11_CLASS_NAME, "ChoreoEngine") ;
-        m_window = glfwCreateWindow((int)props.width, (int)props.height, m_data.title.c_str(), NULL, NULL);
+        {
+            CE_PROFILE_SCOPE("glfwCreateWindow");
+            m_window = glfwCreateWindow((int)props.width, (int)props.height, m_data.title.c_str(), NULL, NULL);
+        }
         m_context = new OpenGLContext(m_window);
         m_context->Init();
 
@@ -160,7 +166,7 @@ namespace ChoreoEngine{
     }
 
     void LinuxWindow::onUpdate(){
-         
+        CE_PROFILE_FUNCTION();
         glfwPollEvents();
         m_context->SwapBuffers();
     }

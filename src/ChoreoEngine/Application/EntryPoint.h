@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Application/Application.h"
+#include "Application/Debug/Instrumentor.h"
 #include "Application/Log.h"
 #include <stdio.h>
 
@@ -25,10 +26,15 @@ int main(int argc, char** argv)
     const std::string rootDir= aux.substr(0,pos+1);
 
     ChoreoEngine::Log::Init();
-    CE_CORE_WARN("Initiliazed Log!");
+    CE_PROFILE_BEGIN_SESSION("Startup", "ChoreoEngine-Startup.json");
     auto app = ChoreoEngine::CreateApplication(rootDir);
+    CE_PROFILE_END_SESSION()
+    CE_PROFILE_BEGIN_SESSION("Runtime", "ChoreoEngine-Runtime.json");
 
     app->run();
+    CE_PROFILE_END_SESSION()
+    CE_PROFILE_BEGIN_SESSION("Shutdown", "ChoreoEngine-Shutdown.json");
     delete app;
+    CE_PROFILE_END_SESSION()
     return 0;
 }

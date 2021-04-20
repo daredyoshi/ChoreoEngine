@@ -32,6 +32,7 @@ namespace ChoreoEngine{
 	}
 
     void Renderer::init(){
+        CE_PROFILE_FUNCTION();  
         RenderCommand::init();
         Renderer2D::init();
     }
@@ -54,6 +55,7 @@ namespace ChoreoEngine{
     static Renderer2DStorage* s_storage; 
 
     void Renderer2D::init(){
+        CE_PROFILE_FUNCTION();  
         // square test
         s_storage = new Renderer2DStorage();
         
@@ -95,16 +97,18 @@ namespace ChoreoEngine{
     }
 
     void Renderer2D::shutdown(){
+    CE_PROFILE_FUNCTION();  
         delete s_storage;
     }
 
     void Renderer2D::beginScene(const OrthographicCamera& cam){ 
+        CE_PROFILE_FUNCTION();  
         s_storage->shader2D->bind();
         s_storage->shader2D->setMat4("u_viewProjection", cam.getViewProjectionMatrix());
     }
 
     void Renderer2D::endScene(){
-
+        CE_PROFILE_FUNCTION();  
     }
 
 
@@ -127,6 +131,7 @@ namespace ChoreoEngine{
     }
 
     void Renderer2D::drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex, const glm::vec4& color){
+        CE_PROFILE_FUNCTION();  
         s_storage->shader2D->bind();
         s_storage->shader2D->setFloat4("u_color", color);
         tex->bind(0);
