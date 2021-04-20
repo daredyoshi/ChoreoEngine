@@ -19,14 +19,18 @@ namespace ChoreoEngine {
 
         const std::string& getName() const override { return m_name; };
 
-        void uploadUniformInt(const std::string& name, const int val);
+        virtual void setMat4(const std::string& name, const glm::mat4& val) const override ;
+        virtual void setInt(const std::string& name, const int) const override ;
+        virtual void setFloat3(const std::string& name, const glm::vec3& val)const override;
+        virtual void setFloat4(const std::string& name, const glm::vec4& val)const override;
 
-        void uploadUniformFloat4(const std::string& name, const glm::vec4& val);
-        void uploadUniformFloat3(const std::string& name, const glm::vec3& val);
-        void uploadUniformFloat2(const std::string& name, const glm::vec2& val);
-        void uploadUniformFloat(const std::string& name, const float val);
-        void uploadUniformMat4(const std::string& name, const glm::mat4& val);
-        void uploadUniformMat3(const std::string& name, const glm::mat3& val);
+        void uploadUniformInt(const std::string& name, const int val) const;
+        void uploadUniformFloat4(const std::string& name, const glm::vec4& val) const;
+        void uploadUniformFloat3(const std::string& name, const glm::vec3& val) const;
+        void uploadUniformFloat2(const std::string& name, const glm::vec2& val) const;
+        void uploadUniformFloat(const std::string& name, const float val) const;
+        void uploadUniformMat4(const std::string& name, const glm::mat4& val) const;
+        void uploadUniformMat3(const std::string& name, const glm::mat3& val) const;
 
     private:
         std::string readFile(const std::string& path);

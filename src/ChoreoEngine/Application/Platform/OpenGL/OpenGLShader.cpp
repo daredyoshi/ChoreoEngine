@@ -190,49 +190,66 @@ void ChoreoEngine::OpenGLShader::bind() const
 {
     glUseProgram(m_rendererId);
 }
-
 void ChoreoEngine::OpenGLShader::unbind() const
 {
     glUseProgram(0); 
 }
-void ChoreoEngine::OpenGLShader::uploadUniformFloat4(const std::string& name, const glm::vec4& val)
+
+void ChoreoEngine::OpenGLShader::setFloat3(const std::string& name, const glm::vec3& val)const 
+{
+    uploadUniformFloat3(name, val);
+}
+
+void ChoreoEngine::OpenGLShader::setFloat4(const std::string& name, const glm::vec4& val)const
+{
+    uploadUniformFloat4(name, val);
+}
+void ChoreoEngine::OpenGLShader::setMat4(const std::string& name, const glm::mat4& val) const 
+{
+    uploadUniformMat4(name, val);
+}
+
+void ChoreoEngine::OpenGLShader::setInt(const std::string& name, const int val) const{
+    uploadUniformInt(name, val);
+} 
+void ChoreoEngine::OpenGLShader::uploadUniformFloat4(const std::string& name, const glm::vec4& val) const
 {
     GLint location = glGetUniformLocation(m_rendererId, name.c_str());
     glUniform4fv(location, 1, glm::value_ptr(val));
 }
 
-void ChoreoEngine::OpenGLShader::uploadUniformMat4(const std::string& name, const glm::mat4& val)
+void ChoreoEngine::OpenGLShader::uploadUniformMat4(const std::string& name, const glm::mat4& val) const
 {
     GLint location = glGetUniformLocation(m_rendererId, name.c_str());
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(val));
 }
 
 
-void ChoreoEngine::OpenGLShader::uploadUniformFloat(const std::string& name, const float val)
+void ChoreoEngine::OpenGLShader::uploadUniformFloat(const std::string& name, const float val) const
 {
     GLint location = glGetUniformLocation(m_rendererId, name.c_str());
     glUniform1f(location, val);
 }
 
-void ChoreoEngine::OpenGLShader::uploadUniformFloat2(const std::string& name, const glm::vec2& val)
+void ChoreoEngine::OpenGLShader::uploadUniformFloat2(const std::string& name, const glm::vec2& val) const
 {
     GLint location = glGetUniformLocation(m_rendererId, name.c_str());
     glUniform2fv(location, 1, glm::value_ptr(val));
 }
 
-void ChoreoEngine::OpenGLShader::uploadUniformFloat3(const std::string& name, const glm::vec3& val)
+void ChoreoEngine::OpenGLShader::uploadUniformFloat3(const std::string& name, const glm::vec3& val) const
 {
     GLint location = glGetUniformLocation(m_rendererId, name.c_str());
     glUniform3fv(location, 1, glm::value_ptr(val));
 }
 
-void ChoreoEngine::OpenGLShader::uploadUniformInt(const std::string& name, const int val)
+void ChoreoEngine::OpenGLShader::uploadUniformInt(const std::string& name, const int val) const
 {
     GLint location = glGetUniformLocation(m_rendererId, name.c_str());
     glUniform1i(location, val);
 }
 
-void ChoreoEngine::OpenGLShader::uploadUniformMat3(const std::string& name, const glm::mat3& val)
+void ChoreoEngine::OpenGLShader::uploadUniformMat3(const std::string& name, const glm::mat3& val) const
 {
     GLint location = glGetUniformLocation(m_rendererId, name.c_str());
     glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(val));

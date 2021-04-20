@@ -12,7 +12,6 @@
 #include "Application/Timestep.h"
 
 
-
 #include "Application/Renderer/RenderCommand.h"
 #include "Application/Renderer/Renderer.h"
 #include "Application/Renderer/Buffer.h"

@@ -1,6 +1,7 @@
 #pragma once
 #include "cepch.h"
 #include <unordered_map>
+#include <glm/glm.hpp>
 
 namespace ChoreoEngine {
     class Shader{
@@ -14,6 +15,11 @@ namespace ChoreoEngine {
         static Ref<Shader> create(const std::string&  name, const std::string& vertexSrc, const std::string& fragmentSrc);
 
         virtual const std::string& getName() const = 0;
+
+        virtual void setMat4(const std::string& name, const glm::mat4& val) const = 0;
+        virtual void setInt(const std::string& name, const int) const = 0;
+        virtual void setFloat3(const std::string& name, const glm::vec3& val)const = 0;
+        virtual void setFloat4(const std::string& name, const glm::vec4& val)const = 0;
 
     private:
         

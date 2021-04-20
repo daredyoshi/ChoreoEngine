@@ -7,11 +7,12 @@ layout(location=1) in vec2 a_Uv;
 uniform mat4 u_viewProjection;
 uniform mat4 u_xform;
 
-
+out vec2 v_Uv;
 
 void main(){
-    gl_Position = u_viewProjection * u_xform * vec4(a_Position , 1.0); 
+    v_Uv = a_Uv;
 
+    gl_Position = u_viewProjection * u_xform * vec4(a_Position , 1.0); 
 }
 
 
@@ -20,10 +21,11 @@ void main(){
 
 layout(location=0) out vec4 color;
 
-
+in vec2 v_Uv;
+uniform sampler2D u_texture;
 uniform vec4 u_color;
 
 void main(){
 
-    color = u_color;
+    color = texture(u_texture, v_Uv) * u_color;
 }

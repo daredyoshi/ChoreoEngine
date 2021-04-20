@@ -19,13 +19,10 @@ public:
     void onDetach() override;
 
 private:
-
-    ChoreoEngine::ShaderLibrary m_shaderLibrary;
-
-    ChoreoEngine::Ref<ChoreoEngine::VertexArray> m_SquareVA;
-
     ChoreoEngine::OrthographicCameraController m_camController;
-
+    ChoreoEngine::Ref<ChoreoEngine::Texture2D> m_texture{ChoreoEngine::Texture2D::create(ChoreoEngine::Application::get().getRootDir() + "assets/textures/ghoul.jpg")};
     glm::vec3 m_squarePos{0};
-    glm::vec3 m_squareCol{0.8, 0.2, 0.2};
+    glm::vec4 m_squareCol{0.8, 0.2, 0.2, 1.0};
+    glm::vec2 m_squareScale{1.0f, 1.0f};
+    float m_squareAngle{0};
 };

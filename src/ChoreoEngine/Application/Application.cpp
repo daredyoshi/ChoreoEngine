@@ -25,7 +25,6 @@ namespace ChoreoEngine {
         m_window->setEventCallback(CE_BIND_EVENT_FN(Application::onEvent));
 
         Renderer::init();
-
     }
     Application::~Application(){
 

@@ -19,6 +19,8 @@ namespace ChoreoEngine{
     class Texture2D : public Texture{
     public:
         static Ref<Texture2D> create(const std::string& path);
+        static Ref<Texture2D> create(uint32_t width, uint32_t height);
+        virtual void setdata(void* data, uint32_t size) = 0;
     };
 
 }

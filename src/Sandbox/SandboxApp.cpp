@@ -63,21 +63,6 @@ public:
         ChoreoEngine::RenderCommand::setClearColor(glm::vec4{ 0.1f, 0.1f, 0.1f, 1 });
         ChoreoEngine::RenderCommand::clear();
 
-        // CE_TRACE("Delta Time: {0}s ({1}ms)", timestep.getSeconds(), timestep.getMilliseconds());
-
-        
-        // if(ChoreoEngine::Input::isKeyPressed(CE_KEY_L)){
-        //     m_squarePos.x += m_camSpeed * timestep; 
-        // }
-        // if(ChoreoEngine::Input::isKeyPressed(CE_KEY_H)){
-        //     m_squarePos.x -= m_camSpeed* timestep; 
-        // }
-        // if(ChoreoEngine::Input::isKeyPressed(CE_KEY_K)){
-        //     m_squarePos.y -= m_camSpeed* timestep; 
-        // }
-        // if(ChoreoEngine::Input::isKeyPressed(CE_KEY_J)){
-        //     m_squarePos.y += m_camSpeed* timestep; 
-        // }
 
         m_camController.onUpdate(timestep);
         ChoreoEngine::Renderer::beginScene(m_camController.getCamera());
@@ -113,6 +98,7 @@ public:
     virtual void onImGuiRender() override {
         ImGui::Begin("ChoreoEngine::Settings");
         ImGui::ColorEdit3("Square Color", glm::value_ptr(m_squareCol));
+        ImGui::DragFloat3("Square Pos", glm::value_ptr(m_squarePos));
         ImGui::End();
         ImGui::ShowDemoWindow();
     }
