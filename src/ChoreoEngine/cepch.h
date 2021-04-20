@@ -15,3 +15,5 @@
 
 #include <fmt/ostream.h>
 #include "Application/Log.h"
+
+#include "Application/Debug/Instrumentor.h"

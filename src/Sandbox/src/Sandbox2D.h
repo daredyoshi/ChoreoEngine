@@ -25,4 +25,11 @@ private:
     glm::vec4 m_squareCol{0.8, 0.2, 0.2, 1.0};
     glm::vec2 m_squareScale{1.0f, 1.0f};
     float m_squareAngle{0};
+
+    struct ProfileResult{
+        const char* name;
+        float time;
+    };
+
+    std::vector<ProfileResult> m_profileResults;
 };

@@ -19,6 +19,8 @@ set(
     ../dependencies/imgui/backends/imgui_impl_opengl3.cpp
     ../dependencies/imgui/backends/imgui_impl_glfw.cpp
 
+    ../dependencies/Cherno/
+
     ../dependencies/stb/stb_image.cpp
 
     Application/Application.cpp
