@@ -18,8 +18,8 @@ namespace ChoreoEngine{
         inline static void clear(){
             s_rendererAPI->clear();
         }
-        inline static void DrawIndexed( const Ref<VertexArray>& vertexArray ){
-            s_rendererAPI->drawIndexed(vertexArray);
+        inline static void DrawIndexed( const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0){
+            s_rendererAPI->drawIndexed(vertexArray, indexCount);
         }
 
     private:

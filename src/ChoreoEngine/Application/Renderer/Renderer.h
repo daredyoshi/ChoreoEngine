@@ -35,9 +35,11 @@ namespace ChoreoEngine {
         static void init();
         static void shutdown();
         static void beginScene(const OrthographicCamera& cam);
+        static void flush();
         static void endScene();
 
         // primitives
+        // TODO: Replace this with a properties struct and single function
         static void drawQuad(const glm::vec2& pos, const float angle,  const glm::vec2& size, const glm::vec4& color);
         static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const glm::vec4& color);
         static void drawQuad(const glm::vec2& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex);

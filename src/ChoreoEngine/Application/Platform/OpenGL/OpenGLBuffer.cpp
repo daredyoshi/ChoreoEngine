@@ -7,6 +7,17 @@
 // Vertex Buffer ////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
+ChoreoEngine::OpenGLVertexBuffer::OpenGLVertexBuffer( uint32_t size)
+{
+    CE_PROFILE_FUNCTION();  
+    glCreateBuffers(1, &m_rendererId);
+    this->bind();
+    // assume that if constructing the buffer like this you are 
+    // targeting batch rendering which would update the buffer on
+    // every frame
+    glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);    
+}
+
 ChoreoEngine::OpenGLVertexBuffer::OpenGLVertexBuffer( float* vertices, uint32_t size)
 {
     CE_PROFILE_FUNCTION();  
@@ -31,6 +42,13 @@ void ChoreoEngine::OpenGLVertexBuffer::unbind() const
     CE_PROFILE_FUNCTION();  
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+void ChoreoEngine::OpenGLVertexBuffer::setData(const void* data, uint32_t size) {
+    glBindBuffer(GL_ARRAY_BUFFER, m_rendererId);
+    // could add an offset at some point but don't need yet
+    glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
+}
+
+
 
 ////////////////////////////////////////////////////////////
 // Index Buffer ////////////////////////////////////////////

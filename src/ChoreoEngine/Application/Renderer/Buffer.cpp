@@ -5,6 +5,16 @@
 #include "Application/Platform/OpenGL/OpenGLBuffer.h"
 
 namespace ChoreoEngine{
+    Ref<VertexBuffer> VertexBuffer::create(uint32_t size){
+        switch ( Renderer::getAPI() ){
+            case RendererAPI::API::None: CE_CORE_ASSERT(false, "RendererAPI:None is currently not supported!");
+            case RendererAPI::API::OpenGL: return CreateRef<OpenGLVertexBuffer>(size);
+        }
+
+        CE_CORE_ASSERT(false, "Unknown RendererAPI!");
+        return nullptr;
+
+    }
 
     Ref<VertexBuffer> VertexBuffer::create(float* vertices, uint32_t size){
         switch ( Renderer::getAPI() ){

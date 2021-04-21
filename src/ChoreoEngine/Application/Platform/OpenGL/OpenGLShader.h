@@ -21,6 +21,7 @@ namespace ChoreoEngine {
 
         virtual void setMat4(const std::string& name, const glm::mat4& val) const override ;
         virtual void setInt(const std::string& name, const int) const override ;
+        virtual void setFloat(const std::string& name, const float val)const override;
         virtual void setFloat3(const std::string& name, const glm::vec3& val)const override;
         virtual void setFloat4(const std::string& name, const glm::vec4& val)const override;
 

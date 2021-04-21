@@ -202,6 +202,11 @@ void ChoreoEngine::OpenGLShader::unbind() const
     CE_PROFILE_FUNCTION();  
     glUseProgram(0); 
 }
+void ChoreoEngine::OpenGLShader::setFloat(const std::string& name, const float val)const 
+{
+    CE_PROFILE_FUNCTION();  
+    uploadUniformFloat(name, val);
+}
 
 void ChoreoEngine::OpenGLShader::setFloat3(const std::string& name, const glm::vec3& val)const 
 {
