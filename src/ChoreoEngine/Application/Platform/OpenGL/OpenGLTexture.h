@@ -20,6 +20,10 @@ namespace ChoreoEngine {
         virtual void setdata(void* data, uint32_t size) override;
         
         virtual void bind(uint32_t slot) const  override ;
+
+        virtual bool operator==(const Texture& other) const override { 
+            return m_rendererId == ((OpenGLTexture2D&)other).m_rendererId;
+        }
     private:
 
        const std::string& m_path{s_tempPath};

@@ -48,6 +48,8 @@ namespace ChoreoEngine{
         glm::vec3 position;
         glm::vec4 color;
         glm::vec2 uv;
+        float textureIndex;
+        float tilingFactor;
     };
     
     struct Renderer2DStorage{
@@ -57,6 +59,7 @@ namespace ChoreoEngine{
         const uint32_t maxQuads = 10000;
         const uint32_t maxVertices = maxQuads * 4;
         const uint32_t maxIndices = maxQuads * 6;
+        static const uint32_t maxTextureSlots = 32; // TODO: Render Caps
 
         // should probably be Scope isntead
         Ref<VertexArray> quadVertexArray;
@@ -69,6 +72,13 @@ namespace ChoreoEngine{
 
         QuadVertex* quadVertexBufferBase = nullptr; 
         QuadVertex* quadVertexBufferPtr= nullptr; 
+
+        // we are using opengl ids, but in the future this
+        // should be the asset id
+        std::array<Ref<Texture2D>, maxTextureSlots> textureSlots;
+        uint32_t textureSlotIndex = 1; // 0 is the white empty texture
+
+        glm::vec4 quadVertexPositions[4];
     };
 
 
@@ -92,7 +102,9 @@ namespace ChoreoEngine{
         s_storage.quadVertexBuffer->setLayout({
             { ShaderDataType::Float3, "a_Position" },
             { ShaderDataType::Float4, "a_Color" },
-            { ShaderDataType::Float2, "a_Uv" }
+            { ShaderDataType::Float2, "a_Uv" },
+            { ShaderDataType::Float, "a_TexIdx" },
+            { ShaderDataType::Float, "a_TilingFactor" }
         });
         s_storage.quadVertexArray->addVertexBuffer(s_storage.quadVertexBuffer);
 
@@ -136,7 +148,20 @@ namespace ChoreoEngine{
         CE_INFO("Texture Shader Source Path = {0}",shaderSrcPath);
         s_storage.shader2D= Shader::create(shaderSrcPath);
         s_storage.shader2D->bind();
-        s_storage.shader2D->setInt("u_texture", 0);
+        // bind ids 0 - 32
+        int32_t samplers[s_storage.maxTextureSlots];
+        for (uint32_t i{0}; i<s_storage.maxTextureSlots; ++i){
+            samplers[i] = i;
+        }
+        s_storage.shader2D->setIntArray("u_textures", samplers, s_storage.maxTextureSlots);
+
+        // initialize all the slots to 0 
+        s_storage.textureSlots[0] = s_storage.emptyTex;
+
+        s_storage.quadVertexPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
+        s_storage.quadVertexPositions[1] = { 0.5f, -0.5f, 0.0f, 1.0f };
+        s_storage.quadVertexPositions[2] = { 0.5f, 0.5f, 0.0f, 1.0f };
+        s_storage.quadVertexPositions[3] = { -0.5f, 0.5f, 0.0f, 1.0f };
     }
 
     void Renderer2D::shutdown(){
@@ -152,16 +177,18 @@ namespace ChoreoEngine{
         s_storage.quadIndexCount = 0;
         // now we can increment this without ofsetting base 
         s_storage.quadVertexBufferPtr = s_storage.quadVertexBufferBase;
+
+        s_storage.textureSlotIndex = 1;
     }
 
     void Renderer2D::flush(){
         CE_PROFILE_FUNCTION();  
         s_storage.shader2D->bind();
         s_storage.shader2D->setFloat("u_tilingFactor", 1.0f);
-        // tex->bind(0);
-        
-        // change this to not being done on the shader
-        // s_storage.shader2D->setMat4("u_xform", xform);
+
+        for (uint32_t i{0}; i<s_storage.textureSlotIndex; i++){
+            s_storage.textureSlots[i]->bind(i);
+        }
 
         s_storage.quadVertexArray->bind();
         RenderCommand::DrawIndexed(s_storage.quadVertexArray, s_storage.quadIndexCount);
@@ -197,41 +224,62 @@ namespace ChoreoEngine{
     }
 
     void Renderer2D::drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex, const glm::vec4& color){
-        (void)tex;
-        (void)angle;
         CE_PROFILE_FUNCTION();  
+        float tilingFactor = 2.0;
 
-        // glm::vec3 xformPos = glm::vec3(glm::vec4(pos, 1) * glm::mat4 {  
-        //                 glm::scale(
-        //                     glm::rotate( 
-        //                         glm::translate(
-        //                             glm::mat4{ 1.0f }, 
-        //                             pos), 
-        //                     glm::radians(angle), 
-        //                     glm::vec3{0.0f, 0.0f, 1.0f}
-        //                     ), 
-        //                 glm::vec3{size.x, size.y, 1.0} 
-        //             ),
-        // });
+
+        float textureIndex = 0;
+        // if the tex is not the empty tex find it's id
+        if (!( *tex.get() == *s_storage.emptyTex.get() )){
+            // check if textuer index in indices here
+            for (uint32_t i{0}; i< s_storage.textureSlotIndex; i++){
+                // replace this with an asset comapre
+                if(*s_storage.textureSlots[i].get() == *tex.get()){
+                    textureIndex = i; 
+                    break;
+                }
+            }
+
+            if (textureIndex == 0){
+                textureIndex = (float)s_storage.textureSlotIndex;
+                s_storage.textureSlots[s_storage.textureSlotIndex] = tex;
+                s_storage.textureSlotIndex++;
+            }
+        }
+
+
+        // figure out rotation
+        glm::mat4 xform = glm::translate(glm::mat4(1.0f), pos);
+        xform *= glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3{0, 0, 1});
+        xform *= glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0});
+
         // vertex 1 
-        s_storage.quadVertexBufferPtr->position = pos;
+        s_storage.quadVertexBufferPtr->position = xform * s_storage.quadVertexPositions[0];
         s_storage.quadVertexBufferPtr->color = color;
         s_storage.quadVertexBufferPtr->uv= {0.0f, 0.0f};
+        s_storage.quadVertexBufferPtr->textureIndex= textureIndex;
+        s_storage.quadVertexBufferPtr->tilingFactor= tilingFactor;
         s_storage.quadVertexBufferPtr++;
         // vertex 2 
-        s_storage.quadVertexBufferPtr->position = {pos.x + size.x, pos.y, pos.z};
+        s_storage.quadVertexBufferPtr->position = xform * s_storage.quadVertexPositions[1];
         s_storage.quadVertexBufferPtr->color = color;
         s_storage.quadVertexBufferPtr->uv= {1.0f, 0.0f};
+        s_storage.quadVertexBufferPtr->textureIndex= textureIndex;
+        s_storage.quadVertexBufferPtr->tilingFactor= tilingFactor;
         s_storage.quadVertexBufferPtr++;
         // vertex 3 
-        s_storage.quadVertexBufferPtr->position = {pos.x + size.x, pos.y + size.y, pos.z};
+        s_storage.quadVertexBufferPtr->position = xform * s_storage.quadVertexPositions[2];
         s_storage.quadVertexBufferPtr->color = color;
         s_storage.quadVertexBufferPtr->uv= {1.0f, 1.0f};
+        s_storage.quadVertexBufferPtr->textureIndex= textureIndex;
+        s_storage.quadVertexBufferPtr->tilingFactor= tilingFactor;
         s_storage.quadVertexBufferPtr++;
         // vertex 4 
-        s_storage.quadVertexBufferPtr->position = {pos.x, pos.y + size.y, pos.z};
+        s_storage.quadVertexBufferPtr->position = xform * s_storage.quadVertexPositions[3];
         s_storage.quadVertexBufferPtr->color = color;
         s_storage.quadVertexBufferPtr->uv= {0.0f, 1.0f};
+        s_storage.quadVertexBufferPtr->textureIndex= textureIndex;
+        s_storage.quadVertexBufferPtr->tilingFactor= tilingFactor;
         s_storage.quadVertexBufferPtr++;
 
         s_storage.quadIndexCount+=6;

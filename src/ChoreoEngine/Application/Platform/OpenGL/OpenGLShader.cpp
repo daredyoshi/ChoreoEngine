@@ -229,6 +229,15 @@ void ChoreoEngine::OpenGLShader::setInt(const std::string& name, const int val) 
     CE_PROFILE_FUNCTION();  
     uploadUniformInt(name, val);
 } 
+void ChoreoEngine::OpenGLShader::setIntArray(const std::string& name, const int* values, const uint32_t count) const{
+    CE_PROFILE_FUNCTION();  
+    uploadUniformIntArray(name, values, count);
+} 
+void ChoreoEngine::OpenGLShader::uploadUniformIntArray(const std::string& name, const int* values, const uint32_t count) const
+{
+    GLint location = glGetUniformLocation(m_rendererId, name.c_str());
+    glUniform1iv(location, count, values);
+}
 void ChoreoEngine::OpenGLShader::uploadUniformFloat4(const std::string& name, const glm::vec4& val) const
 {
     GLint location = glGetUniformLocation(m_rendererId, name.c_str());

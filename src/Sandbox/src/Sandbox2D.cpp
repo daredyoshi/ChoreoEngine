@@ -27,6 +27,7 @@ void Sandbox2D::onUpdate(ChoreoEngine::TimeStep& timestep) {
         ChoreoEngine::Renderer2D::beginScene(m_camController.getCamera());
         ChoreoEngine::Renderer2D::drawQuad(m_squarePos, m_squareAngle, m_squareScale, m_squareCol);
         ChoreoEngine::Renderer2D::drawQuad(m_squarePos + glm::vec3{0.2, 0.2, 0.0}, m_squareAngle, m_squareScale, m_texture, m_squareCol);
+        // ChoreoEngine::Renderer2D::drawQuad(m_squarePos + glm::vec3{-0.2, 0.2, 0.0}, m_squareAngle, m_squareScale, m_logoTexture);
         ChoreoEngine::Renderer2D::endScene();
     }
 

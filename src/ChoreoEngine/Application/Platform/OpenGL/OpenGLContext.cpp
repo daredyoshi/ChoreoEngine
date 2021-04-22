@@ -13,12 +13,13 @@ namespace ChoreoEngine{
 	void ChoreoEngine::OpenGLContext::Init() 
 	{
         CE_PROFILE_FUNCTION ();
-        // Set glfw to use open gl version 3.3 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5); 
         // scale to monitor dpi
         glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+        
 
         glfwMakeContextCurrent(m_windowHandle);
         int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
