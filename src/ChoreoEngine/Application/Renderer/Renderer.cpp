@@ -56,9 +56,9 @@ namespace ChoreoEngine{
         // these are the limits for each batched draw call
         // if it goes above this we will simply do more draw calls per frame
         // but with the maxQuads per draw call
-        const uint32_t maxQuads = 10000;
-        const uint32_t maxVertices = maxQuads * 4;
-        const uint32_t maxIndices = maxQuads * 6;
+        static const uint32_t maxQuads = 2;
+        static const uint32_t maxVertices = maxQuads * 4;
+        static const uint32_t maxIndices = maxQuads * 6;
         static const uint32_t maxTextureSlots = 32; // TODO: Render Caps
 
         // should probably be Scope isntead
@@ -79,6 +79,8 @@ namespace ChoreoEngine{
         uint32_t textureSlotIndex = 1; // 0 is the white empty texture
 
         glm::vec4 quadVertexPositions[4];
+
+        Renderer2D::Stats stats;
     };
 
 
@@ -131,6 +133,8 @@ namespace ChoreoEngine{
             offset +=4;
         }
 
+
+
         Ref<IndexBuffer> quadIB;
         // would be great to set the update type to dynamic somehow...
         quadIB = IndexBuffer::create(quadIndices, s_storage.maxIndices);
@@ -173,12 +177,7 @@ namespace ChoreoEngine{
 
         s_storage.shader2D->bind();
         s_storage.shader2D->setMat4("u_viewProjection", cam.getViewProjectionMatrix());
-
-        s_storage.quadIndexCount = 0;
-        // now we can increment this without ofsetting base 
-        s_storage.quadVertexBufferPtr = s_storage.quadVertexBufferBase;
-
-        s_storage.textureSlotIndex = 1;
+        resetCounters();
     }
 
     void Renderer2D::flush(){
@@ -192,7 +191,7 @@ namespace ChoreoEngine{
 
         s_storage.quadVertexArray->bind();
         RenderCommand::DrawIndexed(s_storage.quadVertexArray, s_storage.quadIndexCount);
-
+        s_storage.stats.drawCalls++;
     }
 
     void Renderer2D::endScene(){
@@ -202,6 +201,18 @@ namespace ChoreoEngine{
         uint32_t dataSize = (uint8_t*)s_storage.quadVertexBufferPtr - (uint8_t*)s_storage.quadVertexBufferBase;
         s_storage.quadVertexBuffer->setData(s_storage.quadVertexBufferBase, dataSize);
         flush();
+    }
+
+    void Renderer2D::resetCounters(){
+        s_storage.quadIndexCount = 0;
+        s_storage.quadVertexBufferPtr = s_storage.quadVertexBufferBase;
+        s_storage.textureSlotIndex = 1;
+    }
+
+    void Renderer2D::startNewBatch(){
+        CE_PROFILE_FUNCTION();
+        Renderer2D::endScene();
+        Renderer2D::resetCounters();
     }
 
 
@@ -225,10 +236,15 @@ namespace ChoreoEngine{
 
     void Renderer2D::drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex, const glm::vec4& color){
         CE_PROFILE_FUNCTION();  
+
+        if(s_storage.quadIndexCount >= Renderer2DStorage::maxIndices){
+            startNewBatch();
+        }
+
         float tilingFactor = 2.0;
-
-
         float textureIndex = 0;
+
+
         // if the tex is not the empty tex find it's id
         if (!( *tex.get() == *s_storage.emptyTex.get() )){
             // check if textuer index in indices here
@@ -283,7 +299,19 @@ namespace ChoreoEngine{
         s_storage.quadVertexBufferPtr++;
 
         s_storage.quadIndexCount+=6;
+        s_storage.stats.quadCount++;
 
     }
+
+    void Renderer2D::resetStats(){
+        s_storage.stats.drawCalls = 0;
+        s_storage.stats.quadCount= 0;
+    }
+
+    Renderer2D::Stats Renderer2D::getStats() {
+        return s_storage.stats;
+    }
+
+    
 }
 

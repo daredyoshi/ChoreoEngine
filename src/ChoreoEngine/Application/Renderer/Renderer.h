@@ -46,5 +46,20 @@ namespace ChoreoEngine {
         static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex);
         static void drawQuad(const glm::vec2& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex, const glm::vec4& color);
         static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex, const glm::vec4& color);
+
+        struct Stats{
+            uint32_t drawCalls{0};
+            uint32_t quadCount{0};
+
+            uint32_t getTotalVertexCount() { return quadCount * 4; }
+            uint32_t getTotalIndexCount() { return quadCount * 6; }
+        }; 
+        static void resetStats();
+        static Stats getStats();
+
+    private:
+        static void resetCounters();
+        static void startNewBatch();
+        
     };
 }
