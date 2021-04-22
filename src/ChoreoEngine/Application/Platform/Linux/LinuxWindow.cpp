@@ -14,6 +14,8 @@ namespace ChoreoEngine{
 
     static void GLFWErrorCallback(int error, const char* description){
         CE_CORE_ERROR("GLFW Error ( {0} ): {1}", error, description);
+        (void)error;
+        (void)description;
     }
 
     // this overwrites the window constructor with a linux window constructor

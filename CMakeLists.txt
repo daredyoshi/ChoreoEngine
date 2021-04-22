@@ -9,14 +9,18 @@ set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
 # for unused variables
 # set(gcc_flags "-Wall;-Werror;-Wunused;-Wextra;-Wshadow;-Wshadow;-Wformat=2;-pedantic-errors;-std=c++17")
 
-set(gcc_flags "-Wall;-Werror;-Wunused;-Wno-unused-variable;-Wextra;-Wshadow;-Wshadow;-Wformat=2;-pedantic-errors;-std=c++17")
+# set(gcc_flags "-Wall;-Werror;-Wunused;-Wno-unused-variable;-Wextra;-Wshadow;-Wshadow;-Wformat=2;-pedantic-errors;-std=c++17")
 set(msvc_flags "-W3")
 
 # set up a Choreo Debug variable
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCE_DEBUG -DCE_ENABLE_ASSERTS ")
+message("Build Type = ${CMAKE_BUILD_TYPE}")
+IF(CMAKE_BUILD_TYPE MATCHES Debug)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCE_DEBUG -DCE_ENABLE_ASSERTS ")
+    message("debug mode")
+ENDIF(CMAKE_BUILD_TYPE MATCHES Debug)
 # uncomment the line below to enable profiling.
 # CE will write out json logs that you can load into chrome://trace
-# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCE_PROFILE")
+# add_compile_definitions(CE_PROFILE)
 set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
 
 # ideally you would set these cmake

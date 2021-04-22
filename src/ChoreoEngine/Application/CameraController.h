@@ -7,6 +7,13 @@
 #include "Application/Events/MouseEvent.h"
 
 namespace ChoreoEngine{
+    struct OrthographicCameraBounds{
+        float left, right;
+        float bottom, top;
+
+        float getWidth() const { return right - left; }
+        float getHeight() const { return top - bottom; }
+    };
 
     // this will basically be a viewport into our view
     class OrthographicCameraController {
@@ -15,6 +22,7 @@ namespace ChoreoEngine{
         
         void onUpdate(TimeStep timestep);
         void onEvent(Event& e);
+        const OrthographicCameraBounds& getBounds() const { return m_bounds; }
 
         OrthographicCamera& getCamera() { return m_camera; }
         const OrthographicCamera& getCamera() const { return m_camera; }
@@ -25,7 +33,9 @@ namespace ChoreoEngine{
 
         float m_aspectRatio;
         float m_zoomLevel{1.0f};
+        float m_zoomSpeed{0.25f};
 
+        OrthographicCameraBounds m_bounds;
         OrthographicCamera m_camera;
         
         bool m_allowRotation = false;
@@ -34,6 +44,6 @@ namespace ChoreoEngine{
 
         float m_translationSpeed{1.0};
         float m_rotationSpeed{50.0};
-        float m_zoomSpeed{0.2};
+
     };
 }

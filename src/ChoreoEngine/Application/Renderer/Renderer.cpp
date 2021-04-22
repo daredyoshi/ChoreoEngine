@@ -56,7 +56,7 @@ namespace ChoreoEngine{
         // these are the limits for each batched draw call
         // if it goes above this we will simply do more draw calls per frame
         // but with the maxQuads per draw call
-        static const uint32_t maxQuads = 2;
+        static const uint32_t maxQuads = 10000;
         static const uint32_t maxVertices = maxQuads * 4;
         static const uint32_t maxIndices = maxQuads * 6;
         static const uint32_t maxTextureSlots = 32; // TODO: Render Caps
@@ -217,24 +217,24 @@ namespace ChoreoEngine{
 
 
     // default z to 0
-    void Renderer2D::drawQuad(const glm::vec2& pos, const float angle, const glm::vec2& size, const glm::vec4& color){
-        drawQuad({pos.x, pos.y, 0.0f}, angle, size, s_storage.emptyTex, color);
+    void Renderer2D::drawQuad(const glm::vec2& pos, const float angleInRadians, const glm::vec2& size, const glm::vec4& color){
+        drawQuad({pos.x, pos.y, 0.0f}, angleInRadians, size, s_storage.emptyTex, color);
     }
 
-    void Renderer2D::drawQuad(const glm::vec3& pos, const float angle, const glm::vec2& size, const glm::vec4& color){
-        drawQuad( pos, angle, size, s_storage.emptyTex, color );
+    void Renderer2D::drawQuad(const glm::vec3& pos, const float angleInRadians, const glm::vec2& size, const glm::vec4& color){
+        drawQuad( pos, angleInRadians, size, s_storage.emptyTex, color );
     }
-    void Renderer2D::drawQuad(const glm::vec2& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex){
-        drawQuad({pos.x, pos.y, 0.0f}, angle, size, tex, glm::vec4{1});
+    void Renderer2D::drawQuad(const glm::vec2& pos,  const float angleInRadians, const glm::vec2& size, const Ref<Texture2D>& tex){
+        drawQuad({pos.x, pos.y, 0.0f}, angleInRadians, size, tex, glm::vec4{1});
     }
-    void Renderer2D::drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex){
-        drawQuad(pos, angle, size, tex, glm::vec4{1});
+    void Renderer2D::drawQuad(const glm::vec3& pos,  const float angleInRadians, const glm::vec2& size, const Ref<Texture2D>& tex){
+        drawQuad(pos, angleInRadians, size, tex, glm::vec4{1});
     }
-    void Renderer2D::drawQuad(const glm::vec2& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex, const glm::vec4& color){
-        drawQuad({pos.x, pos.y, 0.0f}, angle, size, tex, color);
+    void Renderer2D::drawQuad(const glm::vec2& pos,  const float angleInRadians, const glm::vec2& size, const Ref<Texture2D>& tex, const glm::vec4& color){
+        drawQuad({pos.x, pos.y, 0.0f}, angleInRadians, size, tex, color);
     }
 
-    void Renderer2D::drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex, const glm::vec4& color){
+    void Renderer2D::drawQuad(const glm::vec3& pos,  const float angleInRadians, const glm::vec2& size, const Ref<Texture2D>& tex, const glm::vec4& color){
         CE_PROFILE_FUNCTION();  
 
         if(s_storage.quadIndexCount >= Renderer2DStorage::maxIndices){
@@ -243,6 +243,9 @@ namespace ChoreoEngine{
 
         float tilingFactor = 2.0;
         float textureIndex = 0;
+
+
+        const glm::vec2[8] uvs {{ glm::vec2{0.0f, 0.0f}, glm::vec2{1.0f, 0.0f}, glm::vec2{1.0f, 1.0f}, glm::vec2{0.0f, 1.0f}  } };
 
 
         // if the tex is not the empty tex find it's id
@@ -266,16 +269,19 @@ namespace ChoreoEngine{
 
         // figure out rotation
         glm::mat4 xform = glm::translate(glm::mat4(1.0f), pos);
-        xform *= glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3{0, 0, 1});
+        xform *= glm::rotate(glm::mat4(1.0f), angleInRadians, glm::vec3{0, 0, 1});
         xform *= glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0});
 
-        // vertex 1 
-        s_storage.quadVertexBufferPtr->position = xform * s_storage.quadVertexPositions[0];
-        s_storage.quadVertexBufferPtr->color = color;
-        s_storage.quadVertexBufferPtr->uv= {0.0f, 0.0f};
-        s_storage.quadVertexBufferPtr->textureIndex= textureIndex;
-        s_storage.quadVertexBufferPtr->tilingFactor= tilingFactor;
-        s_storage.quadVertexBufferPtr++;
+        for(unsigned int i{0}; i<4; ++i){
+            // vertex 1 
+            s_storage.quadVertexBufferPtr->position = xform * s_storage.quadVertexPositions[i];
+            s_storage.quadVertexBufferPtr->color = color;
+            s_storage.quadVertexBufferPtr->uv= uvs[i];
+            s_storage.quadVertexBufferPtr->textureIndex= textureIndex;
+            s_storage.quadVertexBufferPtr->tilingFactor= tilingFactor;
+            ++s_storage.quadVertexBufferPtr;
+
+        }
         // vertex 2 
         s_storage.quadVertexBufferPtr->position = xform * s_storage.quadVertexPositions[1];
         s_storage.quadVertexBufferPtr->color = color;

@@ -27,6 +27,7 @@ void ChoreoEngine::OpenGLTexture2D::setdata(void* data, uint32_t size) {
     // make sure the images is the same size
     uint32_t bpc = m_dataFormat == GL_RGBA ? 4 : 3; // bytes per chanel
     CE_CORE_ASSERT(size == m_width * m_height * bpc, "Size does not match Texture size!");
+    (void)size;
     glTextureSubImage2D(m_rendererId, 0, 0, 0, m_width, m_height, m_dataFormat, GL_UNSIGNED_BYTE, data);
 }
 

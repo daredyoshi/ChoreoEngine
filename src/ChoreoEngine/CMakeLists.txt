@@ -42,6 +42,7 @@ set(
     Application/Renderer/Shader.cpp
     Application/Renderer/Camera.cpp
     Application/Renderer/Texture.cpp
+    Application/Renderer/SubTexture2D.cpp
     Application/Renderer/VertexArray.cpp
     Application/Renderer/RenderCommand.cpp
     Application/Renderer/RendererAPI.cpp

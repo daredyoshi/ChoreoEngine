@@ -8,7 +8,10 @@
 
 namespace ChoreoEngine {
 	OrthographicCameraController::OrthographicCameraController(float aspectRatio, bool rotation)
-        : m_aspectRatio{aspectRatio}, m_camera(-m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel),
+        :
+            m_aspectRatio{aspectRatio}, 
+            m_bounds({ -m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel }),
+            m_camera(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top),
             m_allowRotation{rotation}
 	{
         CE_PROFILE_FUNCTION();  
@@ -19,7 +22,8 @@ namespace ChoreoEngine {
         CE_PROFILE_FUNCTION();  
         m_zoomLevel -=m_zoomSpeed *  e.getYOffset();
         m_zoomLevel = std::max(0.25f, m_zoomLevel);
-        m_camera.setProjection(-m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel);
+        m_bounds = { -m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel };
+        m_camera.setProjection(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top);
         m_translationSpeed = m_zoomLevel;
 		return false;
 	}
@@ -28,7 +32,8 @@ namespace ChoreoEngine {
 	{
         CE_PROFILE_FUNCTION();  
         m_aspectRatio = (float)e.getWidth() / (float)e.getHeight();
-        m_camera.setProjection(-m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel);
+        m_bounds = { -m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel };
+        m_camera.setProjection(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top);
 		return false;
 	}
 
