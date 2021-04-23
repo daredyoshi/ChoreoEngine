@@ -36,7 +36,34 @@ add_subdirectory(src/dependencies/glad)
 add_subdirectory(src/dependencies/imgui)
 add_subdirectory(src/dependencies/glm)
 add_subdirectory(src/ChoreoApp)
+add_subdirectory(src/ChoreoGrapher)
 add_subdirectory(src/Sandbox)
 
 
 
+add_custom_target(
+    copy_shader_files
+    ${CMAKE_COMMAND}
+    -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets/shaders
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/shaders
+    COMMENT "Copying shader files" VERBATIM
+    )
+
+add_dependencies( ChoreoApp copy_shader_files )
+add_dependencies( ChoreoGrapher copy_shader_files )
+add_dependencies( Sandbox copy_shader_files )
+
+# add custom target to copy texture files across
+
+add_custom_target(
+    copy_texture_files 
+    ${CMAKE_COMMAND}
+    -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets/textures
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/textures
+    COMMENT "Copying texture files" VERBATIM
+    )
+# ChoreoEngine doesn't need textures
+add_dependencies( ChoreoGrapher copy_texture_files )
+add_dependencies( Sandbox copy_texture_files )
