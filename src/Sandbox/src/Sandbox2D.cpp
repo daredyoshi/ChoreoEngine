@@ -40,21 +40,7 @@ void Sandbox2D::onUpdate(ChoreoApp::TimeStep& timestep) {
     }
     if (ChoreoApp::Input::isMouseButtonPressed(CE_MOUSE_BUTTON_LEFT))
 	{
-		auto [x, y] = ChoreoApp::Input::getMousePosition();
-		auto width = ChoreoApp::Application::get().getWindow().getWidth();
-		auto height = ChoreoApp::Application::get().getWindow().getHeight();
-
-		auto bounds = m_camController.getBounds();
-		auto pos = m_camController.getCamera().getPosition();
-		x = (x / width) * bounds.getWidth() - bounds.getWidth() * 0.5f;
-		y = bounds.getHeight() * 0.5f - (y / height) * bounds.getHeight();
-		m_Particle.Position = { x + pos.x, y + pos.y };
-		for (int i = 0; i < 5; i++)
-			m_ParticleSystem.Emit(m_Particle);
 	}
-
-	m_ParticleSystem.OnUpdate(timestep);
-	m_ParticleSystem.OnRender(m_camController.getCamera());
 }
 
 

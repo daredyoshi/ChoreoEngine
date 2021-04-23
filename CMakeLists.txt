@@ -9,14 +9,15 @@ set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
 # for unused variables
 # set(gcc_flags "-Wall;-Werror;-Wunused;-Wextra;-Wshadow;-Wshadow;-Wformat=2;-pedantic-errors;-std=c++17")
 
-# set(gcc_flags "-Wall;-Werror;-Wunused;-Wno-unused-variable;-Wextra;-Wshadow;-Wshadow;-Wformat=2;-pedantic-errors;-std=c++17")
+set(gcc_flags "-Wall;-Werror;-Wunused;-Wno-unused-variable;-Wextra;-Wshadow;-Wshadow;-Wformat=2;-pedantic-errors;-std=c++17")
 set(msvc_flags "-W3")
 
 # set up a Choreo Debug variable
-message("Build Type = ${CMAKE_BUILD_TYPE}")
 IF(CMAKE_BUILD_TYPE MATCHES Debug)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DCE_DEBUG -DCE_ENABLE_ASSERTS ")
-    message("debug mode")
+    message("Building in Debug mode")
+ELSE()
+    message("Building in Release mode")
 ENDIF(CMAKE_BUILD_TYPE MATCHES Debug)
 # uncomment the line below to enable profiling.
 # CE will write out json logs that you can load into chrome://trace
@@ -36,9 +37,13 @@ add_subdirectory(src/dependencies/glad)
 add_subdirectory(src/dependencies/imgui)
 add_subdirectory(src/dependencies/glm)
 add_subdirectory(src/ChoreoApp)
-add_subdirectory(src/ChoreoGrapher)
-add_subdirectory(src/Sandbox)
 
+add_subdirectory(src/ChoreoGrapher)
+add_dependencies(ChoreoGrapher ChoreoApp)
+
+
+add_subdirectory(src/Sandbox)
+add_dependencies(Sandbox ChoreoApp)
 
 
 add_custom_target(

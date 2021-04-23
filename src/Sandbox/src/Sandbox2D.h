@@ -1,7 +1,6 @@
 # pragma once
 #include "Application/Renderer/SubTexture2D.h"
 #include "Application/Timestep.h"
-#include "ParticleSystem.h"
 #include "ChoreoApp.h"
 #include <unordered_map>
 
@@ -40,8 +39,6 @@ private:
     };
 
     std::vector<ProfileResult> m_profileResults;
-	ParticleProps m_Particle;
-	ParticleSystem m_ParticleSystem;
 
     std::unordered_map<char, ChoreoApp::Ref<ChoreoApp::SubTexture2D>> s_textureMap;
     uint32_t m_mapWidth, m_mapHeight;

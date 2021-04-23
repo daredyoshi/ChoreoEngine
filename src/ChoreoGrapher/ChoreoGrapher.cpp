@@ -22,6 +22,7 @@ public:
     }
 
     virtual void onUpdate(ChoreoApp::TimeStep& timestep) override {
+        (void)timestep;
     }
 
     virtual void onEvent(ChoreoApp::Event& e) override{

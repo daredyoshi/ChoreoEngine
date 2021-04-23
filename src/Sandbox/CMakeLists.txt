@@ -5,7 +5,6 @@ set(
     SandboxSources
     SandboxApp.cpp
     src/Sandbox2D.cpp
-    src/ParticleSystem.cpp
     )
 
 
