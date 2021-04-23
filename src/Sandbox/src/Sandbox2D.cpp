@@ -7,6 +7,16 @@
 #include "glm/gtc/type_ptr.hpp"
 
 
+static const uint32_t s_mapWith = 23;
+static const char* s_mapTiles = 
+"00000000000____________"
+"00000000000000000000000"
+"00000000000000000000000"
+"00000000000000000000000"
+"0000000000000000D000000"
+"_______________________"
+"00000000000000000000000"
+;
 
 void Sandbox2D::onAttach() {
     // init particle system
@@ -17,6 +27,16 @@ void Sandbox2D::onAttach() {
 	m_Particle.Velocity = { 0.0f, 0.0f };
 	m_Particle.VelocityVariation = { 3.0f, 1.0f };
 	m_Particle.Position = { 0.0f, 0.0f };
+
+    m_camController.setZoomLevel(5.0f);
+
+    m_mapWidth = s_mapWith;
+    m_mapHeight = strlen(s_mapTiles) / m_mapWidth;
+
+    s_textureMap['_'] = m_brick;
+    s_textureMap['D'] = m_door;
+
+
 }
 void Sandbox2D::onDetach() {
 
@@ -37,26 +57,31 @@ void Sandbox2D::onUpdate(ChoreoEngine::TimeStep& timestep) {
         ChoreoEngine::RenderCommand::setClearColor(glm::vec4{ 0.1f, 0.1f, 0.1f, 1.0f });
         ChoreoEngine::RenderCommand::clear();
 
-        // draw lots of test quads
-        // ChoreoEngine::Renderer2D::beginScene(m_camController.getCamera());
-        // for(float y{-5.0f}; y < 5.0f; y +=0.1){
-        //     for(float x{-5.0f}; x < 5.0f; x +=0.1){
-        //         glm::vec4 color= { ( x + 5.0f  )/ 10.0f, ( y + 5.0  )/ 10.0f, 0.5f, 0.5f };
-        //         ChoreoEngine::Renderer2D::drawQuad({x, y}, glm::radians(m_squareAngle), { 0.045f, 0.045f}  , color);
-        //     }        
-        //             
-        // }
-        // ChoreoEngine::Renderer2D::endScene();
 
 
         ChoreoEngine::Renderer2D::beginScene(m_camController.getCamera());
-        ChoreoEngine::Renderer2D::drawQuad({0.0, 0.8, -0.1}, glm::radians(m_squareAngle), m_squareScale, {0.0, 0.1, 0.7, 1.0});
-        ChoreoEngine::Renderer2D::drawQuad(m_squarePos, glm::radians(m_squareAngle), m_squareScale, m_squareCol);
+        // ChoreoEngine::Renderer2D::drawQuad({0.0, 0.8, -0.1}, glm::radians(m_squareAngle), m_squareScale, {0.0, 0.1, 0.7, 1.0});
+        // ChoreoEngine::Renderer2D::drawQuad(m_squarePos, glm::radians(m_squareAngle), m_squareScale, m_squareCol);
 
         
         // ChoreoEngine::Renderer2D::drawQuad(m_squarePos + glm::vec3{0.2, 0.2, 0.0}, glm::radians(m_squareAngle), m_squareScale, m_logoTexture, m_squareCol);
-        ChoreoEngine::Renderer2D::drawQuad(m_squarePos + glm::vec3{-0.2, 0.2, 0.0}, glm::radians(m_squareAngle), m_squareScale, m_brick);
-        ChoreoEngine::Renderer2D::drawQuad(m_squarePos + glm::vec3{0.2, -0.2, 0.0}, glm::radians(m_squareAngle), {1.5f, 2.0f}, m_door);
+        // ChoreoEngine::Renderer2D::drawQuad(m_squarePos + glm::vec3{-0.2, 0.2, 0.0}, glm::radians(m_squareAngle), m_squareScale, m_brick);
+        // ChoreoEngine::Renderer2D::drawQuad(m_squarePos + glm::vec3{0.2, -0.2, 0.0}, glm::radians(m_squareAngle), {1.5f, 2.0f}, m_door);
+
+        for(uint32_t y{0}; y < m_mapHeight; ++y){
+            for(uint32_t x{0}; x < m_mapWidth; ++x){
+                char tileType = s_mapTiles[x + y*m_mapWidth];
+                // door is an exra big texture
+                if(tileType == 'D'){ 
+                    ChoreoEngine::Renderer2D::drawQuad(glm::vec3{x + 2.0f, m_mapHeight - y + 1.5, 0.0}, glm::radians(0.0), {3.0f, 4.0f}, s_textureMap[tileType]);
+                }
+                // all 1x1 textures
+                else if (tileType != '0'){
+                    ChoreoEngine::Renderer2D::drawQuad(glm::vec3{x, m_mapHeight - y, 0.0}, glm::radians(0.0), {1.0f, 1.0f}, s_textureMap[tileType]);
+                } 
+                        
+            }        
+        }
 
         ChoreoEngine::Renderer2D::endScene();
 

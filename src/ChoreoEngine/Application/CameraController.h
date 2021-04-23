@@ -27,6 +27,9 @@ namespace ChoreoEngine{
         OrthographicCamera& getCamera() { return m_camera; }
         const OrthographicCamera& getCamera() const { return m_camera; }
 
+        float getZoomLevel() const { return m_zoomLevel; }
+        void setZoomLevel(float level) { m_zoomLevel = level; recalculateViewMatrix(); }
+
         void recalculateViewMatrix();
 
     private:

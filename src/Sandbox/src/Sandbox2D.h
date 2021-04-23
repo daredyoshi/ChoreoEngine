@@ -3,6 +3,8 @@
 #include "Application/Timestep.h"
 #include "ParticleSystem.h"
 #include "ChoreoEngine.h"
+#include <unordered_map>
+
 
 class Sandbox2D : public ChoreoEngine::Layer{
 public:
@@ -40,4 +42,7 @@ private:
     std::vector<ProfileResult> m_profileResults;
 	ParticleProps m_Particle;
 	ParticleSystem m_ParticleSystem;
+
+    std::unordered_map<char, ChoreoEngine::Ref<ChoreoEngine::SubTexture2D>> s_textureMap;
+    uint32_t m_mapWidth, m_mapHeight;
 };
