@@ -35,7 +35,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_subdirectory(src/dependencies/glad)
 add_subdirectory(src/dependencies/imgui)
 add_subdirectory(src/dependencies/glm)
-add_subdirectory(src/ChoreoEngine)
+add_subdirectory(src/ChoreoApp)
 add_subdirectory(src/Sandbox)
 
 

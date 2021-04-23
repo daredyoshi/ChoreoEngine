@@ -23,7 +23,7 @@ ParticleSystem::ParticleSystem()
 	m_ParticlePool.resize(1000);
 }
 
-void ParticleSystem::OnUpdate(ChoreoEngine::TimeStep ts)
+void ParticleSystem::OnUpdate(ChoreoApp::TimeStep ts)
 {
 	for (auto& particle : m_ParticlePool)
 	{
@@ -42,9 +42,9 @@ void ParticleSystem::OnUpdate(ChoreoEngine::TimeStep ts)
 	}
 }
 
-void ParticleSystem::OnRender(ChoreoEngine::OrthographicCamera& camera)
+void ParticleSystem::OnRender(ChoreoApp::OrthographicCamera& camera)
 {
-    ChoreoEngine::Renderer2D::beginScene(camera);
+    ChoreoApp::Renderer2D::beginScene(camera);
 	for (auto& particle : m_ParticlePool)
 	{
 		if (!particle.Active)
@@ -56,10 +56,10 @@ void ParticleSystem::OnRender(ChoreoEngine::OrthographicCamera& camera)
 		//color.a = color.a * life;
 
 		float size = glm::lerp(particle.SizeEnd, particle.SizeBegin, life);
-        ChoreoEngine::Renderer2D::drawQuad(particle.Position, particle.Rotation, {size,size},  color);
+        ChoreoApp::Renderer2D::drawQuad(particle.Position, particle.Rotation, {size,size},  color);
 		
 	}
-    ChoreoEngine::Renderer2D::endScene();
+    ChoreoApp::Renderer2D::endScene();
 }
 
 void ParticleSystem::Emit(const ParticleProps& particleProps)

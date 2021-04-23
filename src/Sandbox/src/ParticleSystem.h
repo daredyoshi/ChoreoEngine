@@ -1,5 +1,5 @@
 #pragma once
-#include "ChoreoEngine.h"
+#include "ChoreoApp.h"
 #include <random>
 
 struct ParticleProps
@@ -16,8 +16,8 @@ class ParticleSystem
 public:
 	ParticleSystem();
 
-	void OnUpdate(ChoreoEngine::TimeStep ts);
-	void OnRender(ChoreoEngine::OrthographicCamera& camera);
+	void OnUpdate(ChoreoApp::TimeStep ts);
+	void OnRender(ChoreoApp::OrthographicCamera& camera);
 
 	void Emit(const ParticleProps& particleProps);
 private:
@@ -38,7 +38,7 @@ private:
 	uint32_t m_PoolIndex {999};
 
 	uint32_t m_QuadVA = 0;
-	std::unique_ptr<ChoreoEngine::Shader> m_ParticleShader;
+	std::unique_ptr<ChoreoApp::Shader> m_ParticleShader;
 	int m_ParticleShaderViewProj, m_ParticleShaderTransform, m_ParticleShaderColor;
 };
 
