@@ -4,7 +4,7 @@
 #include "RendererAPI.h"
 #include "Camera.h"
 #include "Shader.h"
-#include "Texture.h"
+#include "SubTexture2D.h"
 #include <memory>
 
 namespace ChoreoEngine {
@@ -42,10 +42,10 @@ namespace ChoreoEngine {
         // TODO: Replace this with a properties struct and single function
         static void drawQuad(const glm::vec2& pos, const float angle,  const glm::vec2& size, const glm::vec4& color);
         static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const glm::vec4& color);
-        static void drawQuad(const glm::vec2& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex);
-        static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex);
-        static void drawQuad(const glm::vec2& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex, const glm::vec4& color);
-        static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<Texture2D>& tex, const glm::vec4& color);
+        static void drawQuad(const glm::vec2& pos,  const float angle, const glm::vec2& size, const Ref<SubTexture2D>& tex);
+        static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<SubTexture2D>& tex);
+        static void drawQuad(const glm::vec2& pos,  const float angle, const glm::vec2& size, const Ref<SubTexture2D>& tex, const glm::vec4& color);
+        static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<SubTexture2D>& tex, const glm::vec4& color);
 
         struct Stats{
             uint32_t drawCalls{0};

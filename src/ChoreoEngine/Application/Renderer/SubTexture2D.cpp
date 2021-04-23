@@ -11,12 +11,10 @@ ChoreoEngine::SubTexture2D::SubTexture2D(const Ref<Texture2D>& texture, const gl
     m_uvs[3] = {min.x, max.y}; 
 }
 
-ChoreoEngine::Ref<ChoreoEngine::SubTexture2D> ChoreoEngine::SubTexture2D::createFromCoords(glm::vec2 spriteIdx, glm::vec2 spriteSize)
-{
-    const 
-
-    glm::vec2 min = { {spriteIdx.x * spriteSize.x}, spriteSize }
-    
-	return SubTexture2D{};
+ChoreoEngine::Ref<ChoreoEngine::SubTexture2D> ChoreoEngine::SubTexture2D::createFromCoords(const Ref<Texture2D>& texture , const glm::vec2 spriteUnitCoords, const glm::vec2 spriteUnitDimensions, const unsigned int spriteUnitPixels){
+    CE_CORE_TRACE(" texture dimensions {0}, {1}", texture->getWidth(), texture->getHeight());
+    glm::vec2 min = { ( spriteUnitCoords.x * spriteUnitPixels ) / texture->getWidth(), ( spriteUnitCoords.y * spriteUnitPixels ) / texture->getHeight()};
+    glm::vec2 max = { ( (spriteUnitCoords.x + spriteUnitDimensions.x) * spriteUnitPixels ) / texture->getWidth(), ((spriteUnitCoords.y + spriteUnitDimensions.y) * spriteUnitPixels) / texture->getHeight()};
+	return CreateRef<SubTexture2D>(texture, min, max);
 }
 

@@ -1,4 +1,5 @@
 # pragma once
+#include "Application/Renderer/SubTexture2D.h"
 #include "Application/Timestep.h"
 #include "ParticleSystem.h"
 #include "ChoreoEngine.h"
@@ -24,6 +25,8 @@ private:
     ChoreoEngine::Ref<ChoreoEngine::Texture2D> m_texture{ChoreoEngine::Texture2D::create(ChoreoEngine::Application::get().getRootDir() + "assets/textures/ghoul.jpg")};
     ChoreoEngine::Ref<ChoreoEngine::Texture2D> m_logoTexture{ChoreoEngine::Texture2D::create(ChoreoEngine::Application::get().getRootDir() + "assets/textures/graphic.png")};
     ChoreoEngine::Ref<ChoreoEngine::Texture2D> m_spriteSheet{ChoreoEngine::Texture2D::create(ChoreoEngine::Application::get().getRootDir() + "assets/textures/gothicvania/old-dark-castle-interior-tileset.png")};
+    ChoreoEngine::Ref<ChoreoEngine::SubTexture2D> m_brick{ChoreoEngine::SubTexture2D::createFromCoords(m_spriteSheet, glm::vec2{3.0f, 3.0f}, glm::vec2{1.0f, 1.0f}, 8)};
+    ChoreoEngine::Ref<ChoreoEngine::SubTexture2D> m_door{ChoreoEngine::SubTexture2D::createFromCoords(m_spriteSheet, glm::vec2{41.0f, 8.0f}, glm::vec2{3.0f, 4.0f}, 8)};
     glm::vec3 m_squarePos{0};
     glm::vec4 m_squareCol{0.8, 0.2, 0.2, 1.0};
     glm::vec2 m_squareScale{1.0f, 1.0f};

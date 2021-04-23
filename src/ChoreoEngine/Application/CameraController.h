@@ -27,6 +27,8 @@ namespace ChoreoEngine{
         OrthographicCamera& getCamera() { return m_camera; }
         const OrthographicCamera& getCamera() const { return m_camera; }
 
+        void recalculateViewMatrix();
+
     private:
         bool onMouseScrolled(MouseScrollEvent& e);
         bool onWindowResized(WindowResizeEvent& e);

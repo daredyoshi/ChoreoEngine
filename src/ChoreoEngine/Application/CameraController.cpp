@@ -22,18 +22,21 @@ namespace ChoreoEngine {
         CE_PROFILE_FUNCTION();  
         m_zoomLevel -=m_zoomSpeed *  e.getYOffset();
         m_zoomLevel = std::max(0.25f, m_zoomLevel);
-        m_bounds = { -m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel };
-        m_camera.setProjection(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top);
+        recalculateViewMatrix();
         m_translationSpeed = m_zoomLevel;
 		return false;
 	}
+
+    void OrthographicCameraController::recalculateViewMatrix(){
+        m_bounds = { -m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel };
+        m_camera.setProjection(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top);
+    }
 
 	bool OrthographicCameraController::onWindowResized(WindowResizeEvent& e)
 	{
         CE_PROFILE_FUNCTION();  
         m_aspectRatio = (float)e.getWidth() / (float)e.getHeight();
-        m_bounds = { -m_aspectRatio * m_zoomLevel, m_aspectRatio * m_zoomLevel, -m_zoomLevel, m_zoomLevel };
-        m_camera.setProjection(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top);
+        recalculateViewMatrix();
 		return false;
 	}
 
