@@ -19,6 +19,7 @@ namespace ChoreoApp{
         virtual ~Application();
         void run();
         void onEvent(Event& e);
+        void close();
 
         void pushLayer(Layer* layer);
         void pushOverlay(Layer* layer);

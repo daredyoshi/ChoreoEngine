@@ -16,6 +16,7 @@ namespace ChoreoApp {
 
         virtual uint32_t  getWidth() const  override {return m_width;};
         virtual uint32_t  getHeight() const override {return m_height;};
+        virtual uint32_t getId() const override { return m_rendererId; }
 
         virtual void setdata(void* data, uint32_t size) override;
         

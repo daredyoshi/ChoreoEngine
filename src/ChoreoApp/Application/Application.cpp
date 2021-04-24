@@ -96,6 +96,11 @@ namespace ChoreoApp {
         };
     }
 
+    void Application::close(){
+        CE_PROFILE_FUNCTION();
+        m_running = false;
+    }
+
     bool Application::onWindowClose(WindowCloseEvent& e){
         (void)e;
         m_running = false;

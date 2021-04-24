@@ -11,6 +11,7 @@ namespace ChoreoApp{
 
         virtual uint32_t  getWidth() const = 0;
         virtual uint32_t  getHeight() const = 0;
+        virtual uint32_t getId() const = 0; 
         
         virtual void bind(uint32_t slot) const  = 0;
 
