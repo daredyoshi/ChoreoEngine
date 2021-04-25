@@ -4,16 +4,25 @@
 #include <glad/glad.h>
 
 namespace ChoreoApp{
-    OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification& spec)
+    OpenGLFramebuffer::OpenGLFramebuffer(FramebufferSpecification& spec)
         : m_spec{spec} {
                 
     }
 
     OpenGLFramebuffer::~OpenGLFramebuffer(){
         glDeleteFramebuffers(1, &m_rendererID);
+        glDeleteTextures(1, &m_colorAttachement);
+        glDeleteTextures(1, &m_depthAttachement);
     }
 
     void OpenGLFramebuffer::invalidate(){
+        // if there already is a renderer id delete the old and create new
+        if(m_rendererID == 0){
+            glDeleteFramebuffers(1, &m_rendererID);
+            glDeleteTextures(1, &m_colorAttachement);
+            glDeleteTextures(1, &m_depthAttachement);
+        }
+
         glCreateFramebuffers(1, &m_rendererID); 
         glBindFramebuffer(GL_FRAMEBUFFER, m_rendererID);
 
@@ -36,7 +45,6 @@ namespace ChoreoApp{
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_depthAttachement, 0);
 
         CE_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!"); 
-        CE_CORE_INFO("Initialized Framebuffer");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -44,10 +52,16 @@ namespace ChoreoApp{
 
     void OpenGLFramebuffer::bind() const{
         glBindFramebuffer(GL_FRAMEBUFFER, m_rendererID);
+        glViewport(0, 0, m_spec.width, m_spec.height);
     }
 
     void OpenGLFramebuffer::unbind() const {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 
+    void OpenGLFramebuffer::resize(uint32_t width, uint32_t height){
+        m_spec.width = width;
+        m_spec.height = height;
+        invalidate();
     }
 }

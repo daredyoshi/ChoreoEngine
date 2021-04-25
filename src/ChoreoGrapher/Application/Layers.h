@@ -21,11 +21,15 @@ public:
     void onAttach() override;
     void onDetach() override;
 
+
 private:
     ChoreoApp::OrthographicCameraController m_camController;
 
     ChoreoApp::Ref<ChoreoApp::Framebuffer> m_framebuffer;
+    ChoreoApp::FramebufferSpecification m_framebufferSpec;
     ChoreoApp::Ref<ChoreoApp::Texture2D> m_logoTexture{ChoreoApp::Texture2D::create(ChoreoApp::Application::get().getRootDir() + "assets/textures/graphic.png")};
 
     uint32_t m_mapWidth, m_mapHeight;
+
+    glm::vec2 m_viewportSize;
 };

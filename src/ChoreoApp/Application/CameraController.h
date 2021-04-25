@@ -29,6 +29,7 @@ namespace ChoreoApp{
 
         float getZoomLevel() const { return m_zoomLevel; }
         void setZoomLevel(float level) { m_zoomLevel = level; recalculateViewMatrix(); }
+        void resize(const float width,const float height) ;
 
         void recalculateViewMatrix();
 

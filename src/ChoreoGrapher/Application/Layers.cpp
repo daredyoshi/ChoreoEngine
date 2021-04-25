@@ -12,12 +12,11 @@
 void MainLayer::onAttach() {
     CE_PROFILE_FUNCTION();
 
-    ChoreoApp::FramebufferSpecification mainSpec;
     // temp
-    mainSpec.width = 1280;
-    mainSpec.height= 720;
+    m_framebufferSpec.width = 1280;
+    m_framebufferSpec.height= 720;
 
-    m_framebuffer = ChoreoApp::Framebuffer::create(mainSpec);
+    m_framebuffer = ChoreoApp::Framebuffer::create(m_framebufferSpec);
     m_framebuffer->invalidate();
 }
 void MainLayer::onDetach() {
@@ -123,15 +122,8 @@ void MainLayer::onImGuiRender()
 
     // DockSpace
     ImGuiIO& io = ImGui::GetIO();
-    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-    {
-        ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-        ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-    }
-    else
-    {
-        // ShowDockingDisabledMessage();
-    }
+    ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 
     if (ImGui::BeginMenuBar())
     {
@@ -168,11 +160,23 @@ void MainLayer::onImGuiRender()
     ImGui::End();
 
     // viewoprt
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0.0f,0.0f});
     ImGui::Begin("ChoreoGrapher::Viewport");
     uint32_t textureId = m_framebuffer->getColorAttachmenRendererID(); 
+    ImVec2 imViewportSize= ImGui::GetContentRegionAvail();
+    glm::vec2 viewportSize{imViewportSize.x, imViewportSize.y};
 
-    ImGui::Image((void*)(uintptr_t)(textureId), ImVec2{1280.0f, 720.0f}, ImVec2{0.0f, 1.0f}, ImVec2{1.0f, 0.0f});
+    if(m_viewportSize != viewportSize){
+        m_framebuffer->resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+        m_viewportSize = viewportSize;
+
+        m_camController.resize(m_viewportSize.x, m_viewportSize.y);
+         
+    }
+
+    ImGui::Image((void*)(uintptr_t)(textureId), imViewportSize, ImVec2{0.0f, 1.0f}, ImVec2{1.0f, 0.0f});
     ImGui::End();
+    ImGui::PopStyleVar(ImGuiStyleVar_WindowPadding);
     
     ImGui::End();
     // ImGui::ShowDemoWindow();

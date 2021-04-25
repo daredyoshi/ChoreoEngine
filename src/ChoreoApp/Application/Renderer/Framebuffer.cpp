@@ -6,7 +6,7 @@
 
 
 namespace ChoreoApp {
-    Ref<Framebuffer> Framebuffer::create(const FramebufferSpecification& spec){
+    Ref<Framebuffer> Framebuffer::create(FramebufferSpecification& spec){
         switch ( Renderer::getAPI() ){
             case RendererAPI::API::None: CE_CORE_ASSERT(false, "RendererAPI:None is currently not supported!");
             case RendererAPI::API::OpenGL: return CreateRef<OpenGLFramebuffer>(spec);

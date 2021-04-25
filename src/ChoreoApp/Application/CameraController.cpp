@@ -73,4 +73,10 @@ namespace ChoreoApp {
         m_camera.setPosition(m_position);
 	}
 
+    void OrthographicCameraController::resize(const float width, const float height){ 
+        CE_PROFILE_FUNCTION();  
+        m_aspectRatio = width / height;
+        recalculateViewMatrix();
+    }
+
 }

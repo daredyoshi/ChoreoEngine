@@ -243,7 +243,7 @@ namespace ChoreoApp{
             startNewBatch();
         }
 
-        float tilingFactor = 2.0;
+        float tilingFactor = 1.0;
         float textureIndex = 0;
 
 

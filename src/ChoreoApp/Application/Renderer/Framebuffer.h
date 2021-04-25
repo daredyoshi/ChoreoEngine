@@ -22,12 +22,13 @@ namespace ChoreoApp {
 
         virtual void bind() const = 0;
         virtual void unbind() const = 0;
+        virtual void resize(uint32_t width, uint32_t height)= 0;
 
         virtual void invalidate() = 0;
 
         // if rendering to a texture in ImGui this is what you give it
         virtual uint32_t getColorAttachmenRendererID() const = 0;
 
-        static Ref<Framebuffer> create(const FramebufferSpecification& spec);
+        static Ref<Framebuffer> create(FramebufferSpecification& spec);
     };
 }
