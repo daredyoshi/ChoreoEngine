@@ -32,6 +32,7 @@ set(
     Application/Platform/Linux/LinuxInput.cpp
     Application/Platform/OpenGL/OpenGLContext.cpp
     Application/Platform/OpenGL/OpenGLBuffer.cpp
+    Application/Platform/OpenGL/OpenGLFramebuffer.cpp
     Application/Platform/OpenGL/OpenGLVertexArray.cpp
     Application/Platform/OpenGL/OpenGLRendererAPI.cpp
     Application/Platform/OpenGL/OpenGLShader.cpp
@@ -39,6 +40,7 @@ set(
     Application/Renderer/GraphicsContext.cpp
     Application/Renderer/Renderer.cpp
     Application/Renderer/Buffer.cpp
+    Application/Renderer/Framebuffer.cpp
     Application/Renderer/Shader.cpp
     Application/Renderer/Camera.cpp
     Application/Renderer/Texture.cpp

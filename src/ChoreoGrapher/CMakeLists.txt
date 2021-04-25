@@ -1,15 +1,18 @@
 
 # Add an application to play around with
 set(
-
     ChoreoGrapherSources
     ChoreoGrapher.cpp
-    )
+    Application/Layers.cpp
+)
 
+message(${CMAKE_CURRENT_SOURCE_DIR}/Application)
 
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoApp)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Application)
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/dependencies/imgui/)
 link_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoApp/)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/Application)
 
 add_executable(
     ChoreoGrapher ${ChoreoGrapherSources} 
