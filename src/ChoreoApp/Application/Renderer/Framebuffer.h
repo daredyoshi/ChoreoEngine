@@ -17,6 +17,7 @@ namespace ChoreoApp {
 
     class Framebuffer {
     public:
+        virtual ~Framebuffer() = default;
         virtual const FramebufferSpecification& getSpecification() = 0;
         virtual const FramebufferSpecification& getSpecification() const = 0;
 

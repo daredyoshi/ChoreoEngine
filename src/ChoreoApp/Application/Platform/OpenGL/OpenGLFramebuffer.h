@@ -6,6 +6,7 @@ namespace ChoreoApp {
     class OpenGLFramebuffer : public Framebuffer{
     public:
         OpenGLFramebuffer(FramebufferSpecification& spec);
+        virtual ~OpenGLFramebuffer();
 
         // recreate the framebuffer by invalidating it
         virtual void invalidate() override;
@@ -21,7 +22,6 @@ namespace ChoreoApp {
         virtual const FramebufferSpecification& getSpecification() const override { return m_spec; }
         virtual const FramebufferSpecification& getSpecification() override { return m_spec; }
 
-        virtual ~OpenGLFramebuffer();
     private:
         uint32_t m_rendererID{0};
         // these attachments will be customizable in the future

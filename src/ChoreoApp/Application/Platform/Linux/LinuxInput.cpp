@@ -1,39 +1,32 @@
-#include "Application/Platform/Linux/LinuxInput.h"
+#include "capch.h"
 #include "Application/Application.h"
-
+#include "Application/Input.h"
 #include <GLFW/glfw3.h>
 
 namespace ChoreoApp {
-
-    // becuase this is a fully static class we can just create
-    // it here instead of an init
-    Input* Input::s_instance = new LinuxInput();
-
-
-
-	bool ChoreoApp::LinuxInput::isKeyPressedImpl(int keycode){
+	bool Input::isKeyPressed(int keycode){
         auto window = static_cast<GLFWwindow*>(Application::get().getWindow().getNativeWindow() );
         auto state = glfwGetKey(window, keycode);
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool ChoreoApp::LinuxInput::isMouseButtonPressedImpl(int button){
+	bool Input::isMouseButtonPressed(int button){
         auto window = static_cast<GLFWwindow*>(Application::get().getWindow().getNativeWindow() );
         auto state = glfwGetMouseButton(window, button);
 		return state == GLFW_PRESS;
 	}
 
-	float ChoreoApp::LinuxInput::getMouseXImpl(){
-        auto[x, y] = getMousePositionImpl(); 
+	float Input::getMouseX(){
+        auto[x, y] = getMousePosition(); 
         return x;
 	}
 
-	float ChoreoApp::LinuxInput::getMouseYImpl(){
-        auto[x, y] = getMousePositionImpl(); 
+	float Input::getMouseY(){
+        auto[x, y] = getMousePosition(); 
         return y;
 	}
 
-    std::pair<float, float> ChoreoApp::LinuxInput::getMousePositionImpl(){
+    std::pair<float, float> Input::getMousePosition(){
         auto window = static_cast<GLFWwindow*>(Application::get().getWindow().getNativeWindow() );
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);

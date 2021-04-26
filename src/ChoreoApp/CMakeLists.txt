@@ -28,8 +28,6 @@ set(
     Application/CameraController.cpp
     Application/LayerStack.cpp
     Application/ImGui/ImGuiLayer.cpp
-    Application/Platform/Linux/LinuxWindow.cpp
-    Application/Platform/Linux/LinuxInput.cpp
     Application/Platform/OpenGL/OpenGLContext.cpp
     Application/Platform/OpenGL/OpenGLBuffer.cpp
     Application/Platform/OpenGL/OpenGLFramebuffer.cpp
@@ -49,8 +47,13 @@ set(
     Application/Renderer/RenderCommand.cpp
     Application/Renderer/RendererAPI.cpp
     Application/Log.cpp
+    
 
-    )
+    # if on Linux
+    Application/Platform/Linux/LinuxWindow.cpp
+    Application/Platform/Linux/LinuxInput.cpp
+)
+
 add_library(
     ChoreoApp ${ChoreoAppSources}
 )
