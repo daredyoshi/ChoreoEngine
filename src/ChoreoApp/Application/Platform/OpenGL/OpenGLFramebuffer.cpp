@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 
 namespace ChoreoApp{
+    static const uint32_t s_maxFramebufferSize{8192};
+
     OpenGLFramebuffer::OpenGLFramebuffer(FramebufferSpecification& spec)
         : m_spec{spec} {
                 
@@ -60,6 +62,10 @@ namespace ChoreoApp{
     }
 
     void OpenGLFramebuffer::resize(uint32_t width, uint32_t height){
+        if(width == 0 || height ==0 || width > s_maxFramebufferSize || height > s_maxFramebufferSize){
+            CE_CORE_WARN("Attempted and failed to resize Framebuffer to {0}, {1}", width, height);
+            return;
+        }
         m_spec.width = width;
         m_spec.height = height;
         invalidate();

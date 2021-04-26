@@ -171,7 +171,7 @@ void MainLayer::onImGuiRender()
     ImVec2 imViewportSize= ImGui::GetContentRegionAvail();
     glm::vec2 viewportSize{imViewportSize.x, imViewportSize.y};
 
-    if(m_viewportSize != viewportSize){
+    if(m_viewportSize != viewportSize && imViewportSize.x > 0 && imViewportSize.y > 0){
         m_framebuffer->resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
         m_viewportSize = viewportSize;
 
