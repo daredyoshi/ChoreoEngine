@@ -27,7 +27,7 @@ void MainLayer::onDetach() {
 void MainLayer::onUpdate(ChoreoApp::TimeStep& timestep) {
     CE_PROFILE_FUNCTION();
     ChoreoApp::Renderer2D::resetStats();
-    {
+    if(m_viewportFocused && m_viewportHovered){
         CE_PROFILE_SCOPE("CamController::onUpdate");
         m_camController.onUpdate(timestep);
 
@@ -162,6 +162,11 @@ void MainLayer::onImGuiRender()
     // viewoprt
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0.0f,0.0f});
     ImGui::Begin("ChoreoGrapher::Viewport");
+
+    m_viewportFocused = ImGui::IsWindowFocused();
+    m_viewportHovered = ImGui::IsWindowHovered();
+    ChoreoApp::Application::get().getImGuiLayer()->setConsumeImGuiEvents(!m_viewportFocused || !m_viewportHovered);
+
     uint32_t textureId = m_framebuffer->getColorAttachmenRendererID(); 
     ImVec2 imViewportSize= ImGui::GetContentRegionAvail();
     glm::vec2 viewportSize{imViewportSize.x, imViewportSize.y};

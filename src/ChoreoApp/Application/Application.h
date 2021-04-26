@@ -24,6 +24,8 @@ namespace ChoreoApp{
         void pushLayer(Layer* layer);
         void pushOverlay(Layer* layer);
 
+        ImGuiLayer* getImGuiLayer() { return m_imGuiLayer; }
+
         inline static Application& get() { return *s_instance; }
         inline const std::string& getRootDir() const { return m_cwd; }
         inline Window& getWindow() const { return *m_window; } 

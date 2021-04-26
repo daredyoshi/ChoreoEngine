@@ -27,6 +27,9 @@ namespace ChoreoApp {
         m_window->setEventCallback(CE_BIND_EVENT_FN(Application::onEvent));
 
         Renderer::init();
+
+        m_imGuiLayer = new ImGuiLayer();
+        pushOverlay(m_imGuiLayer);
     }
     Application::~Application(){
 
@@ -49,8 +52,6 @@ namespace ChoreoApp {
         EventDispatcher dispatcher(e);
         dispatcher.dispatch<WindowCloseEvent>(CE_BIND_EVENT_FN(Application::onWindowClose));
         dispatcher.dispatch<WindowResizeEvent>(CE_BIND_EVENT_FN(Application::onWindowResize));
-        // debug all events
-        // CE_CORE_INFO("{0}", e);         
 
         // work backwards through the layer stack until event is handled
         // begin is lowest level, end is highest (ui) level

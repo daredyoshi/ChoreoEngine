@@ -30,6 +30,8 @@ private:
     ChoreoApp::Ref<ChoreoApp::Texture2D> m_logoTexture{ChoreoApp::Texture2D::create(ChoreoApp::Application::get().getRootDir() + "assets/textures/graphic.png")};
 
     uint32_t m_mapWidth, m_mapHeight;
+    bool m_viewportFocused{false};
+    bool m_viewportHovered{false};
 
     glm::vec2 m_viewportSize;
 };

@@ -66,6 +66,7 @@ namespace ChoreoApp {
         virtual int getCategoryFlags() const = 0;
 
         bool getHandled() const { return m_handled; }
+        void setHandled(bool handled) { m_handled = handled; }
         // useful for debugging
         operator std::string() const { return toString(); }
         virtual std::string toString() const { return getName(); }

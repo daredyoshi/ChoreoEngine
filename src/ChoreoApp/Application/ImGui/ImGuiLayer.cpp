@@ -3,6 +3,8 @@
 #include "Application/ImGui/ImGuiLayer.h"
 #include "Application/Application.h"
 #include "Application/KeyCodes.h"
+#include "Application/Events/MouseEvent.h"
+#include "Application/Events/KeyEvent.h"
 // The macro is defined in the cmake
 // #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <imgui.h>
@@ -68,6 +70,17 @@ namespace ChoreoApp {
 
     }
 
+    void ImGuiLayer::onEvent(Event& e){
+        if(m_consumeImGuiEvents){
+            ImGuiIO& io= ImGui::GetIO();
+            if(e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse)
+                e.setHandled(true);
+            if(e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard)
+                e.setHandled(true);
+        }
+
+    }
+
     void ImGuiLayer::begin(){
         CE_PROFILE_FUNCTION();  
         ImGui_ImplOpenGL3_NewFrame();
@@ -93,7 +106,4 @@ namespace ChoreoApp {
         }
     }
 
-    void ImGuiLayer::onImGuiRender(){
-
-    }
 }

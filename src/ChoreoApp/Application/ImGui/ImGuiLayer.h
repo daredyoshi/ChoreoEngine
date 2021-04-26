@@ -14,13 +14,16 @@ namespace ChoreoApp {
 
         virtual void onAttach() override;
         virtual void onDetach() override;
-        virtual void onImGuiRender() override;
+        virtual void onEvent(Event& ) override;
 
 
         void begin();
         void end();
 
+        void setConsumeImGuiEvents( bool consume) { m_consumeImGuiEvents = consume; }
+
     private:
+        bool m_consumeImGuiEvents{true};
         float m_time{0};
     };
 }

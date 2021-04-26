@@ -16,7 +16,6 @@ public:
     ChoreoGrapher(const std::string& rootDir, const std::string& name) : Application(rootDir, name){
         // pushLayer( new 3DLayer() );
         pushLayer(new MainLayer());
-        pushOverlay(new ChoreoApp::ImGuiLayer());
     }
 
     ~ChoreoGrapher(){

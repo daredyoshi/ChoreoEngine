@@ -169,6 +169,7 @@ namespace ChoreoApp{
 
     void LinuxWindow::onUpdate(){
         CE_PROFILE_FUNCTION();
+        // TODO: change this to glfwWaitEvents() but only when not viewport focused
         glfwPollEvents();
         m_context->SwapBuffers();
     }
