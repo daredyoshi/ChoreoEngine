@@ -69,7 +69,7 @@ namespace ChoreoApp {
 
             // take this through and api layer
             float time = (float)glfwGetTime();
-            TimeStep timestep {time - m_lastFrameTime};
+            Timestep timestep {time - m_lastFrameTime};
             m_lastFrameTime = time;
 
             if(!m_minimized){

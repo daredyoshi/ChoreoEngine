@@ -34,7 +34,8 @@ namespace ChoreoApp {
     public:
         static void init();
         static void shutdown();
-        static void beginScene(const OrthographicCamera& cam);
+        static void beginScene(const Camera& cam, const glm::mat4& xform);
+        static void beginScene(const OrthographicCamera& cam); // TODO: REMOVE
         static void flush();
         static void endScene();
 
@@ -42,10 +43,13 @@ namespace ChoreoApp {
         // TODO: Replace this with a properties struct and single function
         static void drawQuad(const glm::vec2& pos, const float angle,  const glm::vec2& size, const glm::vec4& color);
         static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const glm::vec4& color);
-        static void drawQuad(const glm::vec2& pos,  const float angle, const glm::vec2& size, const Ref<SubTexture2D>& tex);
-        static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<SubTexture2D>& tex);
-        static void drawQuad(const glm::vec2& pos,  const float angle, const glm::vec2& size, const Ref<SubTexture2D>& tex, const glm::vec4& color);
-        static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<SubTexture2D>& tex, const glm::vec4& color);
+        static void drawQuad(const glm::vec2& pos,  const float angle, const glm::vec2& size, const Ref<SubTexture2D>& subTex);
+        static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<SubTexture2D>& subTex);
+        static void drawQuad(const glm::vec2& pos,  const float angle, const glm::vec2& size, const Ref<SubTexture2D>& subTex, const glm::vec4& color);
+        static void drawQuad(const glm::vec3& pos,  const float angle, const glm::vec2& size, const Ref<SubTexture2D>& subTex, const glm::vec4& color);
+        static void drawQuad(const glm::mat4& xform, const Ref<SubTexture2D>& subTex);
+        static void drawQuad(const glm::mat4& xform, const glm::vec4& color);
+        static void drawQuad(const glm::mat4& xform, const Ref<SubTexture2D>& subTex, const glm::vec4& color);
 
         struct Stats{
             uint32_t drawCalls{0};

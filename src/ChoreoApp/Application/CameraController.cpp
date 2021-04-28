@@ -47,7 +47,7 @@ namespace ChoreoApp {
         dispatcher.dispatch<WindowResizeEvent>(CE_BIND_EVENT_FN(OrthographicCameraController::onWindowResized)) ;
 	}
 
-	void OrthographicCameraController::onUpdate(TimeStep timestep)
+	void OrthographicCameraController::onUpdate(Timestep timestep)
 	{
         CE_PROFILE_FUNCTION();  
         if(Input::isKeyPressed(CE_KEY_S)){

@@ -17,7 +17,7 @@ void Sandbox2D::onDetach() {
 }
 
 
-void Sandbox2D::onUpdate(ChoreoApp::TimeStep& timestep) {
+void Sandbox2D::onUpdate(ChoreoApp::Timestep& timestep) {
     CE_PROFILE_FUNCTION();
     ChoreoApp::Renderer2D::resetStats();
     {

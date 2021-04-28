@@ -8,6 +8,7 @@ include_directories(
     .
     ../dependencies/imgui/backends
     ../dependencies/stb
+    ../dependencies/entt
     )
 
 
@@ -18,16 +19,15 @@ set(
     ChoreoAppSources 
     ../dependencies/imgui/backends/imgui_impl_opengl3.cpp
     ../dependencies/imgui/backends/imgui_impl_glfw.cpp
-
-    ../dependencies/Cherno/
-
     ../dependencies/stb/stb_image.cpp
 
     Application/Application.cpp
     Application/Layer.cpp
-    Application/CameraController.cpp
     Application/LayerStack.cpp
+    Application/CameraController.cpp
+
     Application/ImGui/ImGuiLayer.cpp
+
     Application/Platform/OpenGL/OpenGLContext.cpp
     Application/Platform/OpenGL/OpenGLBuffer.cpp
     Application/Platform/OpenGL/OpenGLFramebuffer.cpp
@@ -35,6 +35,7 @@ set(
     Application/Platform/OpenGL/OpenGLRendererAPI.cpp
     Application/Platform/OpenGL/OpenGLShader.cpp
     Application/Platform/OpenGL/OpenGLTexture.cpp
+
     Application/Renderer/GraphicsContext.cpp
     Application/Renderer/Renderer.cpp
     Application/Renderer/Buffer.cpp
@@ -46,6 +47,10 @@ set(
     Application/Renderer/VertexArray.cpp
     Application/Renderer/RenderCommand.cpp
     Application/Renderer/RendererAPI.cpp
+
+    Application/Scene/Scene.cpp
+    Application/Scene/Entity.cpp
+
     Application/Log.cpp
     
 

@@ -59,7 +59,7 @@ public:
         // std::dynamic_pointer_cast<ChoreoApp::OpenGLShader>(m_shader)->uploadUniformFloat3("u_Color", m_squareCol);
     }
 
-    virtual void onUpdate(ChoreoApp::TimeStep& timestep) override {
+    virtual void onUpdate(ChoreoApp::Timestep& timestep) override {
         ChoreoApp::RenderCommand::setClearColor(glm::vec4{ 0.1f, 0.1f, 0.1f, 1 });
         ChoreoApp::RenderCommand::clear();
 

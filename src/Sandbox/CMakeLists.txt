@@ -10,7 +10,7 @@ set(
 
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoApp)
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/dependencies/imgui/)
-link_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoApp/)
+include_directories(${ChoreoEngine_SOURCE_DIR}/src/dependencies/entt/)
 
 add_executable(
     Sandbox ${SandboxSources} 

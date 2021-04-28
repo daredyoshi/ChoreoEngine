@@ -21,6 +21,10 @@
 #include "Application/Renderer/Framebuffer.h"
 // #include "Application/Renderer/Shader.h"
 
+#include "Application/Scene/Scene.h"
+#include "Application/Scene/Components.h"
+#include "Application/Scene/Entity.h"
+
 
 //temp 
 #include "Application/Platform/OpenGL/OpenGLShader.h"

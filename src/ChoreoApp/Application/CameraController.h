@@ -20,7 +20,7 @@ namespace ChoreoApp{
     public:
         OrthographicCameraController(float aspectRatio, bool rotation = false);  
         
-        void onUpdate(TimeStep timestep);
+        void onUpdate(Timestep timestep);
         void onEvent(Event& e);
         const OrthographicCameraBounds& getBounds() const { return m_bounds; }
 

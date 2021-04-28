@@ -18,7 +18,7 @@ namespace ChoreoApp {
         // layer removed from layer stack
         virtual void onDetach() {}
         // layer updated (per frame)
-        virtual void onUpdate(TimeStep& timestep) {(void)timestep;}
+        virtual void onUpdate(Timestep& timestep) {(void)timestep;}
         // imgui render layer
         virtual void onImGuiRender() {}
         // layer recieves/intercepts event. 

@@ -4,6 +4,19 @@
 
 
 namespace ChoreoApp {
+    class Camera{
+    public:
+        Camera(const glm::mat4& projectionMatrix)
+            : m_projectionMatrix{projectionMatrix} {}
+
+        const glm::mat4& getProjectionMatrix() const { return m_projectionMatrix; }
+
+    private:
+        glm::mat4 m_projectionMatrix;
+    };
+
+
+    // this will get deprecated soon 
     // a 2d camera for specific view (top/bot/right/left)
     class OrthographicCamera{
     public:

@@ -30,6 +30,7 @@ namespace ChoreoApp {
 #define CE_CORE_WARN(...)       ::ChoreoApp::Log::GetCoreLogger()->warn(__VA_ARGS__)
 #define CE_CORE_ERROR(...)      ::ChoreoApp::Log::GetCoreLogger()->error(__VA_ARGS__)
 #define CE_CORE_FATAL(...)      ::ChoreoApp::Log::GetCoreLogger()->fatal(__VA_ARGS__)
+#define CE_CORE_ASSERT(x, ...) 
 
 
 // Client log macros
@@ -38,6 +39,7 @@ namespace ChoreoApp {
 #define CE_WARN(...)            ::ChoreoApp::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define CE_ERROR(...)           ::ChoreoApp::Log::GetClientLogger()->error(__VA_ARGS__)
 #define CE_FATAL(...)           ::ChoreoApp::Log::GetClientLogger()->fatal(__VA_ARGS__)
+#define CE_ASSERT(x, ...) 
 
 #else
 
@@ -55,4 +57,14 @@ namespace ChoreoApp {
 #define CE_ERROR(...)      
 #define CE_FATAL(...)      
 
+#ifdef CE_ENABLE_ASSERTS 
+    #include <signal.h>
+ 	#define CE_ASSERT(x, ...) { if(!(x)) { CE_ERROR("Assertion Failed: {0}", __VA_ARGS__); raise(SIGTRAP); } } 
+ 	#define CE_CORE_ASSERT(x, ...) { if(!(x)) { CE_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); raise(SIGTRAP); } } 
+ #else 
+ 	#define CE_ASSERT(x, ...) 
+ 	#define CE_CORE_ASSERT(x, ...) 
+ #endif 
+
 #endif
+

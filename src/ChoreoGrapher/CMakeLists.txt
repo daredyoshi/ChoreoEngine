@@ -9,10 +9,10 @@ set(
 message(${CMAKE_CURRENT_SOURCE_DIR}/Application)
 
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoApp)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Application)
+include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoGrapher)
+include_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoGrapher/Application)
 include_directories(${ChoreoEngine_SOURCE_DIR}/src/dependencies/imgui/)
-link_directories(${ChoreoEngine_SOURCE_DIR}/src/ChoreoApp/)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/Application)
+include_directories(${ChoreoEngine_SOURCE_DIR}/src/dependencies/entt/)
 
 add_executable(
     ChoreoGrapher ${ChoreoGrapherSources} 

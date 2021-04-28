@@ -1,8 +1,5 @@
 
 #include "Layers.h"
-#include "Application/Log.h"
-#include "Application/Renderer/Framebuffer.h"
-#include "Application/Renderer/Renderer.h"
 #include "ChoreoApp.h"
 #include "imgui.h"
 #include "glm/gtc/type_ptr.hpp"
@@ -18,31 +15,39 @@ void MainLayer::onAttach() {
 
     m_framebuffer = ChoreoApp::Framebuffer::create(m_framebufferSpec);
     m_framebuffer->invalidate();
+
+    m_scene = ChoreoApp::CreateRef<ChoreoApp::Scene>();
+    m_squareEntity = m_scene->createEntity("Square");
+    m_squareEntity.addComponent<ChoreoApp::SpriteRendererComponent>(glm::vec4{0.8f, 0.2f, 0.2f, 1.0f}) ;
+
+
+    m_cameraEntity = m_scene->createEntity("Camera Entity");
+    m_cameraEntity.addComponent<ChoreoApp::CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+
 }
 void MainLayer::onDetach() {
     CE_PROFILE_FUNCTION();
 }
 
 
-void MainLayer::onUpdate(ChoreoApp::TimeStep& timestep) {
+void MainLayer::onUpdate(ChoreoApp::Timestep& timestep) {
     CE_PROFILE_FUNCTION();
     ChoreoApp::Renderer2D::resetStats();
+
     if(m_viewportFocused && m_viewportHovered){
         CE_PROFILE_SCOPE("CamController::onUpdate");
         m_camController.onUpdate(timestep);
 
     }
+
     {
         CE_PROFILE_SCOPE("Draw Scene");
         m_framebuffer->bind();
         ChoreoApp::RenderCommand::setClearColor(glm::vec4{ 0.1f, 0.1f, 0.1f, 1.0f });
         ChoreoApp::RenderCommand::clear();
 
+        m_scene->onUpdate(timestep);
 
-
-        ChoreoApp::Renderer2D::beginScene(m_camController.getCamera());
-        ChoreoApp::Renderer2D::drawQuad({0.0f, 0.0f}, glm::radians(0.0f), {1.0f, 1.0f}, ChoreoApp::CreateRef<ChoreoApp::SubTexture2D>( m_logoTexture, glm::vec2{0.0f, 0.0f}, glm::vec2{1.0f, 1.0f} ), {0.8f, 0.2f, 0.2f, 1.0f});
-        ChoreoApp::Renderer2D::endScene();
         m_framebuffer->unbind();
 
     }
@@ -65,7 +70,10 @@ void MainLayer::onImGuiRender()
 {
     CE_PROFILE_FUNCTION();
     // ImGui::ShowDemoWindow();
+
+
     // In 99% case you should be able to just call DockSpaceOverViewport() and ignore all the code below!
+
     // In this specific demo, we are not using DockSpaceOverViewport() because:
     // - we allow the host window to be floating/moveable instead of filling the viewport (when opt_fullscreen == false)
     // - we allow the host window to have padding (when opt_padding == true)
@@ -113,7 +121,7 @@ void MainLayer::onImGuiRender()
     // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
     if (!opt_padding)
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+    ImGui::Begin("DockSpace", &dockspaceOpen, window_flags);
     if (!opt_padding)
         ImGui::PopStyleVar();
 
@@ -139,13 +147,6 @@ void MainLayer::onImGuiRender()
             ImGui::MenuItem("Padding", NULL, &opt_padding);
             ImGui::Separator();
 
-            if (ImGui::MenuItem("Flag: NoSplit",                "", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))                 { dockspace_flags ^= ImGuiDockNodeFlags_NoSplit; }
-            if (ImGui::MenuItem("Flag: NoResize",               "", (dockspace_flags & ImGuiDockNodeFlags_NoResize) != 0))                { dockspace_flags ^= ImGuiDockNodeFlags_NoResize; }
-            if (ImGui::MenuItem("Flag: NoDockingInCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingInCentralNode) != 0))  { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingInCentralNode; }
-            if (ImGui::MenuItem("Flag: AutoHideTabBar",         "", (dockspace_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0))          { dockspace_flags ^= ImGuiDockNodeFlags_AutoHideTabBar; }
-            if (ImGui::MenuItem("Flag: PassthruCentralNode",    "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen)) { dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode; }
-            ImGui::Separator();
-
             if (ImGui::MenuItem("Close", NULL, false))
                 dockspaceOpen= false;
             ImGui::EndMenu();
@@ -157,6 +158,13 @@ void MainLayer::onImGuiRender()
     // settings 
     ImGui::Begin("ChoreoGrapher::Settings");
     ImGui::Text("Test");
+    if(m_squareEntity)
+    {
+        ImGui::Separator();
+        ImGui::Text("%s", m_squareEntity.getComponent<ChoreoApp::TagComponent>().tag.c_str());
+        auto& squarecolor = m_squareEntity.getComponent<ChoreoApp::SpriteRendererComponent>().color;
+        ImGui::ColorEdit4("Square Color", glm::value_ptr( squarecolor) );
+    }
     ImGui::End();
 
     // viewoprt

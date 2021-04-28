@@ -14,7 +14,7 @@ public:
          m_squarePos{0}
          {};
     virtual ~Sandbox2D() {};
-    void onUpdate(ChoreoApp::TimeStep& timestep) override;
+    void onUpdate(ChoreoApp::Timestep& timestep) override;
     void onImGuiRender() override;
     void onEvent(ChoreoApp::Event& e) override;
 

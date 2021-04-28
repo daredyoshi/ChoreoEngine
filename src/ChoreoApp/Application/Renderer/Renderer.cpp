@@ -182,6 +182,14 @@ namespace ChoreoApp{
         resetCounters();
     }
 
+    void Renderer2D::beginScene(const Camera& cam, const glm::mat4& xform){ 
+        CE_PROFILE_FUNCTION();  
+        glm::mat4 viewProjection = cam.getProjectionMatrix() * glm::inverse(xform);
+        s_storage.shader2D->bind();
+        s_storage.shader2D->setMat4("u_viewProjection", viewProjection);
+        resetCounters();
+    }
+
     void Renderer2D::flush(){
         CE_PROFILE_FUNCTION();  
         s_storage.shader2D->bind();
@@ -237,6 +245,22 @@ namespace ChoreoApp{
     }
 
     void Renderer2D::drawQuad(const glm::vec3& pos,  const float angleInRadians, const glm::vec2& size, const Ref<SubTexture2D>& subTex, const glm::vec4& color){
+        // figure out rotation
+        glm::mat4 xform = glm::translate(glm::mat4(1.0f), pos);
+        xform *= glm::rotate(glm::mat4(1.0f), angleInRadians, glm::vec3{0, 0, 1});
+        xform *= glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0});
+        drawQuad(xform, subTex, color);
+    }
+
+
+    void Renderer2D::drawQuad(const glm::mat4& xform, const glm::vec4& color){
+        drawQuad(xform, s_storage.emptySubTex, color);
+    }
+    void Renderer2D::drawQuad(const glm::mat4& xform, const Ref<SubTexture2D>& subTex){
+        drawQuad(xform, subTex, {1.0f, 1.0f, 1.0f, 1.0f});
+    }
+
+    void Renderer2D::drawQuad(const glm::mat4& xform, const Ref<SubTexture2D>& subTex, const glm::vec4& color){
         CE_PROFILE_FUNCTION();  
 
         if(s_storage.quadIndexCount >= Renderer2DStorage::maxIndices){
@@ -268,10 +292,6 @@ namespace ChoreoApp{
         }
 
 
-        // figure out rotation
-        glm::mat4 xform = glm::translate(glm::mat4(1.0f), pos);
-        xform *= glm::rotate(glm::mat4(1.0f), angleInRadians, glm::vec3{0, 0, 1});
-        xform *= glm::scale(glm::mat4(1.0f), {size.x, size.y, 1.0});
 
         for(unsigned int i{0}; i<4; ++i){
             // vertex 1 
