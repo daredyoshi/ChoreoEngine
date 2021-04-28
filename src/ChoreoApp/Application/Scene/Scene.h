@@ -13,6 +13,7 @@ namespace ChoreoApp {
         ~Scene();
 
         void onUpdate(Timestep ts);
+        void onViewportResize(const uint32_t width, const uint32_t height);
         // refactor this to Entity createEntity()
         Entity createEntity(const std::string& name);
 
@@ -21,5 +22,7 @@ namespace ChoreoApp {
     private:
         friend class Entity;
         entt::registry m_registry;
+        uint32_t m_viewportWidth{0};
+        uint32_t m_viewportHeight{0};
     };
 }

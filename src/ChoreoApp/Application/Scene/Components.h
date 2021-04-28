@@ -2,7 +2,8 @@
 
 #include "glm/glm.hpp"
 #include <string>
-#include "Application/Renderer/Camera.h"
+#include "SceneCamera.h"
+#include "ScriptableEntity.h"
 
 namespace ChoreoApp{
     struct TagComponent{
@@ -28,13 +29,26 @@ namespace ChoreoApp{
     };
 
     struct CameraComponent{
-        Camera camera{glm::mat4{1.0}};
+        SceneCamera camera;
+        bool fixedAspectRatio{false};
         bool primary{true}; // TODO think about moving to scene
 
         CameraComponent() = default;
         CameraComponent(const CameraComponent&) = default;
-        CameraComponent(const glm::mat4& projectionMatrix)
-            : camera(projectionMatrix) {}
+    };
+
+    struct NativeScriptComponent{
+        ScriptableEntity* instance = nullptr;
+
+
+        ScriptableEntity*(*instantiateScript)();
+        void(*destoryScript)(NativeScriptComponent*);
+
+        template<typename T>
+        void bind(){
+            instantiateScript = []() {return static_cast<ScriptableEntity*> ( new T() ); };
+            destoryScript = [](NativeScriptComponent* nsc) { delete nsc->instance; nsc->instance = nullptr;};
+        }
     };
 
     struct SpriteRendererComponent{

@@ -24,6 +24,7 @@
 #include "Application/Scene/Scene.h"
 #include "Application/Scene/Components.h"
 #include "Application/Scene/Entity.h"
+#include "Application/Scene/ScriptableEntity.h"
 
 
 //temp 

@@ -6,12 +6,14 @@
 namespace ChoreoApp {
     class Camera{
     public:
+        Camera() = default;
         Camera(const glm::mat4& projectionMatrix)
             : m_projectionMatrix{projectionMatrix} {}
+        virtual ~Camera() = default;
 
         const glm::mat4& getProjectionMatrix() const { return m_projectionMatrix; }
 
-    private:
+    protected:
         glm::mat4 m_projectionMatrix;
     };
 
@@ -37,7 +39,7 @@ namespace ChoreoApp {
         void recalculateViewMatrix();
 
 
-        glm::mat4 m_projectionMatrix;
+        glm::mat4 m_projectionMatrix{glm::mat4{1}};
         glm::mat4 m_viewMatrix;
         // for caching 
         glm::mat4 m_viewProjectionMatrix;

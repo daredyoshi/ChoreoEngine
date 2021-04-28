@@ -31,6 +31,7 @@ private:
     ChoreoApp::Ref<ChoreoApp::Scene> m_scene;
     ChoreoApp::Entity m_squareEntity;
     ChoreoApp::Entity m_cameraEntity;
+    ChoreoApp::Entity m_secondCamera;
     glm::vec4 m_squareColor;
 
     uint32_t m_mapWidth, m_mapHeight;

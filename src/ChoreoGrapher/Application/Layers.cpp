@@ -1,5 +1,6 @@
 
 #include "Layers.h"
+#include "Application/Input.h"
 #include "ChoreoApp.h"
 #include "imgui.h"
 #include "glm/gtc/type_ptr.hpp"
@@ -17,12 +18,46 @@ void MainLayer::onAttach() {
     m_framebuffer->invalidate();
 
     m_scene = ChoreoApp::CreateRef<ChoreoApp::Scene>();
+
+    // Entity
     m_squareEntity = m_scene->createEntity("Square");
     m_squareEntity.addComponent<ChoreoApp::SpriteRendererComponent>(glm::vec4{0.8f, 0.2f, 0.2f, 1.0f}) ;
 
-
+    // primary camera
     m_cameraEntity = m_scene->createEntity("Camera Entity");
-    m_cameraEntity.addComponent<ChoreoApp::CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+    m_cameraEntity.addComponent<ChoreoApp::CameraComponent>();
+
+    // m_secondCamera = m_scene->createEntity("Second Camera Entity");
+    // auto& cc = m_secondCamera.addComponent<ChoreoApp::CameraComponent>();
+    // cc.primary = false;
+
+
+
+    // for scripting
+    class CameraController : public ChoreoApp::ScriptableEntity {
+    public:
+        void onCreate(){
+        }
+        void onDestroy(){
+
+        }
+        void onUpdate(ChoreoApp::Timestep ts){
+            (void)ts;
+            auto& transform = getComponent<ChoreoApp::TransformComponent>().transform;
+            float speed = 0.1f; 
+            if (ChoreoApp::Input::isKeyPressed(CE_KEY_A))
+                transform[3][0] -= speed;
+            if (ChoreoApp::Input::isKeyPressed(CE_KEY_D))
+                transform[3][0] += speed;
+            if (ChoreoApp::Input::isKeyPressed(CE_KEY_W))
+                transform[3][1] += speed;
+            if (ChoreoApp::Input::isKeyPressed(CE_KEY_S))
+                transform[3][1] -= speed;
+            std::cout << "Timestep: " << ts << std::endl;
+        }
+    };
+    m_cameraEntity.addComponent<ChoreoApp::NativeScriptComponent>().bind<CameraController>();
+
 
 }
 void MainLayer::onDetach() {
@@ -34,6 +69,14 @@ void MainLayer::onUpdate(ChoreoApp::Timestep& timestep) {
     CE_PROFILE_FUNCTION();
     ChoreoApp::Renderer2D::resetStats();
 
+    ChoreoApp::FramebufferSpecification spec = m_framebuffer->getSpecification();
+    if(m_viewportSize.x > 0.0f && m_viewportSize.y > 0.0f &&
+            (spec.width != m_viewportSize.x || spec.height != m_viewportSize.y)){
+        m_framebuffer->resize((uint32_t)m_viewportSize.x, (uint32_t)m_viewportSize.y);
+        m_camController.resize(m_viewportSize.x, m_viewportSize.y);
+
+        m_scene->onViewportResize((uint32_t)m_viewportSize.x, (uint32_t)m_viewportSize.y);
+    }
     if(m_viewportFocused && m_viewportHovered){
         CE_PROFILE_SCOPE("CamController::onUpdate");
         m_camController.onUpdate(timestep);
@@ -183,6 +226,7 @@ void MainLayer::onImGuiRender()
         m_framebuffer->resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
         m_viewportSize = viewportSize;
 
+        
         m_camController.resize(m_viewportSize.x, m_viewportSize.y);
          
     }

@@ -49,6 +49,7 @@ set(
     Application/Renderer/RendererAPI.cpp
 
     Application/Scene/Scene.cpp
+    Application/Scene/SceneCamera.cpp
     Application/Scene/Entity.cpp
 
     Application/Log.cpp

@@ -79,29 +79,57 @@ namespace ChoreoApp {
     void Scene::onUpdate(Timestep ts){
         (void)ts;
 
+        // Update scripts
+        { 
+            m_registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc){
+                (void)entity;
+                // TODO: Move to Scene:OnSceneRun
+                if (!nsc.instance){
+                    nsc.instance = nsc.instantiateScript();
+                    nsc.instance->m_entity = Entity{ entity, shared_from_this()};
+                    nsc.instance->onCreate();
+                }
+                nsc.instance->onUpdate(ts);
+            });
+        }
+
         Camera* mainCamera = nullptr;
-        glm::mat4* cameraTransform = nullptr;
+        glm::mat4 cameraTransform;
         {
-            auto group = m_registry.view<TransformComponent, CameraComponent>();
-            for (auto entity : group){
-                const auto& [ transform, camera ] =  group.get<TransformComponent, CameraComponent>(entity);
+            auto view = m_registry.view<TransformComponent, CameraComponent>();
+            for (auto entity : view){
+                auto [ transform, camera ] =  view.get<TransformComponent, CameraComponent>(entity);
                 if(camera.primary){
                     mainCamera = &camera.camera; 
-                    cameraTransform = &transform.transform;
+                    cameraTransform = transform.transform;
                     break;
                 }
             }
         }
 
         if(mainCamera){
-            
-            ChoreoApp::Renderer2D::beginScene(*mainCamera, *cameraTransform);
+
+            ChoreoApp::Renderer2D::beginScene(*mainCamera, cameraTransform);
             auto group = m_registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
             for (auto entity: group){
-                const auto& [transform , spriteRenderer] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+                auto [transform , spriteRenderer] = group.get<TransformComponent, SpriteRendererComponent>(entity);
                 Renderer2D::drawQuad(transform, spriteRenderer.color);
             }
             ChoreoApp::Renderer2D::endScene();
+        }
+    }
+
+    void Scene::onViewportResize(const uint32_t width, const uint32_t height){
+        m_viewportWidth = width;
+        m_viewportHeight = height;
+
+        // Resize our non fixed ratio cameras
+        auto view = m_registry.view<CameraComponent>();
+        for (auto entity : view){
+            auto& cameraComponent =  view.get<CameraComponent>(entity);
+            if (!cameraComponent.fixedAspectRatio){
+                cameraComponent.camera.setViewportSize(width, height);
+            }
         }
     }
 }
