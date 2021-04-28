@@ -7,25 +7,26 @@
 #include "imgui.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "Layers.h"
+#include "Application/EditorLayer.h"
 
+namespace ChoreoGrapher{
 
-
-class ChoreoGrapher : public ChoreoApp::Application{
+class ChoreoGrapherApplication : public ChoreoApp::Application{
 public:
-    ChoreoGrapher(const std::string& rootDir, const std::string& name) : Application(rootDir, name){
+    ChoreoGrapherApplication(const std::string& rootDir, const std::string& name) : Application(rootDir, name){
         // pushLayer( new 3DLayer() );
-        pushLayer(new MainLayer());
+        pushLayer(new EditorLayer());
     }
 
-    ~ChoreoGrapher(){
+    ~ChoreoGrapherApplication(){
 
     }
 };
+}
 
 // overwrite the application creator to create sandbox
 // entry point is in Application/EntryPoint.h
 
 ChoreoApp::Application* ChoreoApp::CreateApplication(const std::string& rootDir){
-    return new ChoreoGrapher(rootDir, "ChoreoGrapher");
+    return new ChoreoGrapher::ChoreoGrapherApplication(rootDir, "ChoreoGrapher");    
 }

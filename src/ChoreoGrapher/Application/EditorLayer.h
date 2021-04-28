@@ -1,18 +1,21 @@
 # pragma once
-#include "Application/Scene/Scene.h"
 #include "ChoreoApp.h"
+#include "Panels/SceneHierarchyPanel.h"
 #include <unordered_map>
+#include "imgui.h"
 
 
-class MainLayer: public ChoreoApp::Layer{
+namespace ChoreoGrapher{
+
+class EditorLayer: public ChoreoApp::Layer{
 public:
-    MainLayer()
+    EditorLayer()
         : 
          Layer("Main"),
          m_camController{1280.0f / 780.0f, true}
     {
     };
-    virtual ~MainLayer() {};
+    virtual ~EditorLayer() {};
     void onUpdate(ChoreoApp::Timestep& timestep) override;
     void onImGuiRender() override;
     void onEvent(ChoreoApp::Event& e) override;
@@ -40,5 +43,12 @@ private:
 
     glm::vec2 m_viewportSize;
 
+    // font
+    ImFont* m_font = nullptr; 
+
+    // panels
+    SceneHierarchyPanel m_sceneHeirarchyPanel;
+
 
 };
+}

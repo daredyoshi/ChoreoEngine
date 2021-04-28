@@ -24,7 +24,7 @@ namespace ChoreoApp {
         }
 
         template<typename T>
-        T& getComponent(){
+        T& getComponent() const{
             CE_CORE_ASSERT(getComponent<T>(), "Entity does not have component!");
             return m_scene.lock()->m_registry.get<T>(m_entityHandle);
         }

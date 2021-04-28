@@ -3,7 +3,10 @@
 set(
     ChoreoGrapherSources
     ChoreoGrapher.cpp
-    Application/Layers.cpp
+
+    Application/EditorLayer.cpp
+
+    Application/Panels/SceneHierarchyPanel.cpp
 )
 
 message(${CMAKE_CURRENT_SOURCE_DIR}/Application)

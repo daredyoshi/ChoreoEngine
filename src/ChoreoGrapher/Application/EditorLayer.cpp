@@ -1,14 +1,18 @@
 
-#include "Layers.h"
+#include "EditorLayer.h"
 #include "Application/Input.h"
 #include "ChoreoApp.h"
-#include "imgui.h"
 #include "glm/gtc/type_ptr.hpp"
 
 
+namespace ChoreoGrapher{
 
-void MainLayer::onAttach() {
+void EditorLayer::onAttach() {
     CE_PROFILE_FUNCTION();
+    // temporary until a preferences menu is created
+    // apologies I have a high-dpi display... just change the size if you don't
+    // std::string fontFile = (ChoreoApp::Application::get().getRootDir() + "assets/fonts/Roboto_Slab/static/RobotoSlab-Regular.ttf");
+    std::string fontFile = (ChoreoApp::Application::get().getRootDir() + "assets/fonts/droid-sans/DroidSans.ttf");
 
     // temp
     m_framebufferSpec.width = 1280;
@@ -18,6 +22,7 @@ void MainLayer::onAttach() {
     m_framebuffer->invalidate();
 
     m_scene = ChoreoApp::CreateRef<ChoreoApp::Scene>();
+    m_sceneHeirarchyPanel.setContext(m_scene);
 
     // Entity
     m_squareEntity = m_scene->createEntity("Square");
@@ -53,19 +58,22 @@ void MainLayer::onAttach() {
                 transform[3][1] += speed;
             if (ChoreoApp::Input::isKeyPressed(CE_KEY_S))
                 transform[3][1] -= speed;
-            std::cout << "Timestep: " << ts << std::endl;
+            // std::cout << "Timestep: " << ts << std::endl;
         }
     };
     m_cameraEntity.addComponent<ChoreoApp::NativeScriptComponent>().bind<CameraController>();
 
+    // init ImGui things
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    m_font = io.Fonts->AddFontFromFileTTF(fontFile.c_str(), 23);
 
 }
-void MainLayer::onDetach() {
+void EditorLayer::onDetach() {
     CE_PROFILE_FUNCTION();
 }
 
 
-void MainLayer::onUpdate(ChoreoApp::Timestep& timestep) {
+void EditorLayer::onUpdate(ChoreoApp::Timestep& timestep) {
     CE_PROFILE_FUNCTION();
     ChoreoApp::Renderer2D::resetStats();
 
@@ -101,7 +109,7 @@ void MainLayer::onUpdate(ChoreoApp::Timestep& timestep) {
 
 
 
-void MainLayer::onEvent(ChoreoApp::Event& e) 
+void EditorLayer::onEvent(ChoreoApp::Event& e) 
 {
     m_camController.onEvent(e);
     if (e.getEventType() == ChoreoApp::EventType::WindowResize){
@@ -109,9 +117,10 @@ void MainLayer::onEvent(ChoreoApp::Event& e)
     }
 }
 
-void MainLayer::onImGuiRender() 
+void EditorLayer::onImGuiRender() 
 {
     CE_PROFILE_FUNCTION();
+    ImGui::PushFont(m_font);
     // ImGui::ShowDemoWindow();
 
 
@@ -210,6 +219,9 @@ void MainLayer::onImGuiRender()
     }
     ImGui::End();
 
+    // scene hierarchy panel
+    m_sceneHeirarchyPanel.onImGuiRender();
+
     // viewoprt
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0.0f,0.0f});
     ImGui::Begin("ChoreoGrapher::Viewport");
@@ -236,6 +248,7 @@ void MainLayer::onImGuiRender()
     ImGui::PopStyleVar(ImGuiStyleVar_WindowPadding);
     
     ImGui::End();
+    ImGui::PopFont();
     // ImGui::ShowDemoWindow();
 }
-
+}

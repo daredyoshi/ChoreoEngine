@@ -5,6 +5,7 @@
 #include "Application/KeyCodes.h"
 #include "Application/Events/MouseEvent.h"
 #include "Application/Events/KeyEvent.h"
+#include "Application/Log.h"
 // The macro is defined in the cmake
 // #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <imgui.h>
@@ -17,6 +18,7 @@
 
 
 namespace ChoreoApp {
+
     ImGuiLayer::ImGuiLayer(){}
     ImGuiLayer::~ImGuiLayer(){}
 
@@ -52,13 +54,6 @@ namespace ChoreoApp {
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init("#version 130");
 
-        // Temporary until we implement proper dpi scaling
-        // The proper way is to recompile the fonts as described here
-        // https://github.com/ocornut/imgui/blob/master/docs/FAQ.md#q-how-should-i-handle-dpi-in-my-application
-        // You scale font by loading them at a different size
-        // https://github.com/ocornut/imgui/blob/master/docs/FONTS.md
-        // But I don't want to do that yet BECAUSE I'm not sure how to distribute fonts yet...
-        io.FontGlobalScale = 1.5;
         
     }
 

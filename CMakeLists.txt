@@ -72,3 +72,16 @@ add_custom_target(
 # ChoreoEngine doesn't need textures
 add_dependencies( ChoreoGrapher copy_texture_files )
 add_dependencies( Sandbox copy_texture_files )
+
+# add custom target to copy font files across
+add_custom_target(
+    copy_font_files 
+    ${CMAKE_COMMAND}
+    -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets/fonts
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/fonts
+    COMMENT "Copying font files" VERBATIM
+    )
+
+add_dependencies(ChoreoApp copy_font_files)
+add_dependencies(ChoreoGrapher copy_font_files)

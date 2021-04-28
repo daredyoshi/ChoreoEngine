@@ -3,6 +3,10 @@
 #include "Application/Timestep.h"
 #include <memory>
 
+// not too great here
+namespace ChoreoGrapher{
+    class SceneHierarchyPanel;
+}
 
 namespace ChoreoApp {
     class Entity;
@@ -19,7 +23,9 @@ namespace ChoreoApp {
 
 
 
+
     private:
+        friend class ChoreoGrapher::SceneHierarchyPanel;
         friend class Entity;
         entt::registry m_registry;
         uint32_t m_viewportWidth{0};
