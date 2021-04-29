@@ -18,6 +18,7 @@ namespace ChoreoGrapher {
         void drawEntityNode(const ChoreoApp::Entity entity);
 
         ChoreoApp::Ref<ChoreoApp::Scene> m_context;
+        ChoreoApp::Entity m_lastSelectedEntity;
     };
 
 }

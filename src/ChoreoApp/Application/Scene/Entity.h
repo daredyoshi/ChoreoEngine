@@ -42,6 +42,13 @@ namespace ChoreoApp {
         }
 
         operator bool() const { return m_entityHandle  != entt::null; }
+        operator uint32_t() const { return (uint32_t)m_entityHandle; }
+        bool operator==(const Entity& other) const { 
+            return m_entityHandle == other.m_entityHandle && m_scene.lock() == other.m_scene.lock(); 
+        }
+        bool operator!=(const Entity& other) const { 
+            return !operator==(other); 
+        }
      
     private:
         entt::entity m_entityHandle{entt::null};

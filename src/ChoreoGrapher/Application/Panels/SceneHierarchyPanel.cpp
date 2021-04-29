@@ -26,8 +26,18 @@ namespace ChoreoGrapher{
     }
 
     void SceneHierarchyPanel::drawEntityNode(const ChoreoApp::Entity entity){
-            auto& tc = entity.getComponent<ChoreoApp::TagComponent>();
-            ImGui::Text("%s", tc.tag.c_str());
+        auto& tc = entity.getComponent<ChoreoApp::TagComponent>();
         
+
+        ImGuiTreeNodeFlags flags =((m_lastSelectedEntity == entity) ?  ImGuiTreeNodeFlags_Selected : 0) |  ImGuiTreeNodeFlags_OpenOnArrow;
+        bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tc.tag.c_str());
+        if(ImGui::IsItemClicked()){
+            m_lastSelectedEntity = entity;
+        }
+
+        if (opened){
+            // recursive stuff here
+            ImGui::TreePop();
+        }
     }
 }
