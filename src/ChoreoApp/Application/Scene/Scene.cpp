@@ -1,9 +1,9 @@
-#include "capch.h"
 #include "Scene.h"
+#include "Entity.h"
 #include "glm/glm.hpp"
 #include "Components.h"
+#include "capch.h"
 #include "Application/Renderer/Renderer.h"
-#include "Entity.h"
 #include <memory>
 
 namespace ChoreoApp {
@@ -58,12 +58,12 @@ namespace ChoreoApp {
     // }
 
 
-    Scene::Scene(){
-    }
+    Scene::Scene(){}
 
     Scene::~Scene(){
 
     }
+
 
     Entity Scene::createEntity(const std::string& name = ""){
         Entity entity ={ m_registry.create(), shared_from_this()}; 
@@ -108,10 +108,10 @@ namespace ChoreoApp {
         }
 
         if(mainCamera){
-
             ChoreoApp::Renderer2D::beginScene(*mainCamera, cameraTransform);
             auto group = m_registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
             for (auto entity: group){
+
                 auto [transform , spriteRenderer] = group.get<TransformComponent, SpriteRendererComponent>(entity);
                 Renderer2D::drawQuad(transform, spriteRenderer.color);
             }

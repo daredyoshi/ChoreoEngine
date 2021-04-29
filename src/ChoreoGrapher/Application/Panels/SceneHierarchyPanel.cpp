@@ -1,6 +1,6 @@
 
+#include "ChoreoApp.h"
 #include "SceneHierarchyPanel.h"
-#include "Application/Scene/Entity.h"
 #include "imgui.h"
 
 namespace ChoreoGrapher{
@@ -15,9 +15,8 @@ namespace ChoreoGrapher{
 
     void SceneHierarchyPanel::onImGuiRender(){
         ImGui::Begin("ChoreoGrapher::Scene Hierarchy");
-
-        m_context->m_registry.each([this](auto entityID){
-            ChoreoApp::Entity entity { entityID, m_context->shared_from_this()};
+        m_context->getRegistry().each([this](auto entityID){
+            ChoreoApp::Ref<ChoreoApp::Entity> entity {ChoreoApp::CreateRef<ChoreoApp::Entity>( entityID, m_context->shared_from_this() )};
             drawEntityNode(entity);
         });
 
@@ -25,14 +24,17 @@ namespace ChoreoGrapher{
         ImGui::ShowDemoWindow();
     }
 
-    void SceneHierarchyPanel::drawEntityNode(const ChoreoApp::Entity entity){
-        auto& tc = entity.getComponent<ChoreoApp::TagComponent>();
+    void SceneHierarchyPanel::drawEntityNode(ChoreoApp::Ref<ChoreoApp::Entity> entity){
+        auto& tc = entity->getComponent<ChoreoApp::TagComponent>();
         
-
-        ImGuiTreeNodeFlags flags =((m_lastSelectedEntity == entity) ?  ImGuiTreeNodeFlags_Selected : 0) |  ImGuiTreeNodeFlags_OpenOnArrow;
-        bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tc.tag.c_str());
+        ImGuiTreeNodeFlags flags =(*(m_context->getLastSelectedEntity()) == *entity ?  ImGuiTreeNodeFlags_Selected : 0) |  ImGuiTreeNodeFlags_OpenOnArrow;
+        bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity->getEntityHandle(), flags, "%s", tc.tag.c_str());
         if(ImGui::IsItemClicked()){
-            m_lastSelectedEntity = entity;
+            m_context->setLastSelectedEntity(entity);
+        }
+        else{
+            if(ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+                m_context->clearLastSelectedEntity();
         }
 
         if (opened){

@@ -1,6 +1,7 @@
 
 #include "EditorLayer.h"
 #include "Application/Input.h"
+#include "Application/Scene/Components.h"
 #include "ChoreoApp.h"
 #include "glm/gtc/type_ptr.hpp"
 
@@ -13,16 +14,17 @@ void EditorLayer::onAttach() {
     // apologies I have a high-dpi display... just change the size if you don't
     // std::string fontFile = (ChoreoApp::Application::get().getRootDir() + "assets/fonts/Roboto_Slab/static/RobotoSlab-Regular.ttf");
     std::string fontFile = (ChoreoApp::Application::get().getRootDir() + "assets/fonts/droid-sans/DroidSans.ttf");
+    // init ImGui things
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    m_font = io.Fonts->AddFontFromFileTTF(fontFile.c_str(), 23);
 
-    // temp
+    // temp also 
     m_framebufferSpec.width = 1280;
     m_framebufferSpec.height= 720;
 
     m_framebuffer = ChoreoApp::Framebuffer::create(m_framebufferSpec);
-    m_framebuffer->invalidate();
+    // m_framebuffer->invalidate();
 
-    m_scene = ChoreoApp::CreateRef<ChoreoApp::Scene>();
-    m_sceneHeirarchyPanel.setContext(m_scene);
 
     // Entity
     m_squareEntity = m_scene->createEntity("Square");
@@ -30,6 +32,7 @@ void EditorLayer::onAttach() {
 
     // primary camera
     m_cameraEntity = m_scene->createEntity("Camera Entity");
+    ChoreoApp::TransformComponent& xform = m_cameraEntity.getComponent<ChoreoApp::TransformComponent>();
     m_cameraEntity.addComponent<ChoreoApp::CameraComponent>();
 
     // m_secondCamera = m_scene->createEntity("Second Camera Entity");
@@ -47,9 +50,8 @@ void EditorLayer::onAttach() {
 
         }
         void onUpdate(ChoreoApp::Timestep ts){
-            (void)ts;
             auto& transform = getComponent<ChoreoApp::TransformComponent>().transform;
-            float speed = 0.1f; 
+            float speed = 0.1f * ts; 
             if (ChoreoApp::Input::isKeyPressed(CE_KEY_A))
                 transform[3][0] -= speed;
             if (ChoreoApp::Input::isKeyPressed(CE_KEY_D))
@@ -63,9 +65,6 @@ void EditorLayer::onAttach() {
     };
     m_cameraEntity.addComponent<ChoreoApp::NativeScriptComponent>().bind<CameraController>();
 
-    // init ImGui things
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    m_font = io.Fonts->AddFontFromFileTTF(fontFile.c_str(), 23);
 
 }
 void EditorLayer::onDetach() {
@@ -78,13 +77,15 @@ void EditorLayer::onUpdate(ChoreoApp::Timestep& timestep) {
     ChoreoApp::Renderer2D::resetStats();
 
     ChoreoApp::FramebufferSpecification spec = m_framebuffer->getSpecification();
-    if(m_viewportSize.x > 0.0f && m_viewportSize.y > 0.0f &&
+
+    if((uint32_t)m_viewportSize.x > 0  && (uint32_t)m_viewportSize.y > 0 
+            &&
             (spec.width != m_viewportSize.x || spec.height != m_viewportSize.y)){
         m_framebuffer->resize((uint32_t)m_viewportSize.x, (uint32_t)m_viewportSize.y);
         m_camController.resize(m_viewportSize.x, m_viewportSize.y);
-
         m_scene->onViewportResize((uint32_t)m_viewportSize.x, (uint32_t)m_viewportSize.y);
     }
+
     if(m_viewportFocused && m_viewportHovered){
         CE_PROFILE_SCOPE("CamController::onUpdate");
         m_camController.onUpdate(timestep);
@@ -219,9 +220,9 @@ void EditorLayer::onImGuiRender()
     }
     ImGui::End();
 
-    // scene hierarchy panel
+    // panels
     m_sceneHeirarchyPanel.onImGuiRender();
-
+    m_entityPropertiesPanel.onImGuiRender();
     // viewoprt
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0.0f,0.0f});
     ImGui::Begin("ChoreoGrapher::Viewport");
@@ -235,12 +236,7 @@ void EditorLayer::onImGuiRender()
     glm::vec2 viewportSize{imViewportSize.x, imViewportSize.y};
 
     if(m_viewportSize != viewportSize && imViewportSize.x > 0 && imViewportSize.y > 0){
-        m_framebuffer->resize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
         m_viewportSize = viewportSize;
-
-        
-        m_camController.resize(m_viewportSize.x, m_viewportSize.y);
-         
     }
 
     ImGui::Image((void*)(uintptr_t)(textureId), imViewportSize, ImVec2{0.0f, 1.0f}, ImVec2{1.0f, 0.0f});

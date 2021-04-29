@@ -1,6 +1,7 @@
 # pragma once
 #include "ChoreoApp.h"
 #include "Panels/SceneHierarchyPanel.h"
+#include "Panels/EntityPropertiesPanel.h"
 #include <unordered_map>
 #include "imgui.h"
 
@@ -31,23 +32,23 @@ private:
     ChoreoApp::FramebufferSpecification m_framebufferSpec;
     ChoreoApp::Ref<ChoreoApp::Texture2D> m_logoTexture{ChoreoApp::Texture2D::create(ChoreoApp::Application::get().getRootDir() + "assets/textures/graphic.png")};
 
-    ChoreoApp::Ref<ChoreoApp::Scene> m_scene;
     ChoreoApp::Entity m_squareEntity;
     ChoreoApp::Entity m_cameraEntity;
-    ChoreoApp::Entity m_secondCamera;
-    glm::vec4 m_squareColor;
+    glm::vec4 m_squareColor { 0.8f, 0.2f, 0.2f, 1.0 };
 
     uint32_t m_mapWidth, m_mapHeight;
     bool m_viewportFocused{false};
     bool m_viewportHovered{false};
 
-    glm::vec2 m_viewportSize;
+    glm::vec2 m_viewportSize{ 0.0f, 0.0f };
 
     // font
     ImFont* m_font = nullptr; 
 
     // panels
-    SceneHierarchyPanel m_sceneHeirarchyPanel;
+    ChoreoApp::Ref<ChoreoApp::Scene> m_scene{ChoreoApp::CreateRef<ChoreoApp::Scene>()};
+    SceneHierarchyPanel m_sceneHeirarchyPanel{m_scene};
+    EntityPropertiesPanel m_entityPropertiesPanel{m_scene};
 
 
 };

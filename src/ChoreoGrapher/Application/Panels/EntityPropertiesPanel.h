@@ -1,11 +1,12 @@
 #pragma once
 #include "ChoreoApp.h"
 
+
 namespace ChoreoGrapher { 
-    class SceneHierarchyPanel{
+    class EntityPropertiesPanel {
     public:
-        SceneHierarchyPanel() = default;
-        SceneHierarchyPanel(const ChoreoApp::Ref<ChoreoApp::Scene>& scene);
+        EntityPropertiesPanel() = default;
+        EntityPropertiesPanel(const ChoreoApp::Ref<ChoreoApp::Scene>& scene);
 
         void setContext(const ChoreoApp::Ref<ChoreoApp::Scene>& scene);
 
@@ -14,8 +15,7 @@ namespace ChoreoGrapher {
         
 
     private:
-        void drawEntityNode(const ChoreoApp::Ref<ChoreoApp::Entity> entity);
-
+        void drawEntityComponents(ChoreoApp::Ref<ChoreoApp::Entity> entity);
         ChoreoApp::Ref<ChoreoApp::Scene> m_context;
     };
 

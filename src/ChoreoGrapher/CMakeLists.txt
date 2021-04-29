@@ -7,6 +7,7 @@ set(
     Application/EditorLayer.cpp
 
     Application/Panels/SceneHierarchyPanel.cpp
+    Application/Panels/EntityPropertiesPanel.cpp
 )
 
 message(${CMAKE_CURRENT_SOURCE_DIR}/Application)
