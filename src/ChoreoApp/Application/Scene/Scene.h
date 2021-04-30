@@ -2,6 +2,7 @@
 #include "entt.hpp"
 #include "Application/Core.h"
 #include "Application/Timestep.h"
+#include "Application/Scene/Time.h"
 #include <memory>
 
 // inherit from ScenePanel to be friend to Scene
@@ -22,6 +23,10 @@ namespace ChoreoApp {
 
         entt::registry& getRegistry() { return m_registry; }        
 
+        const Scope<Time>& getTime() { return m_time; }
+        // TODO: update all scene component controllers when time is set
+        void setTimeTick(const uint32_t tick) { m_time->setTick(tick); }
+
         // void setLastSelectedEntity(const uint32_t entityHandle) { m_lastSelectedEntityHandle = entityHandle; };
         void setLastSelectedEntity(Ref<Entity> entity) { m_lastSelectedEntity = entity; };
         void clearLastSelectedEntity() { m_lastSelectedEntity = CreateRef<Entity>(); }
@@ -31,6 +36,8 @@ namespace ChoreoApp {
 
     private:
         entt::registry m_registry;
+        Scope<Time> m_time{CreateScope<Time>()};
+
 
         Ref<Entity> m_lastSelectedEntity{CreateRef<Entity>()};
 

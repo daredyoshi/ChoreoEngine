@@ -50,6 +50,7 @@ void EditorLayer::onAttach() {
 
         }
         void onUpdate(ChoreoApp::Timestep ts){
+            // this assumes everything has  transform
             auto& transform = getComponent<ChoreoApp::TransformComponent>().transform;
             float speed = 0.1f * ts; 
             if (ChoreoApp::Input::isKeyPressed(CE_KEY_A))
@@ -208,17 +209,6 @@ void EditorLayer::onImGuiRender()
         ImGui::EndMenuBar();
     }
 
-    // settings 
-    ImGui::Begin("ChoreoGrapher::Settings");
-    ImGui::Text("Test");
-    if(m_squareEntity)
-    {
-        ImGui::Separator();
-        ImGui::Text("%s", m_squareEntity.getComponent<ChoreoApp::TagComponent>().tag.c_str());
-        auto& squarecolor = m_squareEntity.getComponent<ChoreoApp::SpriteRendererComponent>().color;
-        ImGui::ColorEdit4("Square Color", glm::value_ptr( squarecolor) );
-    }
-    ImGui::End();
 
     // panels
     m_sceneHeirarchyPanel.onImGuiRender();

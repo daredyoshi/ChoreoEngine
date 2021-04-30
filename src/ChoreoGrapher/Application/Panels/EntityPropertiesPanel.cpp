@@ -46,12 +46,30 @@ namespace ChoreoGrapher{
         // TRANSFORM
         if(entity->hasComponent<ChoreoApp::TransformComponent>()){
             if (ImGui::TreeNodeEx((void*)typeid(ChoreoApp::TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform") ){
-                auto& transform = entity->getComponent<ChoreoApp::TransformComponent>().transform;
-                ImGui::DragFloat3("Position", glm::value_ptr(transform[3]), 0.1f);
+                auto& transform = entity->getComponent<ChoreoApp::TransformComponent>();
+
+                ImGui::DragFloat3("Position", glm::value_ptr(transform.transform[3]), 0.1f);
+
+                
+                // if (ImGui::DragFloat3("Rotation", transform.getEulerRotation()))
+                //
+                //     camera.setPerspectiveVerticalFOV(glm::radians(perspFOV));
+
 
                 ImGui::TreePop();
             }
         }
+
+        // SPRITE RENDERER
+        if(entity->hasComponent<ChoreoApp::SpriteRendererComponent>()){
+            if (ImGui::TreeNodeEx((void*)typeid(ChoreoApp::SpriteRendererComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "SpriteRendererComponent") ){
+                auto& color = entity->getComponent<ChoreoApp::SpriteRendererComponent>().color;
+                ImGui::ColorEdit4("Color", glm::value_ptr(color));
+
+                ImGui::TreePop();
+            }
+        }
+        
 
         // CAMERA
         if(entity->hasComponent<ChoreoApp::CameraComponent>()){
@@ -79,35 +97,46 @@ namespace ChoreoGrapher{
 
                 // PERSPECTIVE 
                 if (camera.getProjectionType() == ChoreoApp::SceneCamera::ProjectionType::Perspective){
-                    float perspFOV = glm::degrees(camera.getPerspectiveVerticalFOV());
-                    if (ImGui::DragFloat("Vertical FOV", &perspFOV))
-                        camera.setPerspectiveVerticalFOV(glm::radians(perspFOV));
-
-                    float perspNear = camera.getPerspectiveNearClip();
-                    if (ImGui::DragFloat("Near", &perspNear))
-                        camera.setPerspectiveNearClip(perspNear);
-
-                    float perspFar = camera.getPerspectiveFarClip();
-                    if (ImGui::DragFloat("Far", &perspFar))
-                        camera.setPerspectiveFarClip(perspFar);
+                    // float perspFOV = glm::degrees(camera.getPerspectiveVerticalFOV());
+                    // ImGui::InputDouble("Vertical FOV", 
+                    float perspectiveFOV{ (float)(camera.getPerspectiveFOV()->getKey().getVal()) };
+                    if (ImGui::DragFloat("Vertical FOV", &perspectiveFOV)){
+                        camera.setPerspectiveFOV(perspectiveFOV);
+                    }
+                    float perspectiveNearClip{ (float)(camera.getPerspectiveNearClip()->getKey().getVal()) };
+                    if (ImGui::DragFloat("Vertical NearClip", &perspectiveNearClip)){
+                        camera.setPerspectiveNearClip(perspectiveNearClip);
+                    }
+                    float perspectiveFarClip{ (float)(camera.getPerspectiveFarClip()->getKey().getVal()) };
+                    if (ImGui::DragFloat("Vertical FarClip", &perspectiveFarClip)){
+                        camera.setPerspectiveFarClip(perspectiveFarClip);
+                    }
+                    //
+                    // float perspNear = camera.getPerspectiveNearClip();
+                    // if (ImGui::DragFloat("Near", &perspNear))
+                    //     camera.setPerspectiveNearClip(perspNear);
+                    //
+                    // float perspFar = camera.getPerspectiveFarClip();
+                    // if (ImGui::DragFloat("Far", &perspFar))
+                    //     camera.setPerspectiveFarClip(perspFar);
                 }
 
                 // ORTHOGARPHIC
                 if (camera.getProjectionType() == ChoreoApp::SceneCamera::ProjectionType::Orthographic){
 
-                    float orthoSize = camera.getOrthographicSize();
-                    if (ImGui::DragFloat("Size", &orthoSize))
-                        camera.setOrthographicSize(orthoSize);
-
-                    float orthoNear = camera.getOrthographicNearClip();
-                    if (ImGui::DragFloat("Near", &orthoNear))
-                        camera.setOrthographicNearClip(orthoNear);
-
-                    float orthoFar = camera.getOrthographicFarClip();
-                    if (ImGui::DragFloat("Far", &orthoFar))
-                        camera.setOrthographicFarClip(orthoFar);
-                    
-                    ImGui::Checkbox("Fixed Aspect Ratio", &cameraComponent.fixedAspectRatio);
+                    // float orthoSize = camera.getOrthographicSize();
+                    // if (ImGui::DragFloat("Size", &orthoSize))
+                    //     camera.setOrthographicSize(orthoSize);
+                    //
+                    // float orthoNear = camera.getOrthographicNearClip();
+                    // if (ImGui::DragFloat("Near", &orthoNear))
+                    //     camera.setOrthographicNearClip(orthoNear);
+                    //
+                    // float orthoFar = camera.getOrthographicFarClip();
+                    // if (ImGui::DragFloat("Far", &orthoFar))
+                    //     camera.setOrthographicFarClip(orthoFar);
+                    //
+                    // ImGui::Checkbox("Fixed Aspect Ratio", &cameraComponent.fixedAspectRatio);
                 }
 
                 ImGui::TreePop();

@@ -67,12 +67,11 @@ namespace ChoreoApp {
 
     Entity Scene::createEntity(const std::string& name = ""){
         Entity entity ={ m_registry.create(), shared_from_this()}; 
-        // all entities should have a transform component
-        entity.addComponent<TransformComponent>();
         // all entities should have a name
         auto& tagComponent { entity.addComponent<TagComponent>(name) };
         tagComponent.tag = name.empty() ? "Entity" : name;
 
+        entity.addComponent<TransformComponent>();
         return entity;
     }
 

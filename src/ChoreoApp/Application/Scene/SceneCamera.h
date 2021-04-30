@@ -2,6 +2,7 @@
 
 
 #include "Application/Renderer/Camera.h"
+#include "Controller.h"
 #include "glm/glm.hpp"
 
 namespace ChoreoApp {
@@ -16,28 +17,19 @@ namespace ChoreoApp {
         void setViewportSize(const uint32_t width,const uint32_t height);
 
         // PERSPECTIVE 
-        void setPerspective(float FOV, float nearClip, float farClip);
-
-        float getPerspectiveVerticalFOV() const { return m_perspectiveFOV; }
-        void setPerspectiveVerticalFOV(float perspectiveFOV){ m_perspectiveFOV= perspectiveFOV; recalculateProjection();}
-
-        float getPerspectiveNearClip() const { return m_perspectiveNear; }
-        void setPerspectiveNearClip(float nearClip) { m_perspectiveNear= nearClip;  recalculateProjection();}
-
-        float getPerspectiveFarClip() const { return m_perspectiveFar; }
-        void setPerspectiveFarClip(float farClip) { m_perspectiveFar= farClip; recalculateProjection(); }
+        Ref<FloatController> getPerspectiveFOV() { return m_perspectiveFOV; }
+        void setPerspectiveFOV(double val){ m_perspectiveFOV->setVal(val); recalculateProjection(); }
+        Ref<FloatController> getPerspectiveNearClip() { return m_perspectiveNearClip; }
+        void setPerspectiveNearClip(double val){ m_perspectiveNearClip->setVal(val); recalculateProjection(); }
+        Ref<FloatController> getPerspectiveFarClip() { return m_perspectiveFarClip; }
+        void setPerspectiveFarClip(double val){ m_perspectiveFarClip->setVal(val); recalculateProjection(); }
         
         // ORTHOGRAPHIC
-        void setOrthographic(float size, float nearClip, float farClip);
+        Ref<FloatController> getOrthographicSize() { return m_orthographicSize; }
+        void setPerspectiveFOV(double val){ m_perspectiveFOV->setVal(val); recalculateProjection(); }
+        Ref<FloatController> getOrthographicNearClip() { return m_orthographicNearClip; }
+        Ref<FloatController> getOrthographicFarClip() { return m_orthographicFarClip; }
 
-        float getOrthographicSize() const { return m_orthographicSize; }
-        void setOrthographicSize(float orthographicSize){ m_orthographicSize = orthographicSize; recalculateProjection();}
-
-        float getOrthographicNearClip() const { return m_orthographicNear; }
-        void setOrthographicNearClip(float nearClip) { m_orthographicNear= nearClip;  recalculateProjection();}
-
-        float getOrthographicFarClip() const { return m_orthographicFar; }
-        void setOrthographicFarClip(float farClip) { m_orthographicFar= farClip; recalculateProjection(); }
 
         float getAspectRatio() const { return m_aspectRatio; }
         
@@ -47,13 +39,13 @@ namespace ChoreoApp {
     private:
         ProjectionType m_projectionType = ProjectionType::Perspective;
         void recalculateProjection();
-        float m_orthographicSize = 10.0f;
-        float m_orthographicNear = -1.0f;
-        float m_orthographicFar = 1.0f;
+        Ref<FloatController> m_orthographicSize {CreateRef<FloatController>(10.0f)};
+        Ref<FloatController> m_orthographicNearClip {CreateRef<FloatController>(-1.0f)};
+        Ref<FloatController> m_orthographicFarClip {CreateRef<FloatController>(1.0f)};
 
-        float m_perspectiveFOV = glm::radians(45.0f);
-        float m_perspectiveNear = 0.01f;
-        float m_perspectiveFar = 1000.0f;
+        Ref<FloatController> m_perspectiveFOV{CreateRef<FloatController>(glm::radians(45.0f))};
+        Ref<FloatController> m_perspectiveNearClip {CreateRef<FloatController>(0.001f)};
+        Ref<FloatController> m_perspectiveFarClip {CreateRef<FloatController>(1000.0f)};
 
         float m_aspectRatio{0};
     };
