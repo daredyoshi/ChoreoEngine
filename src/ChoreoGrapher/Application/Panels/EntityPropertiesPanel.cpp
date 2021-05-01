@@ -99,17 +99,18 @@ namespace ChoreoGrapher{
                 if (camera.getProjectionType() == ChoreoApp::SceneCamera::ProjectionType::Perspective){
                     // float perspFOV = glm::degrees(camera.getPerspectiveVerticalFOV());
                     // ImGui::InputDouble("Vertical FOV", 
-                    float perspectiveFOV{ (float)(camera.getPerspectiveFOV()->getKey().getVal()) };
+                    const ChoreoApp::Scope<ChoreoApp::Time>& t {m_context->getTime()};
+                    float perspectiveFOV{ camera.getPerspectiveFOV()->getKey(t).getVal()[0] };
                     if (ImGui::DragFloat("Vertical FOV", &perspectiveFOV)){
-                        camera.setPerspectiveFOV(perspectiveFOV);
+                        camera.setPerspectiveFOV(perspectiveFOV, m_context->getTime());
                     }
-                    float perspectiveNearClip{ (float)(camera.getPerspectiveNearClip()->getKey().getVal()) };
+                    float perspectiveNearClip{ camera.getPerspectiveFOV()->getKey(t).getVal()[0] };
                     if (ImGui::DragFloat("Vertical NearClip", &perspectiveNearClip)){
-                        camera.setPerspectiveNearClip(perspectiveNearClip);
+                        camera.setPerspectiveNearClip(perspectiveNearClip, m_context->getTime());
                     }
-                    float perspectiveFarClip{ (float)(camera.getPerspectiveFarClip()->getKey().getVal()) };
+                    float perspectiveFarClip{ camera.getPerspectiveFOV()->getKey(t).getVal()[0] };
                     if (ImGui::DragFloat("Vertical FarClip", &perspectiveFarClip)){
-                        camera.setPerspectiveFarClip(perspectiveFarClip);
+                        camera.setPerspectiveFarClip(perspectiveFarClip, m_context->getTime());
                     }
                     //
                     // float perspNear = camera.getPerspectiveNearClip();

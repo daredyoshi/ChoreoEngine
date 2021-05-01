@@ -27,11 +27,10 @@ namespace ChoreoApp {
 
     void SceneCamera::setViewportSize(const uint32_t width, const uint32_t height){
         m_aspectRatio = (float)width / (float)height;
-        recalculateProjection();
     }
-    void SceneCamera::recalculateProjection(){
+    void SceneCamera::recalculateProjection(const Scope<Time>& t){
         if (m_projectionType == ProjectionType::Perspective){
-            m_projectionMatrix = glm::perspective((float)*m_perspectiveFOV, m_aspectRatio, (float)*m_perspectiveNearClip, (float)*m_perspectiveFarClip);
+            m_projectionMatrix = glm::perspective(getPerspectiveFOV()->eval(t), m_aspectRatio, getPerspectiveNearClip()->eval(t), getPerspectiveFarClip()->eval(t));
         }
         else{
             float orthoLeft = -*m_orthographicSize * m_aspectRatio * 0.5f ;
