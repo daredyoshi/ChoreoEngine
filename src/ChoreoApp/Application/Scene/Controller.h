@@ -5,14 +5,56 @@
 #include "glm/glm.hpp"
 
 namespace ChoreoApp{
+class FloatStepController {
+public:
+    FloatStepController() = default;
+    FloatStepController(float val){
+        m_keys.push_back({val});
+    }
+
+    float  virtual eval(const Scope<Time>& t) const {
+        unsigned int idx = getPreviousKey(t);
+        return m_keys[idx].eval(); 
+    }
+    FloatKey& getKey(unsigned int idx) { return m_keys[idx]; }
+    FloatKey& getKey(const Scope<Time>& t) {
+        unsigned int idx = getPreviousKey(t);
+        return m_keys[idx]; 
+    }
+
+    void setVal(float val, const Scope<Time>& t) { 
+        unsigned int idx = getPreviousKey(t);
+        m_keys[idx].setVal(val); 
+    }
+
+protected:
+    std::vector<FloatKey> m_keys;
+private:
+    unsigned int getPreviousKey(const Scope<Time>& t) const{
+        // check to see if this is single value
+        if ( this->m_keys.size() == 1){
+            return 0;
+        }
+
+        for(unsigned int i = 0; i < this->m_keys.size(); ++i){
+            FloatKey k = this->m_keys[i]; 
+            // convert the key to ticks and the time to tcks
+            if ((uint32_t)k >= *t){
+                return i-1;
+            }
+        }
+        CE_CORE_ASSERT(false, "Controller did not find keys")
+        return 0;
+    }
+};
 
 
 // this class is for non-animated parameters
 template<unsigned int TLen>
-class StepController{
+class MultiStepController{
 public:
-    StepController() = default;
-    StepController(std::array<float, TLen> val){
+    MultiStepController() = default;
+    MultiStepController(std::array<float, TLen> val){
        m_keys.push_back(val);
     }
 
@@ -21,20 +63,19 @@ public:
         return m_keys[idx].eval(); 
     }
 
-    Key<TLen>& getKey(unsigned int idx) { return m_keys[idx]; }
-    Key<TLen>& getKey(const Scope<Time>& t) {
+    MultiKey<TLen>& getKey(unsigned int idx) { return m_keys[idx]; }
+    MultiKey<TLen>& getKey(const Scope<Time>& t) {
         unsigned int idx = getPreviousKey(t);
         return m_keys[idx]; 
     }
 
-    void setVal(std::array<float, TLen> val, unsigned int idx ) { m_keys[idx].setVal(val); }
     void setVal(std::array<float, TLen> val, const Scope<Time>& t) { 
         unsigned int idx = getPreviousKey(t);
         m_keys[idx].setVal(val); 
     }
 
 protected:
-    std::vector<Key<TLen>> m_keys;
+    std::vector<MultiKey<TLen>> m_keys;
 
 private:
     unsigned int getPreviousKey(const Time& t) const{
@@ -44,10 +85,10 @@ private:
         }
 
         for(unsigned int i = 0; i < this->m_keys.size(); ++i){
-            Key k = this->m_keys[i]; 
+            MultiKey k = this->m_keys[i]; 
             // convert the key to ticks and the time to tcks
-            if (k > t){
-                return i;
+            if (k >= t){
+                return i - 1;
             }
         }
         CE_CORE_ASSERT(false, "Controller did not find keys")
@@ -59,6 +100,7 @@ private:
 // could try to template this, but since ther is a limited amount of controller types
 // I'd rather be explicit here
 class XformStepController {
+public:
     XformStepController() = default;
     XformStepController(glm::vec3 p, glm::vec3 r, glm::vec3 s){
         m_keys.push_back(XformKey{p, r, s});
@@ -74,13 +116,11 @@ class XformStepController {
         return m_keys[idx]; 
     }
 
-    void setVal(float val, unsigned int keyIdx, unsigned int xformIdx) { m_keys[keyIdx].setVal(val, xformIdx); }
     void setVal(float val, const Scope<Time>& t, unsigned int xformIdx) { 
         unsigned int idx = getPreviousKey(t);
         m_keys[idx].setVal(val, xformIdx); 
     }
 
-    void setVals(XformKey val, unsigned int keyIdx) { m_keys[keyIdx].setVals(val); }
     void setVals(XformKey val, const Scope<Time>& t) { 
         unsigned int idx = getPreviousKey(t);
         m_keys[idx].setVals(val); 
@@ -97,10 +137,10 @@ private:
         }
 
         for(unsigned int i = 0; i < this->m_keys.size(); ++i){
-            Key k = this->m_keys[i]; 
+            XformKey k = this->m_keys[i]; 
             // convert the key to ticks and the time to tcks
-            if (k > *t){
-                return i;
+            if (k >= *t){
+                return i - 1;
             }
         }
         CE_CORE_ASSERT(false, "Controller did not find keys")

@@ -7,7 +7,7 @@
 namespace ChoreoApp {
     SceneCamera::SceneCamera() 
         : Camera() {
-        recalculateProjection();
+        recalculateProjection(CreateScope<Time>(t_cache));
     }
 
     // void SceneCamera::setOrthographic(float size, float nearClip, float farClip){
@@ -28,17 +28,25 @@ namespace ChoreoApp {
     void SceneCamera::setViewportSize(const uint32_t width, const uint32_t height){
         m_aspectRatio = (float)width / (float)height;
     }
+
     void SceneCamera::recalculateProjection(const Scope<Time>& t){
+        // create and cache a copy of time or faster processing
+        t_cache = *t;
+        recalculateProjection();
+    }
+    void SceneCamera::recalculateProjection(){
+        Scope<Time> t_cachePtr = CreateScope<Time>(t_cache);
         if (m_projectionType == ProjectionType::Perspective){
-            m_projectionMatrix = glm::perspective(getPerspectiveFOV()->eval(t), m_aspectRatio, getPerspectiveNearClip()->eval(t), getPerspectiveFarClip()->eval(t));
+            // CE_CORE_TRACE("Cam deets {0}, {1}, {2}", m_perspectiveFOV->eval(t_cachePtr), m_perspectiveNearClip->eval(t_cachePtr), m_perspectiveFarClip->eval(t_cachePtr));
+            m_projectionMatrix = glm::perspective(m_perspectiveFOV->eval(t_cachePtr), m_aspectRatio, m_perspectiveNearClip->eval(t_cachePtr), m_perspectiveFarClip->eval(t_cachePtr));
         }
         else{
-            float orthoLeft = -*m_orthographicSize * m_aspectRatio * 0.5f ;
-            float orthoRight= *m_orthographicSize * m_aspectRatio * 0.5f ;
-            float orthoTop= *m_orthographicSize * 0.5f ;
-            float orthoBottom= -*m_orthographicSize * 0.5f ;
+            float orthoLeft = -m_orthographicSize->eval(t_cachePtr) * m_aspectRatio * 0.5f ;
+            float orthoRight= m_orthographicSize->eval(t_cachePtr) * m_aspectRatio * 0.5f ;
+            float orthoTop= m_orthographicSize->eval(t_cachePtr) * 0.5f ;
+            float orthoBottom= -m_orthographicSize->eval(t_cachePtr) * 0.5f ;
             m_projectionMatrix = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop,
-                    (float)*m_orthographicNearClip, (float)*m_orthographicFarClip);
+                    m_orthographicNearClip->eval(t_cachePtr), m_orthographicFarClip->eval(t_cachePtr));
 
         }
     }

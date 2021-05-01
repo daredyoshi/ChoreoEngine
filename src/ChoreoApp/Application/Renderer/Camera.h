@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "capch.h"
+#include "glm/gtc/type_ptr.hpp"
 
 
 namespace ChoreoApp {
@@ -11,7 +13,7 @@ namespace ChoreoApp {
             : m_projectionMatrix{projectionMatrix} {}
         virtual ~Camera() = default;
 
-        const glm::mat4& getProjectionMatrix() const { return m_projectionMatrix; }
+        const glm::mat4& getProjectionMatrix() const {return m_projectionMatrix; }
 
     protected:
         glm::mat4 m_projectionMatrix;

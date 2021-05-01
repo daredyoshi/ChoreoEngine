@@ -13,44 +13,43 @@
 
 namespace ChoreoApp{
 
-// class Key{
-// public:
-//     Key() = default;
-//     Key(float val)
-//         : m_val{val}, m_time{0} {}
-//     Key(float val, Time time)
-//         : m_val{val}, m_time{time} {}
-//     virtual ~Key(){};
-//
-//     void setVal(const float val) { m_val = val; }    
-//     float& getVal() { return m_val; }
-//     float eval() const { return m_val; }
-//
-//     operator float() { return m_val; }
-//     operator uint32_t() { return m_time; }
-//
-// protected:
-//     float m_val;
-//     Time m_time;
-// };
-//
+class FloatKey{
+public:
+    FloatKey() = default;
+    FloatKey(float val)
+        : m_val{val}, m_time{0} {}
+    FloatKey(float val, Time time)
+        : m_val{val}, m_time{time} {}
+
+    void setVal(const float val) { m_val= val; }    
+    float& getVal() { return m_val; }
+    float eval() const { return m_val; }
+
+
+    operator float (){ return m_val; }
+    operator uint32_t() { return m_time; }
+
+protected:
+    float m_val;
+    Time m_time;
+};
 
 template<unsigned int T>
-class Key{
+class MultiKey{
 public:
-    Key() = default;
-    Key(std::array<Key, T> vals)
+    MultiKey() = default;
+    MultiKey(std::array<MultiKey, T> vals)
         : m_vals{vals}, m_time{0} {}
-    Key(std::array<Key, T> vals, Time time)
+    MultiKey(std::array<MultiKey, T> vals, Time time)
         : m_vals{vals}, m_time{time} {}
 
-    void setVal(const double val, unsigned int idx) { m_vals[idx] = val; }    
+    void setVal(const float val, unsigned int idx) { m_vals[idx] = val; }    
     std::array<float, T>& getVal() { return m_vals; }
     std::array<float, T> eval() const { return m_vals; }
 
-    void setVals(std::array<Key, T> vals) {m_vals = vals;}
+    void setVals(std::array<MultiKey, T> vals) {m_vals = vals;}
 
-    operator std::array<Key, T>() { return m_vals; }
+    operator std::array<MultiKey, T>() { return m_vals; }
     operator uint32_t() { return m_time; }
 
 protected:
@@ -58,7 +57,7 @@ protected:
     Time m_time;
 };
 
-class XformKey : public Key<16>{
+class XformKey : public MultiKey<16>{
 public:
     XformKey(glm::vec3 p, glm::vec3 r, glm::vec3 s){
         compose(p, r, s);
