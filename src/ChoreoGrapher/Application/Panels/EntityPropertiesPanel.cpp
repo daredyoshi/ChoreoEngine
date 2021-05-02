@@ -43,12 +43,24 @@ namespace ChoreoGrapher{
         }
 
 
-        // TRANSFORM
-        if(entity->hasComponent<ChoreoApp::TransformComponent>()){
-            if (ImGui::TreeNodeEx((void*)typeid(ChoreoApp::TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform") ){
-                auto& transform = entity->getComponent<ChoreoApp::TransformComponent>();
-
-                ImGui::DragFloat3("Position", glm::value_ptr(transform.transform[3]), 0.1f);
+        // Xform  
+        if(entity->hasComponent<ChoreoApp::XformComponent>()){
+            if (ImGui::TreeNodeEx((void*)typeid(ChoreoApp::XformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform") ){
+                auto& xform = entity->getComponent<ChoreoApp::XformComponent>();
+                
+                ChoreoApp::XformKey& k { xform.xform->getKey(m_context->getTime()) };
+                glm::vec3 p { k.getPosition() };
+                if (ImGui::DragFloat3("Position", glm::value_ptr(p), 0.1f)){
+                    k.setPosition(p);
+                }
+                glm::vec3 r { k.getEulerRotation() };
+                if (ImGui::DragFloat3("Rotation", glm::value_ptr(r), 1.0f)){
+                    k.setEulerRotation(r);
+                }
+                glm::vec3 s { k.getScale() };
+                if (ImGui::DragFloat3("Scale", glm::value_ptr(s), 0.1f)){
+                    k.setScale(s);
+                }
 
                 
                 // if (ImGui::DragFloat3("Rotation", transform.getEulerRotation()))

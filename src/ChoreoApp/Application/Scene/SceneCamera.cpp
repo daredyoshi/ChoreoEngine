@@ -27,6 +27,7 @@ namespace ChoreoApp {
 
     void SceneCamera::setViewportSize(const uint32_t width, const uint32_t height){
         m_aspectRatio = (float)width / (float)height;
+        recalculateProjection();
     }
 
     void SceneCamera::recalculateProjection(const Scope<Time>& t){
@@ -37,7 +38,6 @@ namespace ChoreoApp {
     void SceneCamera::recalculateProjection(){
         Scope<Time> t_cachePtr = CreateScope<Time>(t_cache);
         if (m_projectionType == ProjectionType::Perspective){
-            // CE_CORE_TRACE("Cam deets {0}, {1}, {2}", m_perspectiveFOV->eval(t_cachePtr), m_perspectiveNearClip->eval(t_cachePtr), m_perspectiveFarClip->eval(t_cachePtr));
             m_projectionMatrix = glm::perspective(m_perspectiveFOV->eval(t_cachePtr), m_aspectRatio, m_perspectiveNearClip->eval(t_cachePtr), m_perspectiveFarClip->eval(t_cachePtr));
         }
         else{

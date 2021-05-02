@@ -53,7 +53,9 @@ private:
 template<unsigned int TLen>
 class MultiStepController{
 public:
-    MultiStepController() = default;
+    MultiStepController() {
+        m_keys.push_back(MultiKey<TLen>());
+    };
     MultiStepController(std::array<float, TLen> val){
        m_keys.push_back(val);
     }
@@ -101,10 +103,15 @@ private:
 // I'd rather be explicit here
 class XformStepController {
 public:
-    XformStepController() = default;
-    XformStepController(glm::vec3 p, glm::vec3 r, glm::vec3 s){
-        m_keys.push_back(XformKey{p, r, s});
+    XformStepController(){
+        m_keys.push_back(XformKey{});
+    } 
+    XformStepController(XformKey& k){
+        m_keys.push_back(k);
     }
+    // XformStepController(glm::vec3 p, glm::vec3 r, glm::vec3 s){
+    //     m_keys.push_back(XformKey{p, r, s});
+    // }
 
     glm::mat4 virtual eval(const Scope<Time>& t) const {
         unsigned int idx = getPreviousKey(t);

@@ -18,7 +18,7 @@ namespace ChoreoApp {
     protected:
         virtual void onCreate(){};
         virtual void onDestroy(){};
-        virtual void onUpdate(Timestep ts){(void(ts));};
+        virtual void onUpdate(Timestep ts, Scene& scene){(void(ts)); (void(scene));};
     private:
         Entity m_entity;
         friend class Scene;

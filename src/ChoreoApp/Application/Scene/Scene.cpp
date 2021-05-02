@@ -71,7 +71,7 @@ namespace ChoreoApp {
         auto& tagComponent { entity.addComponent<TagComponent>(name) };
         tagComponent.tag = name.empty() ? "Entity" : name;
 
-        entity.addComponent<TransformComponent>();
+        entity.addComponent<XformComponent>();
         return entity;
     }
 
@@ -88,31 +88,31 @@ namespace ChoreoApp {
                     nsc.instance->m_entity = Entity{ entity, shared_from_this()};
                     nsc.instance->onCreate();
                 }
-                nsc.instance->onUpdate(ts);
+                nsc.instance->onUpdate(ts, *this);
             });
         }
 
         Camera* mainCamera = nullptr;
-        glm::mat4 cameraTransform;
+        glm::mat4 cameraXform;
         {
-            auto view = m_registry.view<TransformComponent, CameraComponent>();
+            auto view = m_registry.view<XformComponent, CameraComponent>();
             for (auto entity : view){
-                auto [ transform, camera ] =  view.get<TransformComponent, CameraComponent>(entity);
+                auto [ xform, camera ] =  view.get<XformComponent, CameraComponent>(entity);
                 if(camera.primary){
                     mainCamera = &camera.camera; 
-                    cameraTransform = transform.transform;
+                    cameraXform= xform.xform->eval(m_time);
                     break;
                 }
             }
         }
 
         if(mainCamera){
-            ChoreoApp::Renderer2D::beginScene(*mainCamera, cameraTransform);
-            auto group = m_registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+            ChoreoApp::Renderer2D::beginScene(*mainCamera, cameraXform);
+            auto group = m_registry.group<XformComponent>(entt::get<SpriteRendererComponent>);
             for (auto entity: group){
 
-                auto [transform , spriteRenderer] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-                Renderer2D::drawQuad(transform, spriteRenderer.color);
+                auto [xform, spriteRenderer] = group.get<XformComponent, SpriteRendererComponent>(entity);
+                Renderer2D::drawQuad(xform.xform->eval(m_time), spriteRenderer.color);
             }
             ChoreoApp::Renderer2D::endScene();
         }

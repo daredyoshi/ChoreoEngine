@@ -32,7 +32,7 @@ void EditorLayer::onAttach() {
 
     // primary camera
     m_cameraEntity = m_scene->createEntity("Camera Entity");
-    ChoreoApp::TransformComponent& xform = m_cameraEntity.getComponent<ChoreoApp::TransformComponent>();
+    ChoreoApp::XformComponent& xform = m_cameraEntity.getComponent<ChoreoApp::XformComponent>();
     m_cameraEntity.addComponent<ChoreoApp::CameraComponent>();
 
     // m_secondCamera = m_scene->createEntity("Second Camera Entity");
@@ -49,19 +49,19 @@ void EditorLayer::onAttach() {
         void onDestroy(){
 
         }
-        void onUpdate(ChoreoApp::Timestep ts){
+        void onUpdate(ChoreoApp::Timestep ts, ChoreoApp::Scene& scene){
             // this assumes everything has  transform
-            auto& transform = getComponent<ChoreoApp::TransformComponent>().transform;
+            ChoreoApp::XformKey& xformKey = getComponent<ChoreoApp::XformComponent>().xform->getKey(scene.getTime());
             float speed = 0.1f * ts; 
+            glm::vec3 p = xformKey.getPosition();
             if (ChoreoApp::Input::isKeyPressed(CE_KEY_A))
-                transform[3][0] -= speed;
+                xformKey.setPosition({p.x - speed, p.y, p.z});
             if (ChoreoApp::Input::isKeyPressed(CE_KEY_D))
-                transform[3][0] += speed;
+                xformKey.setPosition({p.x + speed, p.y, p.z});
             if (ChoreoApp::Input::isKeyPressed(CE_KEY_W))
-                transform[3][1] += speed;
+                xformKey.setPosition({p.x, p.y + speed, p.z});
             if (ChoreoApp::Input::isKeyPressed(CE_KEY_S))
-                transform[3][1] -= speed;
-            // std::cout << "Timestep: " << ts << std::endl;
+                xformKey.setPosition({p.x, p.y - speed, p.z});
         }
     };
     m_cameraEntity.addComponent<ChoreoApp::NativeScriptComponent>().bind<CameraController>();
