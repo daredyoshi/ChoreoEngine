@@ -72,11 +72,11 @@ public:
 
     void compose(glm::vec3 p, glm::vec3 r, glm::vec3 s){
         glm::mat4 translation = glm::translate(p);
-        glm::mat4 rotation = glm::yawPitchRoll( r.x, r.y, r.z );
-        glm::mat4 scale = glm::scale(s);
-        // glm::mat4 xform = rotation * translation * scale;
-        glm::mat4 xform = translation * rotation * scale;
+        glm::mat4 rotation = glm::eulerAngleXYZ( glm::radians(r.x), glm::radians(r.y),glm::radians( r.z ));
+        glm::mat4 xform = translation * rotation;
+
         setVals( xform );
+        setScale(s);
     };
 
     glm::vec3 getPosition() const {
@@ -97,31 +97,20 @@ public:
         };
     }
     void setScale(glm::vec3 s){
-        // (void)s;
-//  float xs =
-//             matrix[0][0] * matrix[0][1] * matrix[0][2] * matrix[0][3] < 0 ? -1 : 1;
-//     float ys =
-//             matrix[1][0] * matrix[1][1] * matrix[1][2] * matrix[1][3] < 0 ?
-//                     -1 : 1;
-//     float zs =
-//             matrix[2][0] * matrix[2][1] * matrix[2][2] * matrix[2][3] < 0 ?
-//                     -1 : 1;
         // no negative scale allowed
-        if (s.x >=0){
+        if (s.x <=0){
             s.x = 0.000001;
         }
-        if (s.y>=0){
+        if (s.y<=0){
             s.y = 0.000001;
         }
-        if (s.z>=0){
+        if (s.z<=0){
             s.z = 0.000001;
         }
         glm::vec3 x =  glm::normalize( glm::vec3{m_vals[0], m_vals[1], m_vals[2]} ) * s.x;
         glm::vec3 y =  glm::normalize( glm::vec3{m_vals[4], m_vals[5], m_vals[6]} ) * s.y;
         glm::vec3 z =  glm::normalize( glm::vec3{m_vals[8], m_vals[9], m_vals[10]} ) * s.z;
-        
-        // glm::vec3 y{0.0f, 0.5f, 0.0f};
-        // glm::vec3 z{0.0f, 0.0f, 1.0f};
+       
         m_vals[0] = x.x; 
         m_vals[1] = x.y; 
         m_vals[2] = x.z; 
@@ -136,12 +125,31 @@ public:
     glm::vec3 getEulerRotation() const {
         float x, y, z;
         glm::extractEulerAngleXYZ(eval(), x, y, z);
-        return {x, y, z};
+        return {glm::degrees(x),glm::degrees( y),glm::degrees( z)};
     }
-    void setEulerRotation(glm::vec3 eulerAngles){
+    void setEulerRotation(glm::vec3 r){
+        if (r.x>=179.99){
+            r.x = 179.99;
+        }
+        if (r.y>=179.99){
+            r.y = 179.99;
+        }
+        if (r.z>=179.99){
+            r.z = 179.99;
+        }
+        if (r.x<=-179.99){
+            r.x = -179.99;
+        }
+        if (r.y<=-179.99){
+            r.y = -179.99;
+        }
+        if (r.z<=-179.99){
+            r.z = -179.99;
+        }
+ 
         glm::vec3 p { getPosition() };
         glm::vec3 s { getScale() };
-        compose(p, eulerAngles, s);
+        compose(p, r, s);
     };
 
     glm::mat4 eval() const { 
@@ -169,17 +177,14 @@ public:
     }
 
     void setVals(glm::mat4 val) { 
-        CE_CORE_TRACE("Setting Matrix Vals: ");
+        // CE_CORE_TRACE("Setting Matrix Vals: ");
         std::array<float,16> dArray= {0.0};
 
         const float *pSource = (const float*)glm::value_ptr(val);
         for (int i = 0; i < 16; ++i){
-            CE_CORE_TRACE("{0}", pSource[i]);
+            // CE_CORE_TRACE("{0}", pSource[i]);
             dArray[i] = pSource[i];
         }
-        // for (unsigned int i{0};i<16;++i)
-        //     CE_CORE_TRACE( "{0}", std::array<float, 16>{ *glm::value_ptr(val) }[i] );
-        // }
         m_vals = dArray;
     }    
 
