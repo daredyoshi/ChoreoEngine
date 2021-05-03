@@ -48,19 +48,19 @@ namespace ChoreoGrapher{
             if (ImGui::TreeNodeEx((void*)typeid(ChoreoApp::XformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform") ){
                 auto& xform = entity->getComponent<ChoreoApp::XformComponent>();
                 
-                ChoreoApp::XformKey& k { xform.xform->getKey(m_context->getTime()) };
-                glm::vec3 p { k.getPosition() };
-                if (ImGui::DragFloat3("Position", glm::value_ptr(p), 0.1f)){
-                    k.setPosition(p);
-                }
-                glm::vec3 r { k.getEulerRotation() };
-                if (ImGui::DragFloat3("Rotation", glm::value_ptr(r), 1.0f)){
-                    k.setEulerRotation(r);
-                }
-                glm::vec3 s { k.getScale() };
-                if (ImGui::DragFloat3("Scale", glm::value_ptr(s), 0.1f)){
-                    k.setScale(s);
-                }
+                // ChoreoApp::Mat4XformKey& k { xform.xform->getKey(m_context->getTime()) };
+                // glm::vec3 p { k.getPosition() };
+                // if (ImGui::DragFloat3("Position", glm::value_ptr(p), 0.1f)){
+                //     k.setPosition(p);
+                // }
+                // glm::vec3 r { k.getEulerRotation() };
+                // if (ImGui::DragFloat3("Rotation", glm::value_ptr(r), 1.0f)){
+                //     k.setEulerRotation(r);
+                // }
+                // glm::vec3 s { k.getScale() };
+                // if (ImGui::DragFloat3("Scale", glm::value_ptr(s), 0.1f)){
+                //     k.setScale(s);
+                // }
 
                 
                 // if (ImGui::DragFloat3("Rotation", transform.getEulerRotation()))
@@ -112,15 +112,15 @@ namespace ChoreoGrapher{
                     // float perspFOV = glm::degrees(camera.getPerspectiveVerticalFOV());
                     // ImGui::InputDouble("Vertical FOV", 
                     const ChoreoApp::Scope<ChoreoApp::Time>& t {m_context->getTime()};
-                    float perspectiveFOV{ glm::degrees(camera.getPerspectiveFOV()->getKey(t).getVal())};
+                    float perspectiveFOV{ glm::degrees(camera.getPerspectiveFOV()->getKey(t)->getVal())};
                     if (ImGui::DragFloat("Vertical FOV", &perspectiveFOV)){
                         camera.setPerspectiveFOV(glm::radians(perspectiveFOV), m_context->getTime());
                     }
-                    float perspectiveNearClip{ camera.getPerspectiveNearClip()->getKey(t).getVal()};
+                    float perspectiveNearClip{ camera.getPerspectiveNearClip()->getKey(t)->getVal()};
                     if (ImGui::DragFloat("Vertical NearClip", &perspectiveNearClip)){
                         camera.setPerspectiveNearClip(perspectiveNearClip, m_context->getTime());
                     }
-                    float perspectiveFarClip{ camera.getPerspectiveFarClip()->getKey(t).getVal()};
+                    float perspectiveFarClip{ camera.getPerspectiveFarClip()->getKey(t)->getVal()};
                     if (ImGui::DragFloat("Vertical FarClip", &perspectiveFarClip)){
                         camera.setPerspectiveFarClip(perspectiveFarClip, m_context->getTime());
                     }

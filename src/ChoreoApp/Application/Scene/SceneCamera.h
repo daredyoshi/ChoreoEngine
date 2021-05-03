@@ -4,6 +4,7 @@
 #include "Application/Renderer/Camera.h"
 #include "Controller.h"
 #include "glm/glm.hpp"
+#include <memory>
 
 namespace ChoreoApp {
     class SceneCamera : public Camera{
@@ -17,21 +18,21 @@ namespace ChoreoApp {
         void setViewportSize(const uint32_t width,const uint32_t height);
 
         // PERSPECTIVE 
-        Ref<FloatStepController> getPerspectiveFOV() { return m_perspectiveFOV; }
-        void setPerspectiveFOV(float val, const Scope<Time>& t){ m_perspectiveFOV->setVal(val, t); recalculateProjection(t); }
-        Ref<FloatStepController> getPerspectiveNearClip() { return m_perspectiveNearClip; }
-        void setPerspectiveNearClip(float val, const Scope<Time>& t){ m_perspectiveNearClip->setVal(val, t); recalculateProjection(t); }
-        Ref<FloatStepController> getPerspectiveFarClip() { return m_perspectiveFarClip; }
-        void setPerspectiveFarClip(float val, const Scope<Time>& t){ m_perspectiveFarClip->setVal(val, t); recalculateProjection(t); }
+        Ref<FloatController> getPerspectiveFOV() { return m_perspectiveFOV; }
+        void setPerspectiveFOV(float val, const Scope<Time>& t){ m_perspectiveFOV->getKey(t)->setVal(val); recalculateProjection(t); }
+        Ref<FloatController> getPerspectiveNearClip() { return m_perspectiveNearClip; }
+        void setPerspectiveNearClip(float val, const Scope<Time>& t){ m_perspectiveNearClip->getKey(t)->setVal(val); recalculateProjection(t); }
+        Ref<FloatController> getPerspectiveFarClip() { return m_perspectiveFarClip; }
+        void setPerspectiveFarClip(float val, const Scope<Time>& t){ m_perspectiveFarClip->getKey(t)->setVal(val); recalculateProjection(t); }
         
         // ORTHOGRAPHIC
-        Ref<FloatStepController> getOrthographicSize() { return m_orthographicSize; }
-        void setOrthographicSize(float val, const Scope<Time>& t){ m_orthographicSize->setVal(val, t); recalculateProjection(t); }
+        Ref<FloatController> getOrthographicSize() { return m_orthographicSize; }
+        void setOrthographicSize(float val, const Scope<Time>& t){ m_orthographicSize->getKey(t)->setVal(val); recalculateProjection(t); }
         // void setPerspectiveFOV(float val){ m_perspectiveFOV->setVal(val); recalculateProjection(); }
-        Ref<FloatStepController> getOrthographicNearClip() { return m_orthographicNearClip; }
-        void setOrthographicNearClip(float val, const Scope<Time>& t){ m_orthographicNearClip->setVal(val, t); recalculateProjection(t); }
-        Ref<FloatStepController> getOrthographicFarClip() { return m_orthographicFarClip; }
-        void setOrthographicFarClip(float val, const Scope<Time>& t){ m_orthographicFarClip->setVal(val, t); recalculateProjection(t); }
+        Ref<FloatController> getOrthographicNearClip() { return m_orthographicNearClip; }
+        void setOrthographicNearClip(float val, const Scope<Time>& t){ m_orthographicNearClip->getKey(t)->setVal(val); recalculateProjection(t); }
+        Ref<FloatController> getOrthographicFarClip() { return m_orthographicFarClip; }
+        void setOrthographicFarClip(float val, const Scope<Time>& t){ m_orthographicFarClip->getKey(t)->setVal(val); recalculateProjection(t); }
 
 
         float getAspectRatio() const { return m_aspectRatio; }
@@ -43,13 +44,14 @@ namespace ChoreoApp {
         void recalculateProjection(const Scope<Time>& t);
         void recalculateProjection();
         ProjectionType m_projectionType = ProjectionType::Perspective;
-        Ref<FloatStepController> m_orthographicSize {CreateRef<FloatStepController>(10.0f)};
-        Ref<FloatStepController> m_orthographicNearClip {CreateRef<FloatStepController>(-1.0f)};
-        Ref<FloatStepController> m_orthographicFarClip {CreateRef<FloatStepController>(1.0f)};
+        Ref<FloatController> m_orthographicSize {std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(10.0f))};
+        Ref<FloatController> m_orthographicNearClip {std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(-1.0f))};
+        Ref<FloatController> m_orthographicFarClip {std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(1.0f))};
 
-        Ref<FloatStepController> m_perspectiveFOV{CreateRef<FloatStepController>(glm::radians(45.0f))};
-        Ref<FloatStepController> m_perspectiveNearClip {CreateRef<FloatStepController>(0.001f)};
-        Ref<FloatStepController> m_perspectiveFarClip {CreateRef<FloatStepController>(1000.0f)};
+        Ref<FloatController> m_perspectiveFOV{std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(glm::radians(45.0f)))};
+        Ref<FloatController> m_perspectiveNearClip {std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(0.001f))};
+        Ref<FloatController> m_perspectiveFarClip {std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(1000.0f))};
+        // std::shared_ptr<FloatController> m_perspectiveFarClip {std::static_pointer_cast<FloatController>(std::make_shared<FloatStepController>(1000.0f))};
 
         float m_aspectRatio{0};
         Time t_cache{Time{0}};

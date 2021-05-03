@@ -50,18 +50,20 @@ void EditorLayer::onAttach() {
 
         }
         void onUpdate(ChoreoApp::Timestep ts, ChoreoApp::Scene& scene){
+            (void)ts;
+            (void)scene;
             // this assumes everything has  transform
-            ChoreoApp::XformKey& xformKey = getComponent<ChoreoApp::XformComponent>().xform->getKey(scene.getTime());
-            float speed = 0.1f * ts; 
-            glm::vec3 p = xformKey.getPosition();
-            if (ChoreoApp::Input::isKeyPressed(CE_KEY_A))
-                xformKey.setPosition({p.x - speed, p.y, p.z});
-            if (ChoreoApp::Input::isKeyPressed(CE_KEY_D))
-                xformKey.setPosition({p.x + speed, p.y, p.z});
-            if (ChoreoApp::Input::isKeyPressed(CE_KEY_W))
-                xformKey.setPosition({p.x, p.y + speed, p.z});
-            if (ChoreoApp::Input::isKeyPressed(CE_KEY_S))
-                xformKey.setPosition({p.x, p.y - speed, p.z});
+            // ChoreoApp::Mat4XformKey& xformKey = getComponent<ChoreoApp::XformComponent>().xform->getKey(scene.getTime());
+            // float speed = 0.1f * ts; 
+            // glm::vec3 p = xformKey.getPosition();
+            // if (ChoreoApp::Input::isKeyPressed(CE_KEY_A))
+            //     xformKey.setPosition({p.x - speed, p.y, p.z});
+            // if (ChoreoApp::Input::isKeyPressed(CE_KEY_D))
+            //     xformKey.setPosition({p.x + speed, p.y, p.z});
+            // if (ChoreoApp::Input::isKeyPressed(CE_KEY_W))
+            //     xformKey.setPosition({p.x, p.y + speed, p.z});
+            // if (ChoreoApp::Input::isKeyPressed(CE_KEY_S))
+            //     xformKey.setPosition({p.x, p.y - speed, p.z});
         }
     };
     m_cameraEntity.addComponent<ChoreoApp::NativeScriptComponent>().bind<CameraController>();

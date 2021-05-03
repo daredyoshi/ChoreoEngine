@@ -51,6 +51,7 @@ set(
     Application/Scene/Scene.cpp
     Application/Scene/SceneCamera.cpp
     Application/Scene/Entity.cpp
+    Application/Scene/Controller.cpp
 
     Application/Log.cpp
     
