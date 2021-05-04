@@ -75,6 +75,20 @@ namespace ChoreoApp {
         return entity;
     }
 
+    void Scene::setTime(const Time& t){
+        m_timeLine.setCurrentTime(t);
+        
+        m_registry.view<XformComponent>().each([=](auto entity, auto& xformComponent){
+            (void)entity;
+            xformComponent.xform->dirty(); 
+        });
+
+        m_registry.view<CameraComponent>().each([=](auto entity, auto& cameraComponent){
+            (void)entity;
+            cameraComponent.camera.dirty(); 
+        });
+    }
+
     void Scene::onUpdate(Timestep ts){
         (void)ts;
 
@@ -100,7 +114,7 @@ namespace ChoreoApp {
                 auto [ xform, camera ] =  view.get<XformComponent, CameraComponent>(entity);
                 if(camera.primary){
                     mainCamera = &camera.camera; 
-                    cameraXform= xform.xform->eval(m_time);
+                    cameraXform= xform.xform->eval(m_timeLine.getCurrentTime());
                     break;
                 }
             }
@@ -112,7 +126,7 @@ namespace ChoreoApp {
             for (auto entity: group){
 
                 auto [xform, spriteRenderer] = group.get<XformComponent, SpriteRendererComponent>(entity);
-                Renderer2D::drawQuad(xform.xform->eval(m_time), spriteRenderer.color);
+                Renderer2D::drawQuad(xform.xform->eval(m_timeLine.getCurrentTime()), spriteRenderer.color);
             }
             ChoreoApp::Renderer2D::endScene();
         }

@@ -23,9 +23,10 @@ namespace ChoreoApp {
 
         entt::registry& getRegistry() { return m_registry; }        
 
-        const Scope<Time>& getTime() { return m_time; }
-        // TODO: update all scene component controllers when time is set
-        void setTimeTick(const uint32_t tick) { m_time->setTick(tick); }
+        const Scope<Time>& getTime() { return m_timeLine.getCurrentTime(); }
+        const TimeLine& getTimeLine() { return m_timeLine; }
+
+        void setTime(const Time& t);
 
         // void setLastSelectedEntity(const uint32_t entityHandle) { m_lastSelectedEntityHandle = entityHandle; };
         void setLastSelectedEntity(Ref<Entity> entity) { m_lastSelectedEntity = entity; };
@@ -36,7 +37,7 @@ namespace ChoreoApp {
 
     private:
         entt::registry m_registry;
-        Scope<Time> m_time{CreateScope<Time>()};
+        TimeLine m_timeLine{};
 
 
         Ref<Entity> m_lastSelectedEntity{CreateRef<Entity>()};

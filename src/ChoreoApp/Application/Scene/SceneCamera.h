@@ -19,26 +19,28 @@ namespace ChoreoApp {
 
         // PERSPECTIVE 
         Ref<FloatController> getPerspectiveFOV() { return m_perspectiveFOV; }
-        void setPerspectiveFOV(float val, const Scope<Time>& t){ m_perspectiveFOV->getKey(t)->setVal(val); recalculateProjection(t); }
+        void setPerspectiveFOV(float val, const Scope<Time>& t){ m_perspectiveFOV->setValAtTime(t, val); recalculateProjection(t); }
         Ref<FloatController> getPerspectiveNearClip() { return m_perspectiveNearClip; }
-        void setPerspectiveNearClip(float val, const Scope<Time>& t){ m_perspectiveNearClip->getKey(t)->setVal(val); recalculateProjection(t); }
+        void setPerspectiveNearClip(float val, const Scope<Time>& t){ m_perspectiveNearClip->setValAtTime(t, val); recalculateProjection(t); }
         Ref<FloatController> getPerspectiveFarClip() { return m_perspectiveFarClip; }
-        void setPerspectiveFarClip(float val, const Scope<Time>& t){ m_perspectiveFarClip->getKey(t)->setVal(val); recalculateProjection(t); }
+        void setPerspectiveFarClip(float val, const Scope<Time>& t){ m_perspectiveFarClip->setValAtTime(t, val); recalculateProjection(t); }
         
         // ORTHOGRAPHIC
         Ref<FloatController> getOrthographicSize() { return m_orthographicSize; }
-        void setOrthographicSize(float val, const Scope<Time>& t){ m_orthographicSize->getKey(t)->setVal(val); recalculateProjection(t); }
+        void setOrthographicSize(float val, const Scope<Time>& t){ m_orthographicSize->setValAtTime(t, val); recalculateProjection(t); }
         // void setPerspectiveFOV(float val){ m_perspectiveFOV->setVal(val); recalculateProjection(); }
         Ref<FloatController> getOrthographicNearClip() { return m_orthographicNearClip; }
-        void setOrthographicNearClip(float val, const Scope<Time>& t){ m_orthographicNearClip->getKey(t)->setVal(val); recalculateProjection(t); }
+        void setOrthographicNearClip(float val, const Scope<Time>& t){ m_orthographicNearClip->setValAtTime(t, val); recalculateProjection(t); }
         Ref<FloatController> getOrthographicFarClip() { return m_orthographicFarClip; }
-        void setOrthographicFarClip(float val, const Scope<Time>& t){ m_orthographicFarClip->getKey(t)->setVal(val); recalculateProjection(t); }
+        void setOrthographicFarClip(float val, const Scope<Time>& t){ m_orthographicFarClip->setValAtTime(t, val); recalculateProjection(t); }
 
 
         float getAspectRatio() const { return m_aspectRatio; }
         
         ProjectionType getProjectionType() const { return m_projectionType; }
         void setProjectionType(ProjectionType type) { m_projectionType = type; recalculateProjection(); }
+
+        void dirty();
 
     private:
         void recalculateProjection(const Scope<Time>& t);

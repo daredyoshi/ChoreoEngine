@@ -50,4 +50,14 @@ namespace ChoreoApp {
 
         }
     }
+
+    void SceneCamera::dirty(){
+        m_orthographicSize->dirty();
+        m_orthographicNearClip->dirty();
+        m_orthographicFarClip->dirty();
+
+        m_perspectiveFOV->dirty();
+        m_perspectiveNearClip->dirty();
+        m_perspectiveFarClip->dirty();
+    }
 }

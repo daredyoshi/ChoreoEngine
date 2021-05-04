@@ -26,8 +26,8 @@ public:
     T_returnType eval() const { return m_val; }; 
     void setVal(const T_returnType val) { m_val= val; }    
     T_returnType& getVal() { return m_val; }
+    unsigned int getTicke() { return m_time.getTick(); }
 
-    operator uint32_t() { return m_time; }
     operator T_returnType() { return m_val; }
 
 protected:

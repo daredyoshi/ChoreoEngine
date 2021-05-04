@@ -1,11 +1,13 @@
 
 #include "EntityPropertiesPanel.h"
 #include "Application/Scene/Components.h"
+#include "Application/Scene/Controller.h"
 #include "Application/Scene/Entity.h"
 #include "Application/Scene/SceneCamera.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/trigonometric.hpp"
 #include "imgui.h"
+#include <memory>
 
 namespace ChoreoGrapher{
 
@@ -42,30 +44,29 @@ namespace ChoreoGrapher{
             }
         }
 
+        const ChoreoApp::Scope<ChoreoApp::Time>& t {m_context->getTime()};
 
         // Xform  
         if(entity->hasComponent<ChoreoApp::XformComponent>()){
             if (ImGui::TreeNodeEx((void*)typeid(ChoreoApp::XformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform") ){
-                auto& xform = entity->getComponent<ChoreoApp::XformComponent>();
-                
-                // ChoreoApp::Mat4XformKey& k { xform.xform->getKey(m_context->getTime()) };
-                // glm::vec3 p { k.getPosition() };
-                // if (ImGui::DragFloat3("Position", glm::value_ptr(p), 0.1f)){
-                //     k.setPosition(p);
-                // }
-                // glm::vec3 r { k.getEulerRotation() };
-                // if (ImGui::DragFloat3("Rotation", glm::value_ptr(r), 1.0f)){
-                //     k.setEulerRotation(r);
-                // }
-                // glm::vec3 s { k.getScale() };
-                // if (ImGui::DragFloat3("Scale", glm::value_ptr(s), 0.1f)){
-                //     k.setScale(s);
-                // }
-
-                
-                // if (ImGui::DragFloat3("Rotation", transform.getEulerRotation()))
-                //
-                //     camera.setPerspectiveVerticalFOV(glm::radians(perspFOV));
+                auto& XformComponent = entity->getComponent<ChoreoApp::XformComponent>();
+                ChoreoApp::Ref<ChoreoApp::XformController> xformController = XformComponent.xform; 
+              
+                // if this is an Euler Xform Controller
+                if(xformController->getType() == ChoreoApp::XformController::XformType::Euler){
+                    glm::vec3 p { xformController->evalPosition(t) };
+                    if (ImGui::DragFloat3("Position", glm::value_ptr(p), 0.1f)){
+                        xformController->setPositionAtTime(t, p);
+                    }        
+                    glm::vec3 r { xformController->evalEulerAngles(t) };
+                    if(ImGui::DragFloat3("Euler Angles", glm::value_ptr(r), 0.5f)){
+                        xformController->setEulerAnglesAtTime(t, r);
+                    }
+                    glm::vec3 s { xformController->evalScale(t) };
+                    if(ImGui::DragFloat3("Scale", glm::value_ptr(s), 0.01f)){
+                        xformController->setScaleAtTime(t, s);
+                    }
+                }
 
 
                 ImGui::TreePop();
@@ -111,27 +112,18 @@ namespace ChoreoGrapher{
                 if (camera.getProjectionType() == ChoreoApp::SceneCamera::ProjectionType::Perspective){
                     // float perspFOV = glm::degrees(camera.getPerspectiveVerticalFOV());
                     // ImGui::InputDouble("Vertical FOV", 
-                    const ChoreoApp::Scope<ChoreoApp::Time>& t {m_context->getTime()};
-                    float perspectiveFOV{ glm::degrees(camera.getPerspectiveFOV()->getKey(t)->getVal())};
+                    float perspectiveFOV{ glm::degrees(camera.getPerspectiveFOV()->eval(t))};
                     if (ImGui::DragFloat("Vertical FOV", &perspectiveFOV)){
                         camera.setPerspectiveFOV(glm::radians(perspectiveFOV), m_context->getTime());
                     }
-                    float perspectiveNearClip{ camera.getPerspectiveNearClip()->getKey(t)->getVal()};
+                    float perspectiveNearClip{ camera.getPerspectiveNearClip()->eval(t)};
                     if (ImGui::DragFloat("Vertical NearClip", &perspectiveNearClip)){
                         camera.setPerspectiveNearClip(perspectiveNearClip, m_context->getTime());
                     }
-                    float perspectiveFarClip{ camera.getPerspectiveFarClip()->getKey(t)->getVal()};
+                    float perspectiveFarClip{ camera.getPerspectiveFarClip()->eval(t)};
                     if (ImGui::DragFloat("Vertical FarClip", &perspectiveFarClip)){
                         camera.setPerspectiveFarClip(perspectiveFarClip, m_context->getTime());
                     }
-                    //
-                    // float perspNear = camera.getPerspectiveNearClip();
-                    // if (ImGui::DragFloat("Near", &perspNear))
-                    //     camera.setPerspectiveNearClip(perspNear);
-                    //
-                    // float perspFar = camera.getPerspectiveFarClip();
-                    // if (ImGui::DragFloat("Far", &perspFar))
-                    //     camera.setPerspectiveFarClip(perspFar);
                 }
 
                 // ORTHOGARPHIC
