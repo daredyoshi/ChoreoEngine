@@ -11,9 +11,18 @@ template<typename T_returnType>
 class Controller{
 
 public:
-    Controller() = default;
+    enum class ControllerType{
+        Static = 0,
+        Animated = 1,
+        Script = 2
+    };
+    Controller(ControllerType t, const std::string& label="No Name")
+        : m_type{t}, m_label{label} {};
 
-    T_returnType virtual eval(const Scope<Time>& t) const = 0;
+
+    virtual ControllerType getType() const  { return m_type; }
+
+    T_returnType virtual eval(const Scope<Time>& t) = 0;
     // if a key exists at time t, this will set it, otherwise
     // it will only set the cached value which will be cleared on
     // slidertime change
@@ -22,16 +31,24 @@ public:
     // this will get a key at time t if it exists 
     virtual Ref<Key<T_returnType>>& getKeyFromTime(const Scope<Time>& t) =0;
 
+    const std::string& getLabel() const { return m_label; }
+    void setLabel(const std::string& label) { m_label = label; }
+
     virtual void dirty() =0;
+
+private:
+    ControllerType m_type;
+    std::string m_label{};
 };
 
 template<typename T_returnType>
 class StaticController : public Controller<T_returnType>{ 
 public:
-    StaticController() = default;
-    StaticController(T_returnType val){
+    StaticController()
+        : Controller<T_returnType>(Controller<T_returnType>::ControllerType::Static) {};
+    StaticController(T_returnType val)
+        : Controller<T_returnType>(Controller<T_returnType>::ControllerType::Static) {
         m_key->setVal(val);
-        // m_key = CreateRef<Key<T_returnType>>(val);
     }
     virtual Ref<Key<T_returnType>>& getKeyFromTime(const Scope<Time>& t) override { 
         (void)t;
@@ -41,7 +58,7 @@ public:
         (void)idx;
         return m_key; 
     }
-    T_returnType virtual eval(const Scope<Time>& t) const override {
+    T_returnType virtual eval(const Scope<Time>& t) override {
         (void)t;
         return this->m_key->eval(); 
     }       
@@ -66,19 +83,22 @@ protected:
     bool m_dirty{true};
 
 public:
-    virtual Ref<Key<T_returnType>>& getKey(unsigned int idx) override { 
-        return this->m_keys[idx]; 
-    }
+    AnimatedController()
+        : Controller<T_returnType>(Controller<T_returnType>::ControllerType::Animated) {
+        m_keys.push_back(CreateRef<Key<T_returnType>>());            
+    };
+
     std::vector<Ref<Key<T_returnType>>>& getKeys(){
         return m_keys;
     }
 
 
     
-    virtual Ref<Key<T_returnType>>& getKeyFromIdx(unsigned int idx) const override{
-        return m_keys[idx];
-    };
-    virtual Ref<Key<T_returnType>>& getKeyFromTime(const Scope<Time>& t) const override{
+    virtual Ref<Key<T_returnType>>& getKeyFromIdx(const unsigned int idx) override { 
+        return this->m_keys[idx]; 
+    }
+
+    virtual Ref<Key<T_returnType>>& getKeyFromTime(const Scope<Time>& t) override{
         
         // check to see if this is single value
         if ( this->m_keys.size() == 1){
@@ -86,20 +106,21 @@ public:
         }
 
         for(unsigned int i = 0; i < this->m_keys.size(); ++i){
-            Ref<Key<T_returnType>> k = this->m_keys[i]; 
+            Ref<Key<T_returnType>>& k = this->m_keys[i]; 
 
-            if (k->getTick() == t->getTick()){
+            if (k->getTick() >= t->getTick()){
                 return k;
             }
-            if (k->getTick() > t->getTick()){
-                return nullptr;
-            }
+            // if (k->getTick() > t->getTick()){
+            //     return nullptr;
+            // }
         }
         CE_CORE_ASSERT(false, "Controller did not find keys")
-        return 0;
+        return m_keys[0];
     }
 
-    unsigned int getPreviousKeyIdx(const Scope<Time>& t) const override {
+    unsigned int getPreviousKeyIdx(const Scope<Time>& t) const {
+        CE_CORE_ASSERT(m_keys.size() > 0, "There must ALWAYS be at least one key");
         // check to see if this is single value
         if ( this->m_keys.size() == 1){
             return 0;
@@ -117,6 +138,9 @@ public:
     }
 
     T_returnType virtual eval(const Scope<Time>& t) override {
+        if(m_keys.size() ==0){
+            return T_returnType{};
+        }
         if(m_dirty){
             unsigned int idx = getPreviousKeyIdx(t);
 
@@ -126,7 +150,7 @@ public:
         } 
         return m_cache; 
     }       
-    virtual void setValAtTime(const Scope<Time>& t, T_returnType val) {
+    virtual void setValAtTime(const Scope<Time>& t, T_returnType val)override  {
         unsigned int idx = getPreviousKeyIdx(t);
         Ref<Key<T_returnType>>& k = getKeyFromTime(t);
         if(k){
@@ -135,7 +159,7 @@ public:
         m_cache = val;
     }
 
-    virtual void dirty() { m_dirty = true; }
+    virtual void dirty() override { m_dirty = true; }
 };
 
 // class FloatController : public Controller<float>{};

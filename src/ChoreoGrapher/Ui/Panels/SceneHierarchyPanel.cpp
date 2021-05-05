@@ -21,7 +21,6 @@ namespace ChoreoGrapher{
         });
 
         ImGui::End();
-        ImGui::ShowDemoWindow();
     }
 
     void SceneHierarchyPanel::drawEntityNode(ChoreoApp::Ref<ChoreoApp::Entity> entity){

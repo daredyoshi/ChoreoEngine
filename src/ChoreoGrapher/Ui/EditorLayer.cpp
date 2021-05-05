@@ -1,7 +1,9 @@
 
 #include "EditorLayer.h"
+#include "Application/Core.h"
 #include "Application/Input.h"
 #include "Application/Scene/Components.h"
+#include "Application/Scene/Controller.h"
 #include "ChoreoApp.h"
 #include "glm/gtc/type_ptr.hpp"
 
@@ -33,7 +35,10 @@ void EditorLayer::onAttach() {
     // primary camera
     m_cameraEntity = m_scene->createEntity("Camera Entity");
     ChoreoApp::XformComponent& xform = m_cameraEntity.getComponent<ChoreoApp::XformComponent>();
-    m_cameraEntity.addComponent<ChoreoApp::CameraComponent>();
+    ChoreoApp::CameraComponent& cam = m_cameraEntity.addComponent<ChoreoApp::CameraComponent>();
+
+    ChoreoApp::Ref<ChoreoApp::FloatController> newController {ChoreoApp::CreateRef<ChoreoApp::FloatAnimatedController>()  };
+    cam.camera.setPerspectiveFOV(newController);
 
     // m_secondCamera = m_scene->createEntity("Second Camera Entity");
     // auto& cc = m_secondCamera.addComponent<ChoreoApp::CameraComponent>();
@@ -215,6 +220,8 @@ void EditorLayer::onImGuiRender()
     // panels
     m_sceneHeirarchyPanel.onImGuiRender();
     m_entityPropertiesPanel.onImGuiRender();
+    m_curveEditorPanel.onImGuiRender();
+
     // viewoprt
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0.0f,0.0f});
     ImGui::Begin("ChoreoGrapher::Viewport");
@@ -237,6 +244,6 @@ void EditorLayer::onImGuiRender()
     
     ImGui::End();
     ImGui::PopFont();
-    // ImGui::ShowDemoWindow();
+    ImGui::ShowDemoWindow();
 }
 }

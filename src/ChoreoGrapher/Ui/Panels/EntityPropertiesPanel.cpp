@@ -1,12 +1,12 @@
 
 #include "EntityPropertiesPanel.h"
-#include "Application/Scene/Components.h"
+#include "Application/Core.h"
 #include "Application/Scene/Controller.h"
-#include "Application/Scene/Entity.h"
-#include "Application/Scene/SceneCamera.h"
+#include "ChoreoApp.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/trigonometric.hpp"
 #include "imgui.h"
+#include "Ui/Widgets/ControllerEdit.h"
 #include <memory>
 
 namespace ChoreoGrapher{
@@ -112,10 +112,16 @@ namespace ChoreoGrapher{
                 if (camera.getProjectionType() == ChoreoApp::SceneCamera::ProjectionType::Perspective){
                     // float perspFOV = glm::degrees(camera.getPerspectiveVerticalFOV());
                     // ImGui::InputDouble("Vertical FOV", 
-                    float perspectiveFOV{ glm::degrees(camera.getPerspectiveFOV()->eval(t))};
-                    if (ImGui::DragFloat("Vertical FOV", &perspectiveFOV)){
-                        camera.setPerspectiveFOV(glm::radians(perspectiveFOV), m_context->getTime());
+                    // float perspectiveFOV{ glm::degrees(camera.getPerspectiveFOV()->eval(t))};
+                    if(camera.getPerspectiveFOV()->getType() == ChoreoApp::Controller<float>::ControllerType::Animated){
+                        ChoreoApp::Ref<ChoreoApp::FloatAnimatedController> controller = std::static_pointer_cast<ChoreoApp::FloatAnimatedController>(camera.getPerspectiveFOV());
+                        if(ControllerEdit("Vertical FOV", controller, t, 0)){
+                            // CE_TRACE("edited"); 
+                        }
                     }
+                    // if (ImGui::DragFloat("Vertical FOV", &perspectiveFOV)){
+                    //     camera.setPerspectiveFOV(glm::radians(perspectiveFOV), m_context->getTime());
+                    // }
                     float perspectiveNearClip{ camera.getPerspectiveNearClip()->eval(t)};
                     if (ImGui::DragFloat("Vertical NearClip", &perspectiveNearClip)){
                         camera.setPerspectiveNearClip(perspectiveNearClip, m_context->getTime());

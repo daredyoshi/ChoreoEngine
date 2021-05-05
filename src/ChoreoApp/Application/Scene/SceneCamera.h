@@ -19,6 +19,7 @@ namespace ChoreoApp {
 
         // PERSPECTIVE 
         Ref<FloatController> getPerspectiveFOV() { return m_perspectiveFOV; }
+        void setPerspectiveFOV(Ref<FloatController> val) { m_perspectiveFOV = val; }
         void setPerspectiveFOV(float val, const Scope<Time>& t){ m_perspectiveFOV->setValAtTime(t, val); recalculateProjection(t); }
         Ref<FloatController> getPerspectiveNearClip() { return m_perspectiveNearClip; }
         void setPerspectiveNearClip(float val, const Scope<Time>& t){ m_perspectiveNearClip->setValAtTime(t, val); recalculateProjection(t); }
