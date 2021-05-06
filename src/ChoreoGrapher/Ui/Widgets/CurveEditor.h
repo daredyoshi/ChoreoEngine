@@ -24,6 +24,7 @@ int CurveEditor(const char* label
 	, const ImVec2& size = ImVec2(-1, -1)
 	, ImU32 flags = 0
 	, int* new_count = nullptr
+    , int* changed_idx = nullptr
 	, int* selected_point = nullptr);
 
 bool BeginResizablePopup(const char* str_id, const ImVec2& size_on_first_use);

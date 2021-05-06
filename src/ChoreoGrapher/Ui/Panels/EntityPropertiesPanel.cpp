@@ -116,7 +116,7 @@ namespace ChoreoGrapher{
                     if(camera.getPerspectiveFOV()->getType() == ChoreoApp::Controller<float>::ControllerType::Animated){
                         ChoreoApp::Ref<ChoreoApp::FloatController> controller = camera.getPerspectiveFOV();
                         if(FloatControllerEdit("Vertical FOV", controller, t)){
-                            // CE_TRACE("edited"); 
+                            CE_TRACE("edited"); 
                         }
                     }
                     // if (ImGui::DragFloat("Vertical FOV", &perspectiveFOV)){

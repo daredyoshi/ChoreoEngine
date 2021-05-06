@@ -7,9 +7,11 @@ namespace ChoreoApp{
 class Time{
 public:
     Time() = default; 
-    Time( uint32_t tick) : m_tick{tick} {}
+    Time( uint32_t frame) {
+        setFrame(frame);
+    }
     float getSecond() const { return (float)m_tick / (float)m_ticksPerFrame / (float)m_framesPerSecond; };
-    float getFrame() const { return (float)(m_tick * (float)m_ticksPerFrame); };
+    float getFrame() const { return (float)(m_tick / (float)m_ticksPerFrame); };
     uint32_t getTick() const { return m_tick; };
 
     void setSecond(float const sec){ m_tick = sec * (float)m_framesPerSecond * (float)m_ticksPerFrame; }
@@ -17,7 +19,6 @@ public:
     void setTick(int const tick){ m_tick = tick; }
     void setTime(const Time& t) { m_tick = t.getTick(); }
 
-    operator uint32_t() { return m_tick; }
 
 private:
     uint32_t m_tick{0};

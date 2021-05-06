@@ -9,6 +9,7 @@ int CurveEditor(const char* label
 		, const ImVec2& editor_size
 		, ImU32 flags
 		, int* new_count
+        , int* changed_idx
 		, int* selected_point)
 	{
 		enum class StorageValues : ImGuiID
@@ -22,6 +23,7 @@ int CurveEditor(const char* label
 			POINT_START_Y
 		};
 
+        *changed_idx = -1;
 		const float HEIGHT = 100;
 		static ImVec2 start_pan;
 
@@ -199,7 +201,6 @@ int CurveEditor(const char* label
 			start_pan.y = from_y;
 		}
 
-		int changed_idx = -1;
 		for (int point_idx = points_count - 2; point_idx >= 0; --point_idx)
 		{
 			ImVec2* points;
@@ -338,12 +339,12 @@ int CurveEditor(const char* label
 				if (handleTangent(tangent_last, p_prev, 0))
 				{
 					points[1] = ImClamp(tangent_last, ImVec2(0, -1), ImVec2(1, 1));
-					changed_idx = point_idx;
+					*changed_idx = point_idx;
 				}
 				if (handleTangent(tangent, p, 1))
 				{
 					points[2] = ImClamp(tangent, ImVec2(-1, -1), ImVec2(0, 1));
-					changed_idx = point_idx + 1;
+					*changed_idx = point_idx + 1;
 				}
 				if (handlePoint(p, 1))
 				{
@@ -353,7 +354,7 @@ int CurveEditor(const char* label
 						p.x = points[6].x - 0.001f;
 					}
 					points[3] = p;
-					changed_idx = point_idx + 1;
+					*changed_idx = point_idx + 1;
 				}
 
 			}
@@ -368,7 +369,7 @@ int CurveEditor(const char* label
 						p.x = points[2].x - 0.001f;
 					}
 					points[1] = p;
-					changed_idx = point_idx + 1;
+					*changed_idx = point_idx + 1;
 				}
 			}
 			if (point_idx == 0)
@@ -377,7 +378,7 @@ int CurveEditor(const char* label
 				{
 					if (p.x <= p_prev.x) p_prev.x = p.x - 0.001f;
 					points[0] = p_prev;
-					changed_idx = point_idx;
+					*changed_idx = point_idx;
 				}
 			}
             ImGui::PopID();
@@ -450,6 +451,7 @@ int CurveEditor(const char* label
 
         ImGui::EndChildFrame();
         ImGui::RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, inner_bb.Min.y), label);
-		return changed_idx;
+        
+		return *changed_idx == -1;
 	}
 }

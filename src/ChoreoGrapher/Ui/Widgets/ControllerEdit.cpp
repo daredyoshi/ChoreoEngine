@@ -23,6 +23,8 @@ void FloatControllerEditOptionsPopup(ChoreoApp::Ref<ChoreoApp::FloatController>&
 
     ImGuiContext& g = *GImGui;
 
+    ImGui::TextEx("Float Controller");
+    ImGui::Separator();
     ImGui::TextEx("Name : ");
     ImGui::SameLine();
 
@@ -46,8 +48,7 @@ void FloatControllerEditOptionsPopup(ChoreoApp::Ref<ChoreoApp::FloatController>&
     //     if (RadioButton("0.00..1.00", (opts & ImGuiColorEditFlags_Float) != 0)) opts = (opts & ~ImGuiColorEditFlags__DataTypeMask) | ImGuiColorEditFlags_Float;
     // }
 
-    // if (allow_opt_inputs || allow_opt_datatype)
-    //     Separator();
+    ImGui::Separator();
     if (ImGui::Button("Copy Controller", ImVec2(-1, 0)))
        cilpboardFloatControllerPtr = controller; 
     ImGui::PushItemWidth(200.0f);
@@ -134,18 +135,19 @@ bool FloatControllerEdit(const char* label, ChoreoApp::Ref<ChoreoApp::FloatContr
 
     ImGui::SetNextItemWidth(w_inputs);
     value_changed |= ImGui::DragFloat("", &val, 100.0, 0.0f, 0.1f, fmt);
-    ImGui::OpenPopupOnItemClick("context");
+    ImGuiPopupFlags contextMenuFlags = ImGuiPopupFlags_MouseButtonRight;        // For BeginPopupContext*(): open on Right Mouse release. Guaranteed to always be == 1 (same as ImGuiMouseButton_Right)
+    ImGui::OpenPopupOnItemClick("context", contextMenuFlags);
 
     ImGui::SameLine(0, style.ItemInnerSpacing.x);
     window->DC.CursorPos.x = pos.x + w_inputs;
 
     if (ImGui::Button("*", ImVec2(square_sz, square_sz)))
     {
-        ImGui::OpenPopupOnItemClick("context");
         ImGui::OpenPopup("ChoreoGrapher::Curve Editor");
         ImGui::SetNextWindowPos(window->DC.LastItemRect.GetBL() + ImVec2(-1, style.ItemSpacing.y));
         ImGui::SetNextWindowSize(ImVec2{ 600.0f, 200.0f }, true);
     }
+    ImGui::OpenPopupOnItemClick("context", contextMenuFlags);
 
     if (ImGui::BeginPopup("ChoreoGrapher::Curve Editor"))
     {
@@ -162,11 +164,22 @@ bool FloatControllerEdit(const char* label, ChoreoApp::Ref<ChoreoApp::FloatContr
         // ImGuiControllerEditFlags picker_flags = (flags_untouched & picker_flags_to_forward) | ImGuiControllerEditFlags__DisplayMask | ImGuiControllerEditFlags_NoLabel | ImGuiControllerEditFlags_AlphaPreviewHalf;
         ImGui::SetNextItemWidth(square_sz * 12.0f); // Use 256 + bar sizes?
         
-        float values[4]{ 0.0f, 0.2f, 1.0f, 0.8f};
+        std::vector<ChoreoApp::Ref<ChoreoApp::FloatKey>> keys = controller->getKeys();
+        // unsigned int numKeys = controller->
+        std::vector<float> values;
+        values.reserve(keys.size() * 2);
+        for(auto& key : keys){
+            // TODO: add flags here for second/frame/tick
+            values.push_back(key->getTime().getFrame());
+            values.push_back(key->eval());
+        }
+        
         ImVec2 imViewportSize= ImGui::GetContentRegionAvail();
         int newCount{4};
+		int changedIdx{-1};
+        int selectedIdx{-1};
         int curveFlags = (int)ChoreoGrapher::CurveEditorFlags::NO_TANGENTS | (int)ChoreoGrapher::CurveEditorFlags::SHOW_GRID;
-        value_changed |= ChoreoGrapher::CurveEditor("##picker", values, 2, imViewportSize, curveFlags, &newCount);
+        value_changed |= ChoreoGrapher::CurveEditor("##picker", &values[0], keys.size(), imViewportSize, curveFlags, &changedIdx, &newCount, &selectedIdx);
         ImGui::EndPopup();
     }
     // }

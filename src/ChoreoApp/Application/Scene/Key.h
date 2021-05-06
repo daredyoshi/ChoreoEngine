@@ -26,6 +26,7 @@ public:
     T_returnType eval() const { return m_val; }; 
     void setVal(const T_returnType val) { m_val= val; }    
     T_returnType& getVal() { return m_val; }
+    Time& getTime() { return m_time; }
     unsigned int getTick() { return m_time.getTick(); }
 
     operator T_returnType() { return m_val; }
@@ -34,6 +35,8 @@ protected:
     Time m_time;
     T_returnType m_val;
 };
+
+using FloatKey = Key<float>;
 
 //
 // class Mat4XformKey : public XformKey{
