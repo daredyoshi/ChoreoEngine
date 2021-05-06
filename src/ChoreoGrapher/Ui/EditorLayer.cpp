@@ -220,7 +220,7 @@ void EditorLayer::onImGuiRender()
     // panels
     m_sceneHeirarchyPanel.onImGuiRender();
     m_entityPropertiesPanel.onImGuiRender();
-    m_curveEditorPanel.onImGuiRender();
+    // m_curveEditorPanel.onImGuiRender();
 
     // viewoprt
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0.0f,0.0f});

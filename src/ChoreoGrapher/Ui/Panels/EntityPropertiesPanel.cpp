@@ -114,8 +114,8 @@ namespace ChoreoGrapher{
                     // ImGui::InputDouble("Vertical FOV", 
                     // float perspectiveFOV{ glm::degrees(camera.getPerspectiveFOV()->eval(t))};
                     if(camera.getPerspectiveFOV()->getType() == ChoreoApp::Controller<float>::ControllerType::Animated){
-                        ChoreoApp::Ref<ChoreoApp::FloatAnimatedController> controller = std::static_pointer_cast<ChoreoApp::FloatAnimatedController>(camera.getPerspectiveFOV());
-                        if(ControllerEdit("Vertical FOV", controller, t, 0)){
+                        ChoreoApp::Ref<ChoreoApp::FloatController> controller = camera.getPerspectiveFOV();
+                        if(FloatControllerEdit("Vertical FOV", controller, t)){
                             // CE_TRACE("edited"); 
                         }
                     }

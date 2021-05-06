@@ -7,8 +7,9 @@ set(
     Ui/EditorLayer.cpp
 
     Ui/Panels/SceneHierarchyPanel.cpp
-    Ui/Panels/CurveEditorPanel.cpp
     Ui/Panels/EntityPropertiesPanel.cpp
+    Ui/Widgets/ControllerEdit.cpp
+    Ui/Widgets/CurveEditor.cpp
 )
 
 message(${CMAKE_CURRENT_SOURCE_DIR}/Application)
