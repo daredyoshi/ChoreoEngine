@@ -25,6 +25,7 @@
 #include "Application/Scene/Components.h"
 #include "Application/Scene/Entity.h"
 #include "Application/Scene/ScriptableEntity.h"
+#include "Application/Scene/Time.h"
 
 
 //temp 

@@ -19,12 +19,16 @@ public:
     void setTick(int const tick){ m_tick = tick; }
     void setTime(const Time& t) { m_tick = t.getTick(); }
 
+    static uint32_t getFramesPerSecond() { return m_framesPerSecond; }
+    static uint32_t getTicksPerFrame() { return m_ticksPerFrame; }
+
 
 private:
     uint32_t m_tick{0};
-    uint32_t m_ticksPerFrame{30};
-    uint32_t m_framesPerSecond{24};
+    static uint32_t m_ticksPerFrame;
+    static uint32_t m_framesPerSecond;
 };
+
 
 class TimeLine{
 public:
@@ -38,7 +42,7 @@ public:
 private:
     Scope<Time> m_currentTime{CreateScope<Time>(0)};
     Scope<Time> m_startTime{CreateScope<Time>(0)};
-    Scope<Time> m_endTime{CreateScope<Time>(7200)};
+    Scope<Time> m_endTime{CreateScope<Time>(240)};
 };
 
 }

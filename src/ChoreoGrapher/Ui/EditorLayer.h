@@ -2,6 +2,7 @@
 #include "ChoreoApp.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/EntityPropertiesPanel.h"
+#include "Panels/TimelinePanel.h"
 #include <unordered_map>
 #include "imgui.h"
 
@@ -49,6 +50,7 @@ private:
     ChoreoApp::Ref<ChoreoApp::Scene> m_scene{ChoreoApp::CreateRef<ChoreoApp::Scene>()};
     SceneHierarchyPanel m_sceneHeirarchyPanel{m_scene};
     EntityPropertiesPanel m_entityPropertiesPanel{m_scene};
+    TimelinePanel m_timelinePanel{m_scene};
 
 
 };

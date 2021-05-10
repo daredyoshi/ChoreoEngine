@@ -8,8 +8,10 @@ set(
 
     Ui/Panels/SceneHierarchyPanel.cpp
     Ui/Panels/EntityPropertiesPanel.cpp
+    Ui/Panels/TimelinePanel.cpp
     Ui/Widgets/ControllerEdit.cpp
     Ui/Widgets/CurveEditor.cpp
+    Ui/Widgets/Timeline.cpp
 )
 
 message(${CMAKE_CURRENT_SOURCE_DIR}/Application)
