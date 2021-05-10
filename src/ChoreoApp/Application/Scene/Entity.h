@@ -54,4 +54,5 @@ namespace ChoreoApp {
         entt::entity m_entityHandle{entt::null};
         std::weak_ptr<Scene> m_scene{};
     };
+
 }

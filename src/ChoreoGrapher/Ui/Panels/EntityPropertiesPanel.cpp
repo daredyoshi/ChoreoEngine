@@ -11,11 +11,6 @@
 
 namespace ChoreoGrapher{
 
-
-    EntityPropertiesPanel::EntityPropertiesPanel(const ChoreoApp::Ref<ChoreoApp::Scene>& scene){
-        setContext(scene); 
-    }
-
     void EntityPropertiesPanel::setContext(const ChoreoApp::Ref<ChoreoApp::Scene>& scene){
         m_context = scene;;
     }
@@ -81,6 +76,8 @@ namespace ChoreoGrapher{
 
                 ImGui::TreePop();
             }
+
+
         }
         
 
@@ -115,7 +112,7 @@ namespace ChoreoGrapher{
                     // float perspectiveFOV{ glm::degrees(camera.getPerspectiveFOV()->eval(t))};
                     if(camera.getPerspectiveFOV()->getType() == ChoreoApp::Controller<float>::ControllerType::Animated){
                         ChoreoApp::Ref<ChoreoApp::FloatController> controller = camera.getPerspectiveFOV();
-                        if(FloatControllerEdit("Vertical FOV", controller, t)){
+                        if(Widgets::FloatControllerEdit(controller, t, m_controllersBeingEdited)){
                             CE_TRACE("edited"); 
                         }
                     }

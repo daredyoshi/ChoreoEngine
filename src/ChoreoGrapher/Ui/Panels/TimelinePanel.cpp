@@ -23,7 +23,9 @@ namespace ChoreoGrapher{
             Widgets::TimelineFlags_DisplaySeconds | 
             Widgets::TimelineFlags_DisplayTicks | 
             Widgets::TimelineFlags_SnapFrames;
-        Widgets::TimeLineSlider(m_context->getTimeLine(), flags);
+        if(Widgets::TimeLineSlider(m_context->getTimeLine(), flags)){
+            m_context->onTimeChanged(); 
+        }
         // int frame = m_context->getTime()->getFrame();
         // int startTime = m_context->getTimeLine().getStartTime()->getFrame();
         // int endTime = m_context->getTimeLine().getEndTime()->getFrame();

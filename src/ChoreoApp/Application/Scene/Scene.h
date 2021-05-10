@@ -27,6 +27,7 @@ namespace ChoreoApp {
         TimeLine& getTimeLine() { return m_timeLine; }
 
         void setTime(const Time& t);
+        void onTimeChanged();
 
         // void setLastSelectedEntity(const uint32_t entityHandle) { m_lastSelectedEntityHandle = entityHandle; };
         void setLastSelectedEntity(Ref<Entity> entity) { m_lastSelectedEntity = entity; };
@@ -36,6 +37,7 @@ namespace ChoreoApp {
 
 
     private:
+        void dirtyAllControllers();
         entt::registry m_registry;
         TimeLine m_timeLine{};
 

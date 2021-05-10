@@ -8,10 +8,18 @@
 #include "Ui/Widgets/CurveEditor.h"
 
 namespace ChoreoGrapher{
+namespace Widgets{
 
 typedef int ImGuiControllerEditFlags;    // -> enum ImGuiControllerEditFlags_  // Flags: for ColorEdit4(), ColorPicker4() etc.
+
+using floatControllerCollectorRef = std::vector<std::pair<ChoreoApp::Ref<ChoreoApp::FloatController>, bool>>&;
+
 void FloatControllerEditOptionsPopup(ChoreoApp::Ref<ChoreoApp::FloatAnimatedController>& controller, ImGuiColorEditFlags flags=0);
-bool FloatControllerEdit(const char* label, ChoreoApp::Ref<ChoreoApp::FloatController>& controller,const ChoreoApp::Scope<ChoreoApp::Time>& t, ImGuiControllerEditFlags flags = 0);
+bool FloatControllerEdit(
+        ChoreoApp::Ref<ChoreoApp::FloatController>& controller,
+        const ChoreoApp::Scope<ChoreoApp::Time>& t, 
+        floatControllerCollectorRef controllersBeingEdited,
+        ImGuiControllerEditFlags flags = 0);
 
 enum ImGuiControllerEditFlags_
 {
@@ -35,5 +43,6 @@ enum ImGuiControllerEditFlags_
     // ImGuiControllerEditFlags__OptionsDefault = ,
 };
 
+}
 
 }

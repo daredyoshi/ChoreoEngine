@@ -3,10 +3,14 @@
 
 
 namespace ChoreoGrapher { 
+    using floatControllerCollectorRef = std::vector<std::pair<ChoreoApp::Ref<ChoreoApp::FloatController>, bool>>&;
     class EntityPropertiesPanel {
     public:
-        EntityPropertiesPanel() = default;
-        EntityPropertiesPanel(const ChoreoApp::Ref<ChoreoApp::Scene>& scene);
+        EntityPropertiesPanel(
+                const ChoreoApp::Ref<ChoreoApp::Scene>& scene,
+                floatControllerCollectorRef controllersBeingEdited) 
+
+            :    m_context{scene}, m_controllersBeingEdited{controllersBeingEdited} {};
 
         void setContext(const ChoreoApp::Ref<ChoreoApp::Scene>& scene);
 
@@ -17,6 +21,7 @@ namespace ChoreoGrapher {
     private:
         void drawEntityComponents(ChoreoApp::Ref<ChoreoApp::Entity> entity);
         ChoreoApp::Ref<ChoreoApp::Scene> m_context;
+        floatControllerCollectorRef  m_controllersBeingEdited;
     };
 
 }

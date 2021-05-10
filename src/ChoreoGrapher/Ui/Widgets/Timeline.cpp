@@ -16,9 +16,9 @@ int TimeLineSlider(ChoreoApp::TimeLine& timeline, int flags){
         HEIGHT,
         IS_PANNING,
         IS_DRAGGING,
-        POINT_START_X,
     };
 
+    int changed = 0;
 
 	static int start_pan;
 	static int start_drag;
@@ -124,6 +124,7 @@ int TimeLineSlider(ChoreoApp::TimeLine& timeline, int flags){
     ImU32 notInFrameRangeFillColor = ImGui::ColorConvertFloat4ToU32({0.1f, 0.1f, 0.1f, 0.5f});
 
 
+    // draw ticks?
     auto transform = [&](const float tick, const float height) -> ImVec2
     {
         float x = (tick - fromTick) / displayTickRange;
@@ -136,12 +137,7 @@ int TimeLineSlider(ChoreoApp::TimeLine& timeline, int flags){
         );
     };
 
-    // for drawing the frame numbers this will be helpful
-
-
     float tickStep = (float)bb_width / (float)displayTickRange;
-    // float startX = step_x * int(fromTick / step_x);
-    // int startX = fromTick;
 
     // draw ticks if enabled and they are not closer than pixels
     if((flags & TimelineFlags_DisplayTicks) && displayTickRange < (float)bb_width / 3.0){
@@ -170,9 +166,6 @@ int TimeLineSlider(ChoreoApp::TimeLine& timeline, int flags){
 
     // draw the seconds if the resolution is high enough
     float secondStep = (float)bb_width / (float)displaySecondRange;
-
-        // CE_TRACE("drawing seconds? {0}", (flags & TimelineFlags_DisplaySeconds));
-
     if((flags & TimelineFlags_DisplaySeconds) && displaySecondRange < (float)bb_width / 3.0){
     // if((flags & TimelineFlags_DisplaySeconds)){
         for (unsigned int i{firstSecondToDraw}; i<toSecond; ++i){
@@ -188,31 +181,11 @@ int TimeLineSlider(ChoreoApp::TimeLine& timeline, int flags){
 
     // strings 
     int exp;
-    // CE_TRACE("display range {0}", displayRange);
     frexp(displayRange / 5, &exp);
     float step_x = ldexp(1.0f, exp);
-    // int cell_cols = int(displayRange / step_x);
     int cell_cols = (float)bb_width / 100.0 > 3.0f ? bb_width / 100.0 : 3;
     int step = (float)displayTickRange / (float)cell_cols;
 
-    // for (int i = -1; i < cell_cols + 2; ++i)
-    // {
-    //     float tick = i * step_x * displaySpacing;
-    //
-    //     ImVec2 a = transform( tick, 0);
-    //     ImVec2 b = transform( tick, textHeight);
-    //     window->DrawList->AddLine(a, b, 0x55000000);
-    //     char buf[64];
-    //     if (exp > 0)
-    //     {
-    //         ImFormatString(buf, sizeof(buf), " %d", int(i * step_x));
-    //     }
-    //     else
-    //     {
-    //         ImFormatString(buf, sizeof(buf), " %f", i * step_x);
-    //     }
-    //     window->DrawList->AddText(b, 0x55000000, buf);
-    // }
 
     for (int i ={0}; i < cell_cols; ++i)
     {
@@ -271,9 +244,7 @@ int TimeLineSlider(ChoreoApp::TimeLine& timeline, int flags){
     // ZOOMING 
     if (ImGui::GetIO().MouseWheel != 0 && ImGui::IsWindowHovered())
     {
-        // float scale = powf(2, -ImGui::GetIO().MouseWheel);
         float scale = -ImGui::GetIO().MouseWheel;
-        // TODO add something here to offset the position to center around the scal
         ImVec2 mousePos = ImGui::GetMousePos(); 
         ImVec2 windowSize = ImGui::GetWindowSize();
         ImVec2 windowPos = ImGui::GetWindowPos();
@@ -316,18 +287,19 @@ int TimeLineSlider(ChoreoApp::TimeLine& timeline, int flags){
     }
 
     // SET TIME  
-    if (ImGui::IsMouseDown(0)){
+    if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()){
         ImVec2 mousePos = ImGui::GetMousePos();
         int hoverTick = ( mousePos.x - inner_bb.Min.x ) * (displayTickRange / (float)bb_width) + fromTick;
+        hoverTick = hoverTick > 0 ? hoverTick : 0;
         ChoreoApp::Time newT{};
-        newT.setTick(hoverTick > 0 ? hoverTick : 0);
+        newT.setTick(hoverTick);
         timeline.setCurrentTime(newT);
+        changed = hoverTick; 
     }
 
     ImGui::EndChildFrame();
     // ImGui::RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, inner_bb.Min.y), label);
-    return 0;
+    return changed;
 }
-
 }
 }

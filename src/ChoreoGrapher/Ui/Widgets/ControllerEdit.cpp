@@ -1,11 +1,15 @@
 
 #include "ControllerEdit.h"
+#include "Application/Core.h"
 #include "Application/Scene/Controller.h"
+#include "Application/Scene/Scene.h"
 #include "MessageBox.h"
 #include "imgui.h"
 #include <memory>
 
 namespace ChoreoGrapher{
+namespace Widgets{
+
 static ChoreoApp::Ref<ChoreoApp::FloatController> cilpboardFloatControllerPtr{nullptr};
 
 
@@ -27,6 +31,19 @@ void FloatControllerEditOptionsPopup(ChoreoApp::Ref<ChoreoApp::FloatController>&
     ImGui::Separator();
     ImGui::TextEx("Name : ");
     ImGui::SameLine();
+
+        // static char name[32] = "Label1";
+        // char buf[64];
+        // sprintf(buf, "Button: %s###Button", name); // ### operator override ID ignoring the preceding label
+        // ImGui::Button(buf);
+        // if (ImGui::BeginPopupContextItem())
+        // {
+        //     ImGui::Text("Edit name:");
+        //     ImGui::InputText("##edit", name, IM_ARRAYSIZE(name));
+        //     if (ImGui::Button("Close"))
+        //         ImGui::CloseCurrentPopup();
+        //     ImGui::EndPopup();
+        // }
 
     char buffer[256];
     // initialize to 0
@@ -100,7 +117,14 @@ void FloatControllerEditOptionsPopup(ChoreoApp::Ref<ChoreoApp::FloatController>&
 // See enum ImGuiColorEditFlags_ for available options. e.g. Only access 3 floats if ImGuiColorEditFlags_NoAlpha flag is set.
 // With typical options: Left-click on color square to open color picker. Right-click to open option menu. CTRL-Click over input fields to edit them and TAB to go to next item.
 // bool ImGui::ColorEdit4(const char* label, float col[4], ImGuiColorEditFlags flags)
-bool FloatControllerEdit(const char* label, ChoreoApp::Ref<ChoreoApp::FloatController>& controller,const ChoreoApp::Scope<ChoreoApp::Time>& t, ImGuiControllerEditFlags flags){
+
+bool FloatControllerEdit(
+        ChoreoApp::Ref<ChoreoApp::FloatController>& controller, 
+        const ChoreoApp::Scope<ChoreoApp::Time>& t,
+        floatControllerCollectorRef controllersBeingEdited,
+        ImGuiControllerEditFlags flags){
+
+    const char* label = controller->getLabel().c_str();
 
     ImGuiWindow* window = ImGui::GetCurrentWindow();
     if (window->SkipItems)
@@ -117,8 +141,9 @@ bool FloatControllerEdit(const char* label, ChoreoApp::Ref<ChoreoApp::FloatContr
     g.NextItemData.ClearFlags();
 
     ImGui::BeginGroup();
-    ImGui::PushID(label);
+    ImGui::PushID(controller->getID());
 
+    // for reference
     // ImGui::ColorEdit4
 
     // Context menu: display and modify options (before defaults are applied)
@@ -143,44 +168,17 @@ bool FloatControllerEdit(const char* label, ChoreoApp::Ref<ChoreoApp::FloatContr
 
     if (ImGui::Button("*", ImVec2(square_sz, square_sz)))
     {
-        ImGui::OpenPopup("ChoreoGrapher::Curve Editor");
-        ImGui::SetNextWindowPos(window->DC.LastItemRect.GetBL() + ImVec2(-1, style.ItemSpacing.y));
-        ImGui::SetNextWindowSize(ImVec2{ 600.0f, 200.0f }, true);
-    }
-    ImGui::OpenPopupOnItemClick("context", contextMenuFlags);
-
-    if (ImGui::BeginPopup("ChoreoGrapher::Curve Editor"))
-    {
-        picker_active_window = g.CurrentWindow;
-        std::string popupTxt{ "Editing Controller: " + controller->getLabel()};
-        const char* controllerLabel = popupTxt.c_str();
-        const char* controllerLabelTextEnd= ImGui::FindRenderedTextEnd(controllerLabel);
-        if (controllerLabel!= controllerLabelTextEnd)
-        {
-            ImGui::TextEx(controllerLabel, controllerLabelTextEnd);
-            ImGui::Spacing();
+        int found{0};
+        for(auto& controllerBeingEdited : controllersBeingEdited){
+            // compare the contents of the two controller shared_pts
+            if(controller->getID() == controllerBeingEdited.first->getID()){
+                found = 1;
+                break;
+            }
         }
-        // ImGuiControllerEditFlags picker_flags_to_forward = ImGuiControllerEditFlags__DataTypeMask | ImGuiControllerEditFlags__PickerMask | ImGuiControllerEditFlags__InputMask | ImGuiControllerEditFlags_HDR | ImGuiControllerEditFlags_NoAlpha | ImGuiControllerEditFlags_AlphaBar;
-        // ImGuiControllerEditFlags picker_flags = (flags_untouched & picker_flags_to_forward) | ImGuiControllerEditFlags__DisplayMask | ImGuiControllerEditFlags_NoLabel | ImGuiControllerEditFlags_AlphaPreviewHalf;
-        ImGui::SetNextItemWidth(square_sz * 12.0f); // Use 256 + bar sizes?
-        
-        std::vector<ChoreoApp::Ref<ChoreoApp::FloatKey>> keys = controller->getKeys();
-        // unsigned int numKeys = controller->
-        std::vector<float> values;
-        values.reserve(keys.size() * 2);
-        for(auto& key : keys){
-            // TODO: add flags here for second/frame/tick
-            values.push_back(key->getTime().getFrame());
-            values.push_back(key->eval());
+        if(!found){
+            controllersBeingEdited.push_back({ controller, true });
         }
-        
-        ImVec2 imViewportSize= ImGui::GetContentRegionAvail();
-        int newCount{4};
-		int changedIdx{-1};
-        int selectedIdx{-1};
-        int curveFlags = (int)ChoreoGrapher::CurveEditorFlags::NO_TANGENTS | (int)ChoreoGrapher::CurveEditorFlags::SHOW_GRID;
-        value_changed |= ChoreoGrapher::CurveEditor("##picker", &values[0], keys.size(), imViewportSize, curveFlags, &changedIdx, &newCount, &selectedIdx);
-        ImGui::EndPopup();
     }
     // }
 
@@ -317,4 +315,4 @@ bool FloatControllerEdit(const char* label, ChoreoApp::Ref<ChoreoApp::FloatContr
 
     return value_changed;
 }
-}
+}}

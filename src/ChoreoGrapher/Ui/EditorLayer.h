@@ -1,4 +1,5 @@
 # pragma once
+#include "Application/Scene/Controller.h"
 #include "ChoreoApp.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/EntityPropertiesPanel.h"
@@ -48,8 +49,12 @@ private:
 
     // panels
     ChoreoApp::Ref<ChoreoApp::Scene> m_scene{ChoreoApp::CreateRef<ChoreoApp::Scene>()};
+
+    using floatControllerCollector = std::vector<std::pair<ChoreoApp::Ref<ChoreoApp::FloatController>, bool>>;
+    floatControllerCollector m_floatControllers{};
+
     SceneHierarchyPanel m_sceneHeirarchyPanel{m_scene};
-    EntityPropertiesPanel m_entityPropertiesPanel{m_scene};
+    EntityPropertiesPanel m_entityPropertiesPanel{m_scene, m_floatControllers};
     TimelinePanel m_timelinePanel{m_scene};
 
 

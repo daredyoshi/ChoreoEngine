@@ -4,6 +4,7 @@
 #include "Application/Input.h"
 #include "Application/Scene/Components.h"
 #include "Application/Scene/Controller.h"
+#include "Ui/Panels/ControllorEditorPanel.h"
 #include "ChoreoApp.h"
 #include "glm/gtc/type_ptr.hpp"
 
@@ -225,6 +226,16 @@ void EditorLayer::onImGuiRender()
     m_sceneHeirarchyPanel.onImGuiRender();
     m_entityPropertiesPanel.onImGuiRender();
     m_timelinePanel.onImGuiRender();
+    int idx{0};
+    for(auto& controller : m_floatControllers){
+        if(controller.second){
+            Panels::CurveEditorPanel(controller.first, &controller.second);
+        }
+        else{
+            m_floatControllers.erase(m_floatControllers.begin()+idx);
+        }
+        idx++;
+    }
     ImGui::ShowDemoWindow();
 
     // viewoprt

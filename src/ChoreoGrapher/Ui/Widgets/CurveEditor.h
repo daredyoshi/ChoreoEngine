@@ -5,6 +5,8 @@
 #include <math.h>
 
 namespace ChoreoGrapher{
+namespace Widgets{
+
 static constexpr float HANDLE_RADIUS = 4.0f;
 
 static ImVec2 node_pos;
@@ -39,4 +41,4 @@ bool Gradient4(const char* label, int max_count, int* count, float* keys, float*
 void PushReadOnly();
 void PopReadOnly();
 
-}
+}}

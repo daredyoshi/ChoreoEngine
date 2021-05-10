@@ -77,7 +77,14 @@ namespace ChoreoApp {
 
     void Scene::setTime(const Time& t){
         m_timeLine.setCurrentTime(t);
-        
+        onTimeChanged();
+    }
+
+    void Scene::onTimeChanged(){
+        dirtyAllControllers(); 
+    }
+
+    void Scene::dirtyAllControllers(){
         m_registry.view<XformComponent>().each([=](auto entity, auto& xformComponent){
             (void)entity;
             xformComponent.xform->dirty(); 
@@ -87,6 +94,7 @@ namespace ChoreoApp {
             (void)entity;
             cameraComponent.camera.dirty(); 
         });
+
     }
 
     void Scene::onUpdate(Timestep ts){

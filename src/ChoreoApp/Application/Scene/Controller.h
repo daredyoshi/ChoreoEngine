@@ -7,6 +7,8 @@
 
 namespace ChoreoApp{
 
+static uint32_t idCounter{0};
+
 template<typename T_returnType>
 class Controller{
 
@@ -17,7 +19,9 @@ public:
         Script = 2
     };
     Controller(ControllerType t, const std::string& label="No Name")
-        : m_type{t}, m_label{label} {};
+        : m_type{t}, m_label{label} {
+        m_id = ++idCounter;
+    };
 
 
     virtual ControllerType getType() const  { return m_type; }
@@ -38,11 +42,15 @@ public:
     const std::string& getLabel() const { return m_label; }
     void setLabel(const std::string& label) { m_label = label; }
 
+    virtual uint32_t getID() const { return m_id; }
+
     virtual void dirty() =0;
+
 
 private:
     ControllerType m_type;
     std::string m_label{};
+    uint32_t m_id;
 };
 
 template<typename T_returnType>

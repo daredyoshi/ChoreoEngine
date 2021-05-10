@@ -2,6 +2,8 @@
 #include "CurveEditor.h"
 
 namespace ChoreoGrapher{
+namespace Widgets{
+
 
 int CurveEditor(const char* label
 		, float* values
@@ -56,7 +58,7 @@ int CurveEditor(const char* label
 		for (int point_idx = 0; point_idx < points_count; ++point_idx)
 		{
 			ImVec2 point;
-			if (flags & (int)ChoreoGrapher::CurveEditorFlags::NO_TANGENTS)
+			if (flags & (int)CurveEditorFlags::NO_TANGENTS)
 			{
 				point = ((ImVec2*)values)[point_idx];
 			}
@@ -69,7 +71,7 @@ int CurveEditor(const char* label
 		}
 		points_max.y = ImMax(points_max.y, points_min.y + 0.0001f);
 
-		if (flags & (int)ChoreoGrapher::CurveEditorFlags::RESET) window->StateStorage.Clear();
+		if (flags & (int)CurveEditorFlags::RESET) window->StateStorage.Clear();
 
 		float from_x = window->StateStorage.GetFloat((ImGuiID)StorageValues::FROM_X, points_min.x);
 		float from_y = window->StateStorage.GetFloat((ImGuiID)StorageValues::FROM_Y, points_min.y);
@@ -454,4 +456,4 @@ int CurveEditor(const char* label
         
 		return *changed_idx == -1;
 	}
-}
+}}
