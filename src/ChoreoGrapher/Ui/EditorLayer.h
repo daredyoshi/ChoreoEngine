@@ -13,11 +13,7 @@ namespace ChoreoGrapher{
 class EditorLayer: public ChoreoApp::Layer{
 public:
     EditorLayer()
-        : 
-         Layer("Main"),
-    {
-         m_camController{1280.0f / 780.0f, true}
-    };
+        :  Layer("Editor Layer") {};
     virtual ~EditorLayer() {};
     void onUpdate(ChoreoApp::Timestep& timestep) override;
     void onImGuiRender() override;
@@ -28,7 +24,6 @@ public:
 
 
 private:
-    ChoreoApp::OrthographicCameraController m_camController;
 
     ChoreoApp::Ref<ChoreoApp::Framebuffer> m_framebuffer;
     ChoreoApp::FramebufferSpecification m_framebufferSpec;

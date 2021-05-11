@@ -1,5 +1,6 @@
 
 #include "capch.h"
+#include "Entity.h"
 #include "SceneCamera.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include <glm/glm.hpp>
@@ -9,15 +10,16 @@ namespace ChoreoApp {
         : Camera() {
         m_scene = scene; 
 
-        recalculateProjection(CreateScope<Time>(t_cache));
 
-        m_orthographicSize = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 10.0f));
-        m_orthographicNearClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, -1.0f));
-        m_orthographicFarClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1.0f));
+        m_orthographicSize = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 10.0f, "Ortho Size"));
+        m_orthographicNearClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, -1.0f, "Near Clip"));
+        m_orthographicFarClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1.0f, "Far Clip"));
                                                                                                              
-        m_perspectiveFOV = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, glm::radians(45.0f)));
-        m_perspectiveNearClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.001f));
-        m_perspectiveFarClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1000.0f));
+        m_perspectiveFOV = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, glm::radians(45.0f), "FOV"));
+        m_perspectiveNearClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.001f, "Near Clip"));
+        m_perspectiveFarClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1000.0f, "Far Clipe"));
+
+        recalculateProjection(t_cache);
     }
 
     // void SceneCamera::setOrthographic(float size, float nearClip, float farClip){
@@ -40,23 +42,24 @@ namespace ChoreoApp {
         recalculateProjection();
     }
 
-    void SceneCamera::recalculateProjection(const Scope<Time>& t){
+    void SceneCamera::recalculateProjection(const Time& t, bool force){
         // create and cache a copy of time or faster processing
-        t_cache = *t;
+        t_cache = t;
+        if(force)
+            dirty();
         recalculateProjection();
     }
     void SceneCamera::recalculateProjection(){
-        Scope<Time> t_cachePtr = CreateScope<Time>(t_cache);
         if (m_projectionType == ProjectionType::Perspective){
-            m_projectionMatrix = glm::perspective(m_perspectiveFOV->eval(t_cachePtr), m_aspectRatio, m_perspectiveNearClip->eval(t_cachePtr), m_perspectiveFarClip->eval(t_cachePtr));
+            m_projectionMatrix = glm::perspective(m_perspectiveFOV->eval(t_cache), m_aspectRatio, m_perspectiveNearClip->eval(t_cache), m_perspectiveFarClip->eval(t_cache));
         }
         else{
-            float orthoLeft = -m_orthographicSize->eval(t_cachePtr) * m_aspectRatio * 0.5f ;
-            float orthoRight= m_orthographicSize->eval(t_cachePtr) * m_aspectRatio * 0.5f ;
-            float orthoTop= m_orthographicSize->eval(t_cachePtr) * 0.5f ;
-            float orthoBottom= -m_orthographicSize->eval(t_cachePtr) * 0.5f ;
+            float orthoLeft = -m_orthographicSize->eval(t_cache) * m_aspectRatio * 0.5f ;
+            float orthoRight= m_orthographicSize->eval(t_cache) * m_aspectRatio * 0.5f ;
+            float orthoTop= m_orthographicSize->eval(t_cache) * 0.5f ;
+            float orthoBottom= -m_orthographicSize->eval(t_cache) * 0.5f ;
             m_projectionMatrix = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop,
-                    m_orthographicNearClip->eval(t_cachePtr), m_orthographicFarClip->eval(t_cachePtr));
+                    m_orthographicNearClip->eval(t_cache), m_orthographicFarClip->eval(t_cache));
 
         }
     }

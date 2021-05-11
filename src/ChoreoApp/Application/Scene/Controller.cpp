@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
+#include <memory>
 
 namespace ChoreoApp{
     FloatController::FloatController(ControllerType t, std::weak_ptr<Scene> scene, const std::string& label)
@@ -29,7 +30,7 @@ namespace ChoreoApp{
         return this->m_keys[idx]; 
     }
 
-    Ref<FloatKey> AnimatedFloatController::getKeyFromTime(const Scope<Time>& t) {
+    Ref<FloatKey> AnimatedFloatController::getKeyFromTime(const Time& t) {
         
         // check to see if this is single value
         if ( this->m_keys.size() == 1){
@@ -39,7 +40,7 @@ namespace ChoreoApp{
         for(unsigned int i = 0; i < this->m_keys.size(); ++i){
             Ref<FloatKey> k = this->m_keys[i]; 
 
-            if (k->getTick() >= t->getTick()){
+            if (k->getTick() >= t.getTick()){
                 return k;
             }
             // if (k->getTick() > t->getTick()){
@@ -50,7 +51,7 @@ namespace ChoreoApp{
         return m_keys[0];
     }
 
-    unsigned int AnimatedFloatController::getPreviousKeyIdx(const Scope<Time>& t) const {
+    unsigned int AnimatedFloatController::getPreviousKeyIdx(const Time& t) const {
         CE_CORE_ASSERT(m_keys.size() > 0, "There must ALWAYS be at least one key");
         // check to see if this is single value
         if ( this->m_keys.size() == 1){
@@ -60,7 +61,7 @@ namespace ChoreoApp{
         for(unsigned int i = 1; i < this->m_keys.size(); ++i){
             Ref<FloatKey> k = this->m_keys[i]; 
             // convert the key to ticks and the time to tcks
-            if (k->getTick() >= t->getTick()){
+            if (k->getTick() >= t.getTick()){
                 return i-1;
             }
         }
@@ -68,7 +69,7 @@ namespace ChoreoApp{
         return 0;
     }
 
-    float AnimatedFloatController::eval(const Scope<Time>& t) {
+    float AnimatedFloatController::eval(const Time& t) {
         if(m_keys.size() ==0){
             return float{};
         }
@@ -81,18 +82,29 @@ namespace ChoreoApp{
         } 
         return m_cache; 
     }       
-    void AnimatedFloatController::setValAtTime(const Scope<Time>& t, float val){
+    void AnimatedFloatController::setValAtTime(const Time& t, float val){
         unsigned int idx = getPreviousKeyIdx(t);
         Ref<FloatKey> k = getKeyFromTime(t);
         if(k){
             k->setVal(val);
         }
-        m_cache = val;
+        m_dirty=true;
     }
 
     XformController::XformController(XformControllerType t, std::weak_ptr<Scene> scene, const std::string& label)
         : m_type{t}, m_label{label} {
-        m_id = scene.lock()->getID();
+
+        m_scene = scene; 
+
+        m_id = m_scene.lock()->getID();
+
+        m_xPosController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.0f, "X Position"));     
+        m_yPosController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.0f, "Y Position"));     
+        m_zPosController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.0f, "Z Position"));     
+                                                                                                                  
+        m_xScaleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1.0f, "X Scale"));   
+        m_yScaleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1.0f, "Y Scale"));   
+        m_zScaleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1.0f, "Z Scale"));   
     }
 
     void XformController::dirty() {
@@ -106,14 +118,14 @@ namespace ChoreoApp{
         m_dirty = true;
     }
 
-    glm::vec3 XformController::evalPosition(const Scope<Time>& t) const{
+    glm::vec3 XformController::evalPosition(const Time& t) const{
         return {
                 m_xPosController->eval(t),
                 m_yPosController->eval(t),
                 m_zPosController->eval(t)
         };   
     }
-    glm::vec3 XformController::evalScale(const Scope<Time>& t) const{
+    glm::vec3 XformController::evalScale(const Time& t) const{
         return {
                 m_xScaleController->eval(t),
                 m_yScaleController->eval(t),
@@ -121,20 +133,28 @@ namespace ChoreoApp{
         };   
     }
 
-    void XformController::setPositionAtTime(const Scope<Time>& t, const glm::vec3& p){
+    void XformController::setPositionAtTime(const Time& t, const glm::vec3& p){
         m_xPosController->setValAtTime(t, p.x);
         m_yPosController->setValAtTime(t, p.y);
         m_zPosController->setValAtTime(t, p.z);
         m_dirty = true;
     }
-    void XformController::setScaleAtTime(const Scope<Time>& t, const glm::vec3& s){
+    void XformController::setScaleAtTime(const Time& t, const glm::vec3& s){
         m_xScaleController->setValAtTime(t, s.x);
         m_yScaleController->setValAtTime(t, s.y);
         m_zScaleController->setValAtTime(t, s.z);
         m_dirty = true;
     }
 
-    glm::mat4 EulerXformController::eval(const Scope<Time>& t) {
+    EulerXformController::EulerXformController(std::weak_ptr<Scene> scene, const std::string& label)
+        : XformController(XformController::XformControllerType::Euler, scene, label) {
+
+        m_xAngleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.0f, "X Angle"));
+        m_yAngleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.0f, "Y Angle"));
+        m_zAngleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.0f, "Z Angle"));
+    }
+
+    glm::mat4 EulerXformController::eval(const Time& t) {
         if(m_dirty){
             glm::vec3 p {
                 m_xPosController->eval(t),
@@ -170,21 +190,21 @@ namespace ChoreoApp{
         XformController::dirty();
     }
 
-    glm::vec3 EulerXformController::evalEulerAngles(const Scope<Time>& t) const{
+    glm::vec3 EulerXformController::evalEulerAngles(const Time& t) const{
         return {
                 m_xAngleController->eval(t),
                 m_yAngleController->eval(t),
                 m_zAngleController->eval(t)
         };   
     }
-    void EulerXformController::setEulerAnglesAtTime(const Scope<Time>& t, const glm::vec3& p){
+    void EulerXformController::setEulerAnglesAtTime(const Time& t, const glm::vec3& p){
         m_xAngleController->setValAtTime(t, p.x);
         m_yAngleController->setValAtTime(t, p.y);
         m_zAngleController->setValAtTime(t, p.z);
         m_dirty = true;
     }
 
-    void EulerXformController::setFromMat4(const glm::mat4& xform, Scope<Time>& t){
+    void EulerXformController::setFromMat4(const glm::mat4& xform, Time& t){
         glm::vec3 s;
         glm::quat q;
         glm::vec3 p;

@@ -48,11 +48,11 @@ set(
     Application/Renderer/RenderCommand.cpp
     Application/Renderer/RendererAPI.cpp
 
+    Application/Scene/Entity.cpp
+    Application/Scene/Controller.cpp
     Application/Scene/Scene.cpp
     Application/Scene/Time.cpp
     Application/Scene/SceneCamera.cpp
-    Application/Scene/Entity.cpp
-    Application/Scene/Controller.cpp
 
     Application/Log.cpp
     

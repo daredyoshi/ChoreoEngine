@@ -4,6 +4,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtx/transform.hpp"
 #include "glm/gtx/euler_angles.hpp"
+#include <memory>
 #include <string>
 #include "SceneCamera.h"
 #include "ScriptableEntity.h"
@@ -23,14 +24,16 @@ namespace ChoreoApp{
 
     struct XformComponent{
         // defaulting to eulers
-        Ref<XformController> xform {CreateRef<EulerXformController>()};
+        Ref<XformController> xform;
 
-        XformComponent() = default;
+        // XformComponent() = default;
         XformComponent(const XformComponent&) = default;
-        XformComponent(const glm::mat4& _xform){
+        XformComponent(std::weak_ptr<Scene> scene, const std::string& label="No Name"){
+            // XformComponent(scene, glm::mat4{0}, label);
             Scope<Time> t = CreateScope<Time>(0);
-            xform->setFromMat4(_xform, t);
+            xform =  {CreateRef<EulerXformController>(scene, label)};
         }
+
     };
 
     struct CameraComponent{
@@ -38,8 +41,10 @@ namespace ChoreoApp{
         bool fixedAspectRatio{false};
         bool primary{true}; // TODO think about moving to scene
 
-        CameraComponent() = default;
+        // CameraComponent() = default;
         CameraComponent(const CameraComponent&) = default;
+        CameraComponent(std::weak_ptr<Scene> scene)
+            : camera{scene} {}
     };
 
     struct NativeScriptComponent{

@@ -36,10 +36,10 @@ void EditorLayer::onAttach() {
     // primary camera
     m_cameraEntity = m_scene->createEntity("Camera Entity");
     ChoreoApp::XformComponent& xform = m_cameraEntity.getComponent<ChoreoApp::XformComponent>();
-    ChoreoApp::CameraComponent& cam = m_cameraEntity.addComponent<ChoreoApp::CameraComponent>();
+    ChoreoApp::CameraComponent& cam = m_cameraEntity.addComponent<ChoreoApp::CameraComponent>(m_scene->shared_from_this());
 
-    ChoreoApp::Ref<ChoreoApp::FloatController> newController {ChoreoApp::CreateRef<ChoreoApp::FloatAnimatedController>()  };
-    newController->addKey(ChoreoApp::CreateRef<ChoreoApp::FloatKey>(0, 0.8f));
+    ChoreoApp::Ref<ChoreoApp::FloatController> newController {ChoreoApp::CreateRef<ChoreoApp::AnimatedFloatController>(m_scene->shared_from_this(), "FOV")  };
+    newController->addKey(ChoreoApp::CreateRef<ChoreoApp::FloatKey>(0, 45.0f));
     newController->addKey(ChoreoApp::CreateRef<ChoreoApp::FloatKey>(12, 0.8f));
     newController->addKey(ChoreoApp::CreateRef<ChoreoApp::FloatKey>(24, 1.8f));
     newController->addKey(ChoreoApp::CreateRef<ChoreoApp::FloatKey>(48, 0.2f));
@@ -95,13 +95,11 @@ void EditorLayer::onUpdate(ChoreoApp::Timestep& timestep) {
             &&
             (spec.width != m_viewportSize.x || spec.height != m_viewportSize.y)){
         m_framebuffer->resize((uint32_t)m_viewportSize.x, (uint32_t)m_viewportSize.y);
-        m_camController.resize(m_viewportSize.x, m_viewportSize.y);
         m_scene->onViewportResize((uint32_t)m_viewportSize.x, (uint32_t)m_viewportSize.y);
     }
 
     if(m_viewportFocused && m_viewportHovered){
         CE_PROFILE_SCOPE("CamController::onUpdate");
-        m_camController.onUpdate(timestep);
 
     }
 
@@ -125,7 +123,6 @@ void EditorLayer::onUpdate(ChoreoApp::Timestep& timestep) {
 
 void EditorLayer::onEvent(ChoreoApp::Event& e) 
 {
-    m_camController.onEvent(e);
     if (e.getEventType() == ChoreoApp::EventType::WindowResize){
             auto& re = (ChoreoApp::WindowResizeEvent&) e;
     }
@@ -226,16 +223,7 @@ void EditorLayer::onImGuiRender()
     m_sceneHeirarchyPanel.onImGuiRender();
     m_entityPropertiesPanel.onImGuiRender();
     m_timelinePanel.onImGuiRender();
-    int idx{0};
-    for(auto& controller : m_floatControllers){
-        if(controller.second){
-            Panels::CurveEditorPanel(controller.first, &controller.second);
-        }
-        else{
-            m_floatControllers.erase(m_floatControllers.begin()+idx);
-        }
-        idx++;
-    }
+    Panels::drawControllerEditorWindows(m_floatControllers);
     ImGui::ShowDemoWindow();
 
     // viewoprt

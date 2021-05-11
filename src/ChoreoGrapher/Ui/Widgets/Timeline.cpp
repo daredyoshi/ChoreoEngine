@@ -54,17 +54,17 @@ int TimeLineSlider(ChoreoApp::TimeLine& timeline, int flags){
     int tpf = ChoreoApp::Time::getTicksPerFrame();
     int fps = ChoreoApp::Time::getFramesPerSecond();
 
-    unsigned int startTick{timeline.getStartTime()->getTick()};
-    unsigned int endTick{timeline.getEndTime()->getTick()};
-    unsigned int currentTick{timeline.getCurrentTime()->getTick()};
+    unsigned int startTick{timeline.getStartTime().getTick()};
+    unsigned int endTick{timeline.getEndTime().getTick()};
+    unsigned int currentTick{timeline.getCurrentTime().getTick()};
 
-    unsigned int startFrame = timeline.getStartTime()->getFrame(); 
-    unsigned int endFrame = timeline.getEndTime()->getFrame();
-    unsigned int currentFrame = timeline.getCurrentTime()->getFrame();
+    unsigned int startFrame = timeline.getStartTime().getFrame(); 
+    unsigned int endFrame = timeline.getEndTime().getFrame();
+    unsigned int currentFrame = timeline.getCurrentTime().getFrame();
 
-    unsigned int startSecond = timeline.getStartTime()->getSecond(); 
-    unsigned int endSecond = timeline.getEndTime()->getSecond();
-    unsigned int currentSecond = timeline.getCurrentTime()->getSecond();
+    unsigned int startSecond = timeline.getStartTime().getSecond(); 
+    unsigned int endSecond = timeline.getEndTime().getSecond();
+    unsigned int currentSecond = timeline.getCurrentTime().getSecond();
 
     unsigned int time_start{0};
     unsigned int time_end{1};

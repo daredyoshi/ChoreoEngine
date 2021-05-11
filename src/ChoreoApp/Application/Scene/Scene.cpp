@@ -58,7 +58,8 @@ namespace ChoreoApp {
     // }
 
 
-    Scene::Scene(){}
+    Scene::Scene(){
+    }
 
     Scene::~Scene(){
 
@@ -71,7 +72,7 @@ namespace ChoreoApp {
         auto& tagComponent { entity.addComponent<TagComponent>(name) };
         tagComponent.tag = name.empty() ? "Entity" : name;
 
-        entity.addComponent<XformComponent>();
+        entity.addComponent<XformComponent>(shared_from_this(), (name + " Xform Controller"));
         return entity;
     }
 

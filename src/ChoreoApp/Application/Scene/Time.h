@@ -32,17 +32,17 @@ private:
 
 class TimeLine{
 public:
-    const Scope<Time>& getCurrentTime() const {return m_currentTime;}
-    const Scope<Time>& getStartTime() const { return m_startTime; }
-    const Scope<Time>& getEndTime() const{ return m_endTime; }
+    const Time& getCurrentTime() const {return m_currentTime;}
+    const Time& getStartTime() const { return m_startTime; }
+    const Time& getEndTime() const{ return m_endTime; }
 
-    void setCurrentTime(const Time& t) { m_currentTime->setTime(t); }
-    void setStartTime(const Time& t) { m_startTime->setTime(t); }
-    void setEndTime(const Time& t) { m_endTime->setTime(t); }
+    void setCurrentTime(const Time& t) { m_currentTime.setTime(t); }
+    void setStartTime(const Time& t) { m_startTime.setTime(t); }
+    void setEndTime(const Time& t) { m_endTime.setTime(t); }
 private:
-    Scope<Time> m_currentTime{CreateScope<Time>(0)};
-    Scope<Time> m_startTime{CreateScope<Time>(0)};
-    Scope<Time> m_endTime{CreateScope<Time>(240)};
+    Time m_currentTime{0};
+    Time m_startTime{0};
+    Time m_endTime{240};
 };
 
 }

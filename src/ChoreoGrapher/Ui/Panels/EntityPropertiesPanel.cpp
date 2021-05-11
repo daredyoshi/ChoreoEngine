@@ -39,7 +39,7 @@ namespace ChoreoGrapher{
             }
         }
 
-        const ChoreoApp::Scope<ChoreoApp::Time>& t {m_context->getTime()};
+        const ChoreoApp::Time& t {m_context->getTime()};
 
         // Xform  
         if(entity->hasComponent<ChoreoApp::XformComponent>()){
@@ -48,7 +48,7 @@ namespace ChoreoGrapher{
                 ChoreoApp::Ref<ChoreoApp::XformController> xformController = XformComponent.xform; 
               
                 // if this is an Euler Xform Controller
-                if(xformController->getType() == ChoreoApp::XformController::XformType::Euler){
+                if(xformController->getType() == ChoreoApp::XformController::XformControllerType::Euler){
                     glm::vec3 p { xformController->evalPosition(t) };
                     if (ImGui::DragFloat3("Position", glm::value_ptr(p), 0.1f)){
                         xformController->setPositionAtTime(t, p);
@@ -110,7 +110,7 @@ namespace ChoreoGrapher{
                     // float perspFOV = glm::degrees(camera.getPerspectiveVerticalFOV());
                     // ImGui::InputDouble("Vertical FOV", 
                     // float perspectiveFOV{ glm::degrees(camera.getPerspectiveFOV()->eval(t))};
-                    if(camera.getPerspectiveFOV()->getType() == ChoreoApp::Controller<float>::ControllerType::Animated){
+                    if(camera.getPerspectiveFOV()->getType() == ChoreoApp::FloatController::ControllerType::Animated){
                         ChoreoApp::Ref<ChoreoApp::FloatController> controller = camera.getPerspectiveFOV();
                         if(Widgets::FloatControllerEdit(controller, t, m_controllersBeingEdited)){
                             CE_TRACE("edited"); 

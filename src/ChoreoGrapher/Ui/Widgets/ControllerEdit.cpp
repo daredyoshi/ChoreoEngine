@@ -1,8 +1,6 @@
 
 #include "ControllerEdit.h"
-#include "Application/Core.h"
-#include "Application/Scene/Controller.h"
-#include "Application/Scene/Scene.h"
+#include "ChoreoApp.h"
 #include "MessageBox.h"
 #include "imgui.h"
 #include <memory>
@@ -120,7 +118,7 @@ void FloatControllerEditOptionsPopup(ChoreoApp::Ref<ChoreoApp::FloatController>&
 
 bool FloatControllerEdit(
         ChoreoApp::Ref<ChoreoApp::FloatController>& controller, 
-        const ChoreoApp::Scope<ChoreoApp::Time>& t,
+        const ChoreoApp::Time& t,
         floatControllerCollectorRef controllersBeingEdited,
         ImGuiControllerEditFlags flags){
 
@@ -168,17 +166,7 @@ bool FloatControllerEdit(
 
     if (ImGui::Button("*", ImVec2(square_sz, square_sz)))
     {
-        int found{0};
-        for(auto& controllerBeingEdited : controllersBeingEdited){
-            // compare the contents of the two controller shared_pts
-            if(controller->getID() == controllerBeingEdited.first->getID()){
-                found = 1;
-                break;
-            }
-        }
-        if(!found){
-            controllersBeingEdited.push_back({ controller, true });
-        }
+        controllersBeingEdited.push_back({ {controller}, true });
     }
     // }
 

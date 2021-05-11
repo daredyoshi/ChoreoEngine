@@ -23,7 +23,7 @@ namespace ChoreoApp {
 
         entt::registry& getRegistry() { return m_registry; }        
 
-        const Scope<Time>& getTime() { return m_timeLine.getCurrentTime(); }
+        const Time& getTime() { return m_timeLine.getCurrentTime(); }
         TimeLine& getTimeLine() { return m_timeLine; }
 
         void setTime(const Time& t);
