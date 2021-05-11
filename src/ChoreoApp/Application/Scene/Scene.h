@@ -35,11 +35,14 @@ namespace ChoreoApp {
         Ref<Entity> getLastSelectedEntity() { return m_lastSelectedEntity; };
 
 
+        uint32_t getID() { return idCounter++; }
 
     private:
         void dirtyAllControllers();
         entt::registry m_registry;
         TimeLine m_timeLine{};
+
+        uint32_t idCounter{0};
 
 
         Ref<Entity> m_lastSelectedEntity{CreateRef<Entity>()};

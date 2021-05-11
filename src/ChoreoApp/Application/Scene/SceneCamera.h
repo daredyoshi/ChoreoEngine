@@ -7,12 +7,13 @@
 #include <memory>
 
 namespace ChoreoApp {
+    class Scene;
     class SceneCamera : public Camera{
     public:
         enum class ProjectionType { Perspective = 0, Orthographic = 1 };
 
 
-        SceneCamera();
+        SceneCamera(std::weak_ptr<Scene> scene);
         virtual ~SceneCamera() override {};
 
         void setViewportSize(const uint32_t width,const uint32_t height);
@@ -44,16 +45,17 @@ namespace ChoreoApp {
         void dirty();
 
     private:
+        std::weak_ptr<Scene> m_scene;
         void recalculateProjection(const Scope<Time>& t);
         void recalculateProjection();
         ProjectionType m_projectionType = ProjectionType::Perspective;
-        Ref<FloatController> m_orthographicSize {std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(10.0f))};
-        Ref<FloatController> m_orthographicNearClip {std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(-1.0f))};
-        Ref<FloatController> m_orthographicFarClip {std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(1.0f))};
+        Ref<FloatController> m_orthographicSize    ;  
+        Ref<FloatController> m_orthographicNearClip;  
+        Ref<FloatController> m_orthographicFarClip ;  
 
-        Ref<FloatController> m_perspectiveFOV{std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(glm::radians(45.0f)))};
-        Ref<FloatController> m_perspectiveNearClip {std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(0.001f))};
-        Ref<FloatController> m_perspectiveFarClip {std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(1000.0f))};
+        Ref<FloatController> m_perspectiveFOV      ;  
+        Ref<FloatController> m_perspectiveNearClip ;  
+        Ref<FloatController> m_perspectiveFarClip  ;  
         // std::shared_ptr<FloatController> m_perspectiveFarClip {std::static_pointer_cast<FloatController>(std::make_shared<FloatStepController>(1000.0f))};
 
         float m_aspectRatio{0};

@@ -5,9 +5,19 @@
 #include <glm/glm.hpp>
 
 namespace ChoreoApp {
-    SceneCamera::SceneCamera() 
+    SceneCamera::SceneCamera(std::weak_ptr<Scene> scene) 
         : Camera() {
+        m_scene = scene; 
+
         recalculateProjection(CreateScope<Time>(t_cache));
+
+        m_orthographicSize = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 10.0f));
+        m_orthographicNearClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, -1.0f));
+        m_orthographicFarClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1.0f));
+                                                                                                             
+        m_perspectiveFOV = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, glm::radians(45.0f)));
+        m_perspectiveNearClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.001f));
+        m_perspectiveFarClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1000.0f));
     }
 
     // void SceneCamera::setOrthographic(float size, float nearClip, float farClip){

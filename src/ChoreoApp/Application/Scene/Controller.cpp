@@ -5,7 +5,95 @@
 #include "glm/gtx/matrix_decompose.hpp"
 
 namespace ChoreoApp{
+    FloatController::FloatController(ControllerType t, std::weak_ptr<Scene> scene, const std::string& label)
+        : m_type{t}, m_label{label} {
 
+        m_id = scene.lock()->getID();
+    }
+
+    StaticFloatController::StaticFloatController(std::weak_ptr<Scene> scene, const std::string& label)
+        : FloatController(FloatController::ControllerType::Static, scene, label) {}
+
+    StaticFloatController::StaticFloatController(std::weak_ptr<Scene> scene, float val, const std::string& label)
+        : FloatController(FloatController::ControllerType::Static, scene, label) {
+            m_key->setVal(val);
+    }
+
+    AnimatedFloatController::AnimatedFloatController(std::weak_ptr<Scene> scene,const std::string& label )
+        : FloatController(FloatController::ControllerType::Animated, scene, label) {
+        m_keys.push_back(CreateRef<FloatKey>());            
+    }
+
+
+    Ref<FloatKey> AnimatedFloatController::getKeyFromIdx(const unsigned int idx) {
+        return this->m_keys[idx]; 
+    }
+
+    Ref<FloatKey> AnimatedFloatController::getKeyFromTime(const Scope<Time>& t) {
+        
+        // check to see if this is single value
+        if ( this->m_keys.size() == 1){
+            return m_keys[0];
+        }
+
+        for(unsigned int i = 0; i < this->m_keys.size(); ++i){
+            Ref<FloatKey> k = this->m_keys[i]; 
+
+            if (k->getTick() >= t->getTick()){
+                return k;
+            }
+            // if (k->getTick() > t->getTick()){
+            //     return nullptr;
+            // }
+        }
+        CE_CORE_ASSERT(false, "Controller did not find keys")
+        return m_keys[0];
+    }
+
+    unsigned int AnimatedFloatController::getPreviousKeyIdx(const Scope<Time>& t) const {
+        CE_CORE_ASSERT(m_keys.size() > 0, "There must ALWAYS be at least one key");
+        // check to see if this is single value
+        if ( this->m_keys.size() == 1){
+            return 0;
+        }
+
+        for(unsigned int i = 1; i < this->m_keys.size(); ++i){
+            Ref<FloatKey> k = this->m_keys[i]; 
+            // convert the key to ticks and the time to tcks
+            if (k->getTick() >= t->getTick()){
+                return i-1;
+            }
+        }
+        CE_CORE_ASSERT(false, "Controller did not find keys")
+        return 0;
+    }
+
+    float AnimatedFloatController::eval(const Scope<Time>& t) {
+        if(m_keys.size() ==0){
+            return float{};
+        }
+        if(m_dirty){
+            unsigned int idx = getPreviousKeyIdx(t);
+
+            // default to stepped interpolation
+            m_cache = m_keys[idx]->eval();
+            m_dirty = false;
+        } 
+        return m_cache; 
+    }       
+    void AnimatedFloatController::setValAtTime(const Scope<Time>& t, float val){
+        unsigned int idx = getPreviousKeyIdx(t);
+        Ref<FloatKey> k = getKeyFromTime(t);
+        if(k){
+            k->setVal(val);
+        }
+        m_cache = val;
+    }
+
+    XformController::XformController(XformControllerType t, std::weak_ptr<Scene> scene, const std::string& label)
+        : m_type{t}, m_label{label} {
+        m_id = scene.lock()->getID();
+    }
 
     void XformController::dirty() {
         m_xPosController->dirty();

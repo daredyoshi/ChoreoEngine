@@ -15,8 +15,8 @@ public:
     EditorLayer()
         : 
          Layer("Main"),
-         m_camController{1280.0f / 780.0f, true}
     {
+         m_camController{1280.0f / 780.0f, true}
     };
     virtual ~EditorLayer() {};
     void onUpdate(ChoreoApp::Timestep& timestep) override;
@@ -50,7 +50,7 @@ private:
     // panels
     ChoreoApp::Ref<ChoreoApp::Scene> m_scene{ChoreoApp::CreateRef<ChoreoApp::Scene>()};
 
-    using floatControllerCollector = std::vector<std::pair<ChoreoApp::Ref<ChoreoApp::FloatController>, bool>>;
+    using floatControllerCollector = std::vector<std::pair<std::vector<ChoreoApp::Ref<ChoreoApp::FloatController>>, bool>>;
     floatControllerCollector m_floatControllers{};
 
     SceneHierarchyPanel m_sceneHeirarchyPanel{m_scene};

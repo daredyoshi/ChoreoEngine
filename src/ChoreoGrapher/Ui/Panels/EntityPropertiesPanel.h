@@ -3,7 +3,7 @@
 
 
 namespace ChoreoGrapher { 
-    using floatControllerCollectorRef = std::vector<std::pair<ChoreoApp::Ref<ChoreoApp::FloatController>, bool>>&;
+    using floatControllerCollectorRef = std::vector<std::pair<std::vector<ChoreoApp::Ref<ChoreoApp::FloatController>>, bool>>&;
     class EntityPropertiesPanel {
     public:
         EntityPropertiesPanel(
