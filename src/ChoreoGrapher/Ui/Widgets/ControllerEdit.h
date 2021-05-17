@@ -12,7 +12,7 @@ namespace Widgets{
 
 typedef int ImGuiControllerEditFlags;    // -> enum ImGuiControllerEditFlags_  // Flags: for ColorEdit4(), ColorPicker4() etc.
 
-using floatControllerCollectorRef = std::vector<std::pair<std::vector<ChoreoApp::Ref<ChoreoApp::FloatController>>, bool>>&;
+using floatControllerCollectorRef = std::vector<CurveEditorData>;
 
 void FloatControllerEditOptionsPopup(ChoreoApp::Ref<ChoreoApp::AnimatedFloatController>& controller, ImGuiColorEditFlags flags=0);
 bool FloatControllerEdit(

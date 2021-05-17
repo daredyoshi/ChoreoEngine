@@ -1,9 +1,10 @@
 #pragma once
 #include "ChoreoApp.h"
+#include "Ui/Widgets/CurveEditor.h"
 
 
 namespace ChoreoGrapher { 
-    using floatControllerCollectorRef = std::vector<std::pair<std::vector<ChoreoApp::Ref<ChoreoApp::FloatController>>, bool>>&;
+    using floatControllerCollectorRef = std::vector<Widgets::CurveEditorData>;
     class EntityPropertiesPanel {
     public:
         EntityPropertiesPanel(

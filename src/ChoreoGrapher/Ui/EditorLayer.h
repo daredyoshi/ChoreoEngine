@@ -4,6 +4,7 @@
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/EntityPropertiesPanel.h"
 #include "Panels/TimelinePanel.h"
+#include "Panels/ControllorEditorPanel.h"
 #include <unordered_map>
 #include "imgui.h"
 
@@ -45,8 +46,7 @@ private:
     // panels
     ChoreoApp::Ref<ChoreoApp::Scene> m_scene{ChoreoApp::CreateRef<ChoreoApp::Scene>()};
 
-    using floatControllerCollector = std::vector<std::pair<std::vector<ChoreoApp::Ref<ChoreoApp::FloatController>>, bool>>;
-    floatControllerCollector m_floatControllers{};
+    std::vector<Widgets::CurveEditorData> m_floatControllers{};
 
     SceneHierarchyPanel m_sceneHeirarchyPanel{m_scene};
     EntityPropertiesPanel m_entityPropertiesPanel{m_scene, m_floatControllers};

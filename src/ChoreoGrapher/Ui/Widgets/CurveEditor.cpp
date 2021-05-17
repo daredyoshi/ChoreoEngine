@@ -1,44 +1,24 @@
 
 #include "CurveEditor.h"
+#include "imgui.h"
 
 namespace ChoreoGrapher{
 namespace Widgets{
 
+int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 
-int CurveEditor(const char* label
-		, float* values
-		, int points_count
-		, const ImVec2& editor_size
-		, ImU32 flags
-		, int* new_count
-        , int* changed_idx
-		, int* selected_point)
-	{
-		enum class StorageValues : ImGuiID
-		{
-			FROM_X = 100,
-			FROM_Y,
-			WIDTH,
-			HEIGHT,
-			IS_PANNING,
-			POINT_START_X,
-			POINT_START_Y
-		};
-
-        *changed_idx = -1;
-		const float HEIGHT = 100;
-		static ImVec2 start_pan;
-
+        int changedIdx{-1};
+        ImVec2 editorSize = ImGui::GetContentRegionAvail();
 		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
-		ImVec2 size = editor_size;
-		size.x = size.x < 0 ? ImGui::CalcItemWidth() + (style.FramePadding.x * 2) : size.x;
-		size.y = size.y < 0 ? HEIGHT : size.y;
+		// editorSize.x = editorSize.x < 0 ? ImGui::CalcItemWidth() + (style.FramePadding.x * 2) : editorSize.x;
+		// editorSize.y = editorSize.y < 0 ? HEIGHT : editorSize.y;
 
 		ImGuiWindow* parent_window = ImGui::GetCurrentWindow();
 		ImGuiID id = parent_window->GetID(label);
-		if (new_count) *new_count = points_count;
-		if (!ImGui::BeginChildFrame(id, size, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+		// if (new_count) *new_count = points_count;
+
+		if (!ImGui::BeginChildFrame(id, editorSize, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 		{
             ImGui::EndChildFrame();
 			return -1;
@@ -53,42 +33,42 @@ int CurveEditor(const char* label
 			return -1;
 		}
 		
-		ImVec2 points_min(FLT_MAX, FLT_MAX);
-		ImVec2 points_max(-FLT_MAX, -FLT_MAX);
-		for (int point_idx = 0; point_idx < points_count; ++point_idx)
-		{
-			ImVec2 point;
-			if (flags & (int)CurveEditorFlags::NO_TANGENTS)
-			{
-				point = ((ImVec2*)values)[point_idx];
-			}
-			else
-			{
-				point = ((ImVec2*)values)[1 + point_idx * 3];
-			}
-			points_max = ImMax(points_max, point);
-			points_min = ImMin(points_min, point);
-		}
-		points_max.y = ImMax(points_max.y, points_min.y + 0.0001f);
+		// ImVec2 points_min(FLT_MAX, FLT_MAX);
+		// ImVec2 points_max(-FLT_MAX, -FLT_MAX);
+		// for (int point_idx = 0; point_idx < points_count; ++point_idx)
+		// {
+		// 	ImVec2 point;
+		// 	if (flags & (int)CurveEditorFlags::NO_TANGENTS)
+		// 	{
+		// 		point = ((ImVec2*)values)[point_idx];
+		// 	}
+		// 	else
+		// 	{
+		// 		point = ((ImVec2*)values)[1 + point_idx * 3];
+		// 	}
+		// 	points_max = ImMax(points_max, point);
+		// 	points_min = ImMin(points_min, point);
+		// }
+		// points_max.y = ImMax(points_max.y, points_min.y + 0.0001f);
 
-		if (flags & (int)CurveEditorFlags::RESET) window->StateStorage.Clear();
+		// if (flags & (int)CurveEditorFlags::RESET) window->StateStorage.Clear();
 
-		float from_x = window->StateStorage.GetFloat((ImGuiID)StorageValues::FROM_X, points_min.x);
-		float from_y = window->StateStorage.GetFloat((ImGuiID)StorageValues::FROM_Y, points_min.y);
-		float width = window->StateStorage.GetFloat((ImGuiID)StorageValues::WIDTH, points_max.x - points_min.x);
-		float height = window->StateStorage.GetFloat((ImGuiID)StorageValues::HEIGHT, points_max.y - points_min.y);
-		window->StateStorage.SetFloat((ImGuiID)StorageValues::FROM_X, from_x);
-		window->StateStorage.SetFloat((ImGuiID)StorageValues::FROM_Y, from_y);
-		window->StateStorage.SetFloat((ImGuiID)StorageValues::WIDTH, width);
-		window->StateStorage.SetFloat((ImGuiID)StorageValues::HEIGHT, height);
+		// float curveEditorData.gridStartT = window->StateStorage.GetFloat((ImGuiID)StorageValues::FROM_X, points_min.x);
+		// float curveEditorData.gridStartVal = window->StateStorage.GetFloat((ImGuiID)StorageValues::FROM_Y, points_min.y);
+		// float curveEditorData.timeRange = window->StateStorage.GetFloat((ImGuiID)StorageValues::WIDTH, points_max.x - points_min.x);
+		// float curveEditorData.valueRange = window->StateStorage.GetFloat((ImGuiID)StorageValues::HEIGHT, points_max.y - points_min.y);
+		// window->StateStorage.SetFloat((ImGuiID)StorageValues::FROM_X, curveEditorData.gridStartT);
+		// window->StateStorage.SetFloat((ImGuiID)StorageValues::FROM_Y, curveEditorData.gridStartVal);
+		// window->StateStorage.SetFloat((ImGuiID)StorageValues::WIDTH, curveEditorData.timeRange);
+		// window->StateStorage.SetFloat((ImGuiID)StorageValues::HEIGHT, curveEditorData.valueRange);
 
 		const ImRect inner_bb = window->InnerClipRect;
 		const ImRect frame_bb(inner_bb.Min - style.FramePadding, inner_bb.Max + style.FramePadding);
 
 		auto transform = [&](const ImVec2& pos) -> ImVec2
 		{
-			float x = (pos.x - from_x) / width;
-			float y = (pos.y - from_y) / height;
+			float x = (pos.x - curveEditorData.gridStartT) / curveEditorData.timeRange;
+			float y = (pos.y - curveEditorData.gridStartVal) / curveEditorData.valueRange;
 
 			return ImVec2(
 				inner_bb.Min.x * (1 - x) + inner_bb.Max.x * x,
@@ -102,23 +82,23 @@ int CurveEditor(const char* label
 			float y = (inner_bb.Max.y - pos.y) / (inner_bb.Max.y - inner_bb.Min.y);
 
 			return ImVec2(
-				from_x + width * x,
-				from_y + height * y
+				curveEditorData.gridStartT + curveEditorData.timeRange * x,
+				curveEditorData.gridStartVal + curveEditorData.valueRange * y
 			);
 		};
 
-		if (flags & (int)CurveEditorFlags::SHOW_GRID)
+		if (curveEditorData.curveEditorFlags & CurveEditorFlags_ShowGrid)
 		{
 			int exp;
-			frexp(width / 5, &exp);
+			frexp(curveEditorData.timeRange / 5, &exp);
 			float step_x = (float)ldexp(1.0, exp);
-			int cell_cols = int(width / step_x);
+			int cell_cols = int(curveEditorData.timeRange / step_x);
 
-			float x = step_x * int(from_x / step_x);
+			float x = step_x * int(curveEditorData.gridStartT / step_x);
 			for (int i = -1; i < cell_cols + 2; ++i)
 			{
-				ImVec2 a = transform({ x + i * step_x, from_y });
-				ImVec2 b = transform({ x + i * step_x, from_y + height });
+				ImVec2 a = transform({ x + i * step_x, curveEditorData.gridStartVal });
+				ImVec2 b = transform({ x + i * step_x, curveEditorData.gridStartVal + curveEditorData.valueRange });
 				window->DrawList->AddLine(a, b, 0x55000000);
 				char buf[64];
 				if (exp > 0)
@@ -132,15 +112,15 @@ int CurveEditor(const char* label
 				window->DrawList->AddText(b, 0x55000000, buf);
 			}
 
-			frexp(height / 5, &exp);
+			frexp(curveEditorData.valueRange / 5, &exp);
 			float step_y = (float)ldexp(1.0, exp);
-			int cell_rows = int(height / step_y);
+			int cell_rows = int(curveEditorData.valueRange / step_y);
 
-			float y = step_y * int(from_y / step_y);
+			float y = step_y * int(curveEditorData.gridStartVal / step_y);
 			for (int i = -1; i < cell_rows + 2; ++i)
 			{
-				ImVec2 a = transform({ from_x, y + i * step_y });
-				ImVec2 b = transform({ from_x + width, y + i * step_y });
+				ImVec2 a = transform({ curveEditorData.gridStartT, y + i * step_y });
+				ImVec2 b = transform({ curveEditorData.gridStartT + curveEditorData.timeRange, y + i * step_y });
 				window->DrawList->AddLine(a, b, 0x55000000);
 				char buf[64];
 				if (exp > 0)
@@ -165,295 +145,307 @@ int CurveEditor(const char* label
             float relativeWindowPosX = (( mousePos.x - windowPos.x) / windowSize.x) ;
             float relativeWindowPosY = (1 - ( mousePos.y  - windowPos.y ) / windowSize.y) ;
             if(scale >= 1.0){
-                from_x -= width * (relativeWindowPosX);
-                from_y -= height * (relativeWindowPosY);
+                curveEditorData.gridStartT -= curveEditorData.timeRange * (relativeWindowPosX);
+                curveEditorData.gridStartVal -= curveEditorData.valueRange * (relativeWindowPosY);
 
             }
             else{
-                from_x += width * (relativeWindowPosX) * scale;
-                from_y += height * (relativeWindowPosY) * scale;
+                curveEditorData.gridStartT += curveEditorData.timeRange * (relativeWindowPosX) * scale;
+                curveEditorData.gridStartVal += curveEditorData.valueRange * (relativeWindowPosY) * scale;
 
             }
-            width *= scale;
-            height *= scale;
-			window->StateStorage.SetFloat((ImGuiID)StorageValues::FROM_X, from_x);
-			window->StateStorage.SetFloat((ImGuiID)StorageValues::FROM_Y, from_y);
-			window->StateStorage.SetFloat((ImGuiID)StorageValues::WIDTH, width);
-			window->StateStorage.SetFloat((ImGuiID)StorageValues::HEIGHT, height);
+            curveEditorData.timeRange *= scale;
+            curveEditorData.valueRange *= scale;
 		}
 		if (ImGui::IsMouseReleased(2))
 		{
-			window->StateStorage.SetBool((ImGuiID)StorageValues::IS_PANNING, false);
+            curveEditorData.isPanning = false;
 		}
-		if (window->StateStorage.GetBool((ImGuiID)StorageValues::IS_PANNING, false))
+		if (curveEditorData.isPanning)
 		{
 			ImVec2 drag_offset = ImGui::GetMouseDragDelta(2);
-			from_x = start_pan.x;
-			from_y = start_pan.y;
-			from_x -= drag_offset.x * width / (inner_bb.Max.x - inner_bb.Min.x);
-			from_y += drag_offset.y * height / (inner_bb.Max.y - inner_bb.Min.y);
-			window->StateStorage.SetFloat((ImGuiID)StorageValues::FROM_X, from_x);
-			window->StateStorage.SetFloat((ImGuiID)StorageValues::FROM_Y, from_y);
+			curveEditorData.gridStartT = curveEditorData.panStartT;
+			curveEditorData.gridStartVal = curveEditorData.panStartVal;
+			curveEditorData.gridStartT -= drag_offset.x * curveEditorData.timeRange / (inner_bb.Max.x - inner_bb.Min.x);
+			curveEditorData.gridStartVal += drag_offset.y * curveEditorData.valueRange / (inner_bb.Max.y - inner_bb.Min.y);
 		}
 
 		else if (ImGui::IsMouseDragging(2) && ImGui::IsWindowHovered())
 		{
-			window->StateStorage.SetBool((ImGuiID)StorageValues::IS_PANNING, true);
-			start_pan.x = from_x;
-			start_pan.y = from_y;
+            curveEditorData.isPanning = true;
+			curveEditorData.panStartT   = curveEditorData.gridStartT;
+			curveEditorData.panStartVal = curveEditorData.gridStartVal;
 		}
 
-		for (int point_idx = points_count - 2; point_idx >= 0; --point_idx)
-		{
-			ImVec2* points;
-			if (flags & (int)CurveEditorFlags::NO_TANGENTS)
-			{
-				points = ((ImVec2*)values) + point_idx;
-			}
-			else
-			{
-				points = ((ImVec2*)values) + 1 + point_idx * 3;
-			}
+        for (auto& controller : curveEditorData.floatControllers){
+            unsigned int keyIdx{0};
+
+			// ImVec2* points = ((ImVec2*)values) + point_idx;
+            ImVec2 pPrev{0.0f, 0.0f};
+
+            for (auto& key: controller->getKeys()){
+                ImVec2 p { static_cast<float>(key->getTick()), key->eval() };
+                    
+                auto handlePoint = [&](ImVec2& _p, unsigned int idx) -> bool
+                {
+                    static const float SIZE = 3;
+
+                    ImVec2 cursor_pos = ImGui::GetCursorScreenPos();
+                    ImVec2 pos = transform(_p);
+
+                    ImGui::SetCursorScreenPos(pos - ImVec2(SIZE, SIZE));
+                    ImGui::PushID(idx);
+                    ImGui::InvisibleButton("", ImVec2(2 * curveEditorData.handleRadius, 2 * curveEditorData.handleRadius));
+
+                    bool is_selected = curveEditorData.lastEditedKey && curveEditorData.lastEditedKey == idx;
+                    float thickness = is_selected ? 2.0f : 1.0f;
+                    ImU32 col = ImGui::IsItemActive() || 
+                        ImGui::IsItemHovered() ? ImGui::GetColorU32(ImGuiCol_PlotLinesHovered) : 
+                        ImGui::GetColorU32(ImGuiCol_PlotLines);
+
+                    window->DrawList->AddLine(pos + ImVec2(-SIZE, 0), pos + ImVec2(0, SIZE), col, thickness);
+                    window->DrawList->AddLine(pos + ImVec2(SIZE, 0), pos + ImVec2(0, SIZE), col, thickness);
+                    window->DrawList->AddLine(pos + ImVec2(SIZE, 0), pos + ImVec2(0, -SIZE), col, thickness);
+                    window->DrawList->AddLine(pos + ImVec2(-SIZE, 0), pos + ImVec2(0, -SIZE), col, thickness);
+
+                    if (ImGui::IsItemHovered()) hovered_idx = idx;
+
+                    bool changed = false;
+                    if (ImGui::IsItemActive() && ImGui::IsMouseClicked(0))
+                    {
+                        if (curveEditorData.lastEditedKey) curveEditorData.lastEditedKey = idx;
+                        curveEditorData.pointStartT = pos.x;
+                        curveEditorData.pointStartVal = pos.y;
+                    }
+
+                    if (ImGui::IsItemHovered() || (ImGui::IsItemActive() && ImGui::IsMouseDragging(0)))
+                    {
+                        char tmp[64];
+                        ImFormatString(tmp, sizeof(tmp), "%0.2f, %0.2f", p.x, p.y);
+                        window->DrawList->AddText({ pos.x, pos.y - ImGui::GetTextLineHeight() }, 0xff000000, tmp);
+                    }
+
+                    if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
+                    {
+                        pos.x = curveEditorData.pointStartT;
+                        pos.y = curveEditorData.pointStartVal;
+                        pos += ImGui::GetMouseDragDelta();
+                        ImVec2 v = invTransform(pos);
+
+                        _p = v;
+                        changed = true;
+                    }
+                    ImGui::PopID();
+
+                    ImGui::SetCursorScreenPos(cursor_pos);
+                    return changed;
+                };
+
+                ImGui::PushID(keyIdx);
+				if (handlePoint(p, 1))
+				{
+                    key->setVal(p.y);
+					// if (p.x <= pPrev.x) p.x = pPrev.x + 0.001f;
+					// if (point_idx < points_count - 2 && p.x >= points[2].x)
+					// {
+					// 	p.x = points[2].x - 0.001f;
+					// }
+					// points[1] = p;
+					changedIdx= keyIdx;
+				}
+                // don't draw a line the first time
+                // TODO replace this with evaluating controller for x number of segs
+                if(!keyIdx)
+				    window->DrawList->AddLine(transform(pPrev), transform(p), ImGui::GetColorU32(ImGuiCol_PlotLines), 1.0f);
+                ImGui::PopID();
+                pPrev = p;
+                ++keyIdx;
+            }
+        }
+			// auto handleTangent = [&](ImVec2& t, const ImVec2& _p, int idx) -> bool
+			// {
+			// 	static const float SIZE = 2;
+			// 	static const float LENGTH = 18;
+            //
+			// 	auto normalized = [](const ImVec2& v) -> ImVec2
+			// 	{
+			// 		float len = 1.0f / sqrtf(v.x *v.x + v.y * v.y);
+			// 		return ImVec2(v.x * len, v.y * len);
+			// 	};
+            //
+			// 	ImVec2 cursor_pos = ImGui::GetCursorScreenPos();
+			// 	ImVec2 pos = transform(_p);
+			// 	ImVec2 tang = pos + normalized(ImVec2(t.x, -t.y)) * LENGTH;
+            //
+            //     ImGui::SetCursorScreenPos(tang - ImVec2(SIZE, SIZE));
+            //     ImGui::PushID(-idx);
+            //     ImGui::InvisibleButton("", ImVec2(2 * curveEditorData.handleRadius, 2 * curveEditorData.handleRadius));
+            //
+			// 	window->DrawList->AddLine(pos, tang, ImGui::GetColorU32(ImGuiCol_PlotLines));
+            //
+			// 	ImU32 col = ImGui::IsItemHovered() ? ImGui::GetColorU32(ImGuiCol_PlotLinesHovered) : ImGui::GetColorU32(ImGuiCol_PlotLines);
+            //
+			// 	window->DrawList->AddLine(tang + ImVec2(-SIZE, SIZE), tang + ImVec2(SIZE, SIZE), col);
+			// 	window->DrawList->AddLine(tang + ImVec2(SIZE, SIZE), tang + ImVec2(SIZE, -SIZE), col);
+			// 	window->DrawList->AddLine(tang + ImVec2(SIZE, -SIZE), tang + ImVec2(-SIZE, -SIZE), col);
+			// 	window->DrawList->AddLine(tang + ImVec2(-SIZE, -SIZE), tang + ImVec2(-SIZE, SIZE), col);
+            //
+			// 	bool changed = false;
+			// 	if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
+			// 	{
+			// 		tang = ImGui::GetIO().MousePos - pos;
+			// 		tang = normalized(tang);
+			// 		tang.y *= -1;
+            //
+			// 		t = tang;
+			// 		changed = true;
+			// 	}
+            //     ImGui::PopID();
+            //
+            //     ImGui::SetCursorScreenPos(cursor_pos);
+			// 	return changed;
+			// 
+		// for (int point_idx = points_count - 2; point_idx >= 0; --point_idx)
+		// {
+		// 	ImVec2* points;
+		// 	if (flags & (int)CurveEditorFlags::NO_TANGENTS)
+		// 	{
+		// 		points = ((ImVec2*)values) + point_idx;
+		// 	}
+		// 	else
+		// 	{
+		// 		points = ((ImVec2*)values) + 1 + point_idx * 3;
+		// 	}
 			
-			ImVec2 p_prev = points[0];
-			ImVec2 tangent_last;
-			ImVec2 tangent;
-			ImVec2 p;
-			if (flags & (int)CurveEditorFlags::NO_TANGENTS)
-			{
-				p = points[1];
-			}
-			else
-			{
-				tangent_last = points[1];
-				tangent = points[2];
-				p = points[3];
-			}
 
-			auto handlePoint = [&](ImVec2& _p, int idx) -> bool
-			{
-				static const float SIZE = 3;
 
-				ImVec2 cursor_pos = ImGui::GetCursorScreenPos();
-				ImVec2 pos = transform(_p);
 
-                ImGui::SetCursorScreenPos(pos - ImVec2(SIZE, SIZE));
-                ImGui::PushID(idx);
-                ImGui::InvisibleButton("", ImVec2(2 * HANDLE_RADIUS, 2 * HANDLE_RADIUS));
+			// if ((flags & (int)CurveEditorFlags::NO_TANGENTS) == 0)
+			// {
+			// 	window->DrawList->AddBezierCubic(
+			// 		transform(p_prev),
+			// 		transform(p_prev + tangent_last),
+			// 		transform(p + tangent),
+			// 		transform(p),
+			// 		ImGui::GetColorU32(ImGuiCol_PlotLines),
+			// 		1.0f,
+			// 		20);
+			// 	if (handleTangent(tangent_last, p_prev, 0))
+			// 	{
+			// 		points[1] = ImClamp(tangent_last, ImVec2(0, -1), ImVec2(1, 1));
+			// 		*changed_idx = point_idx;
+			// 	}
+			// 	if (handleTangent(tangent, p, 1))
+			// 	{
+			// 		points[2] = ImClamp(tangent, ImVec2(-1, -1), ImVec2(0, 1));
+			// 		*changed_idx = point_idx + 1;
+			// 	}
+			// 	if (handlePoint(p, 1))
+			// 	{
+			// 		if (p.x <= p_prev.x) p.x = p_prev.x + 0.001f;
+			// 		if (point_idx < points_count - 2 && p.x >= points[6].x)
+			// 		{
+			// 			p.x = points[6].x - 0.001f;
+			// 		}
+			// 		points[3] = p;
+			// 		*changed_idx = point_idx + 1;
+			// 	}
+            //
+			// }
+			// else
+			// {
+			// 	window->DrawList->AddLine(transform(p_prev), transform(p), ImGui::GetColorU32(ImGuiCol_PlotLines), 1.0f);
+			// 	if (handlePoint(p, 1))
+			// 	{
+			// 		if (p.x <= p_prev.x) p.x = p_prev.x + 0.001f;
+			// 		if (point_idx < points_count - 2 && p.x >= points[2].x)
+			// 		{
+			// 			p.x = points[2].x - 0.001f;
+			// 		}
+			// 		points[1] = p;
+			// 		*changed_idx = point_idx + 1;
+			// 	}
+			// }
+			// if (point_idx == 0)
+			// {
+			// 	if (handlePoint(p_prev, 0))
+			// 	{
+			// 		if (p.x <= p_prev.x) p_prev.x = p.x - 0.001f;
+			// 		points[0] = p_prev;
+			// 		*changed_idx = point_idx;
+			// 	}
+			// }
+            // ImGui::PopID();
+		// }
 
-				bool is_selected = selected_point && *selected_point == point_idx + idx;
-				float thickness = is_selected ? 2.0f : 1.0f;
-				ImU32 col = ImGui::IsItemActive() || ImGui::IsItemHovered() ? ImGui::GetColorU32(ImGuiCol_PlotLinesHovered) : ImGui::GetColorU32(ImGuiCol_PlotLines);
-
-				window->DrawList->AddLine(pos + ImVec2(-SIZE, 0), pos + ImVec2(0, SIZE), col, thickness);
-				window->DrawList->AddLine(pos + ImVec2(SIZE, 0), pos + ImVec2(0, SIZE), col, thickness);
-				window->DrawList->AddLine(pos + ImVec2(SIZE, 0), pos + ImVec2(0, -SIZE), col, thickness);
-				window->DrawList->AddLine(pos + ImVec2(-SIZE, 0), pos + ImVec2(0, -SIZE), col, thickness);
-
-				if (ImGui::IsItemHovered()) hovered_idx = point_idx + idx;
-
-				bool changed = false;
-				if (ImGui::IsItemActive() && ImGui::IsMouseClicked(0))
-				{
-					if (selected_point) *selected_point = point_idx + idx;
-					window->StateStorage.SetFloat((ImGuiID)StorageValues::POINT_START_X, pos.x);
-					window->StateStorage.SetFloat((ImGuiID)StorageValues::POINT_START_Y, pos.y);
-				}
-
-				if (ImGui::IsItemHovered() || (ImGui::IsItemActive() && ImGui::IsMouseDragging(0)))
-				{
-					char tmp[64];
-					ImFormatString(tmp, sizeof(tmp), "%0.2f, %0.2f", p.x, p.y);
-					window->DrawList->AddText({ pos.x, pos.y - ImGui::GetTextLineHeight() }, 0xff000000, tmp);
-				}
-
-				if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
-				{
-					pos.x = window->StateStorage.GetFloat((ImGuiID)StorageValues::POINT_START_X, pos.x);
-					pos.y = window->StateStorage.GetFloat((ImGuiID)StorageValues::POINT_START_Y, pos.y);
-					pos += ImGui::GetMouseDragDelta();
-					ImVec2 v = invTransform(pos);
-
-					_p = v;
-					changed = true;
-				}
-                ImGui::PopID();
-
-                ImGui::SetCursorScreenPos(cursor_pos);
-				return changed;
-			};
-
-			auto handleTangent = [&](ImVec2& t, const ImVec2& _p, int idx) -> bool
-			{
-				static const float SIZE = 2;
-				static const float LENGTH = 18;
-
-				auto normalized = [](const ImVec2& v) -> ImVec2
-				{
-					float len = 1.0f / sqrtf(v.x *v.x + v.y * v.y);
-					return ImVec2(v.x * len, v.y * len);
-				};
-
-				ImVec2 cursor_pos = ImGui::GetCursorScreenPos();
-				ImVec2 pos = transform(_p);
-				ImVec2 tang = pos + normalized(ImVec2(t.x, -t.y)) * LENGTH;
-
-                ImGui::SetCursorScreenPos(tang - ImVec2(SIZE, SIZE));
-                ImGui::PushID(-idx);
-                ImGui::InvisibleButton("", ImVec2(2 * HANDLE_RADIUS, 2 * HANDLE_RADIUS));
-
-				window->DrawList->AddLine(pos, tang, ImGui::GetColorU32(ImGuiCol_PlotLines));
-
-				ImU32 col = ImGui::IsItemHovered() ? ImGui::GetColorU32(ImGuiCol_PlotLinesHovered) : ImGui::GetColorU32(ImGuiCol_PlotLines);
-
-				window->DrawList->AddLine(tang + ImVec2(-SIZE, SIZE), tang + ImVec2(SIZE, SIZE), col);
-				window->DrawList->AddLine(tang + ImVec2(SIZE, SIZE), tang + ImVec2(SIZE, -SIZE), col);
-				window->DrawList->AddLine(tang + ImVec2(SIZE, -SIZE), tang + ImVec2(-SIZE, -SIZE), col);
-				window->DrawList->AddLine(tang + ImVec2(-SIZE, -SIZE), tang + ImVec2(-SIZE, SIZE), col);
-
-				bool changed = false;
-				if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
-				{
-					tang = ImGui::GetIO().MousePos - pos;
-					tang = normalized(tang);
-					tang.y *= -1;
-
-					t = tang;
-					changed = true;
-				}
-                ImGui::PopID();
-
-                ImGui::SetCursorScreenPos(cursor_pos);
-				return changed;
-			};
-
-            ImGui::PushID(point_idx);
-			if ((flags & (int)CurveEditorFlags::NO_TANGENTS) == 0)
-			{
-				window->DrawList->AddBezierCubic(
-					transform(p_prev),
-					transform(p_prev + tangent_last),
-					transform(p + tangent),
-					transform(p),
-					ImGui::GetColorU32(ImGuiCol_PlotLines),
-					1.0f,
-					20);
-				if (handleTangent(tangent_last, p_prev, 0))
-				{
-					points[1] = ImClamp(tangent_last, ImVec2(0, -1), ImVec2(1, 1));
-					*changed_idx = point_idx;
-				}
-				if (handleTangent(tangent, p, 1))
-				{
-					points[2] = ImClamp(tangent, ImVec2(-1, -1), ImVec2(0, 1));
-					*changed_idx = point_idx + 1;
-				}
-				if (handlePoint(p, 1))
-				{
-					if (p.x <= p_prev.x) p.x = p_prev.x + 0.001f;
-					if (point_idx < points_count - 2 && p.x >= points[6].x)
-					{
-						p.x = points[6].x - 0.001f;
-					}
-					points[3] = p;
-					*changed_idx = point_idx + 1;
-				}
-
-			}
-			else
-			{
-				window->DrawList->AddLine(transform(p_prev), transform(p), ImGui::GetColorU32(ImGuiCol_PlotLines), 1.0f);
-				if (handlePoint(p, 1))
-				{
-					if (p.x <= p_prev.x) p.x = p_prev.x + 0.001f;
-					if (point_idx < points_count - 2 && p.x >= points[2].x)
-					{
-						p.x = points[2].x - 0.001f;
-					}
-					points[1] = p;
-					*changed_idx = point_idx + 1;
-				}
-			}
-			if (point_idx == 0)
-			{
-				if (handlePoint(p_prev, 0))
-				{
-					if (p.x <= p_prev.x) p_prev.x = p.x - 0.001f;
-					points[0] = p_prev;
-					*changed_idx = point_idx;
-				}
-			}
-            ImGui::PopID();
-		}
-
-        ImGui::SetCursorScreenPos(inner_bb.Min);
-
-        ImGui::InvisibleButton("bg", inner_bb.Max - inner_bb.Min);
-
-		if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0) && new_count)
-		{
-			ImVec2 mp = ImGui::GetMousePos();
-			ImVec2 new_p = invTransform(mp);
-			ImVec2* points = (ImVec2*)values;
-
-			if ((flags & (int)CurveEditorFlags::NO_TANGENTS) == 0)
-			{
-				points[points_count * 3 + 0] = ImVec2(-0.2f, 0);
-				points[points_count * 3 + 1] = new_p;
-				points[points_count * 3 + 2] = ImVec2(0.2f, 0);;
-				++*new_count;
-
-				auto compare = [](const void* a, const void* b) -> int
-				{
-					float fa = (((const ImVec2*)a) + 1)->x;
-					float fb = (((const ImVec2*)b) + 1)->x;
-					return fa < fb ? -1 : (fa > fb) ? 1 : 0;
-				};
-
-				qsort(values, points_count + 1, sizeof(ImVec2) * 3, compare);
-
-			}
-			else
-			{
-				points[points_count] = new_p;
-				++*new_count;
-
-				auto compare = [](const void* a, const void* b) -> int
-				{
-					float fa = ((const ImVec2*)a)->x;
-					float fb = ((const ImVec2*)b)->x;
-					return fa < fb ? -1 : (fa > fb) ? 1 : 0;
-				};
-
-				qsort(values, points_count + 1, sizeof(ImVec2), compare);
-			}
-		}
-
-		if (hovered_idx >= 0 && ImGui::IsMouseDoubleClicked(0) && new_count && points_count > 2)
-		{
-			ImVec2* points = (ImVec2*)values;
-			--*new_count;
-			if ((flags & (int)CurveEditorFlags::NO_TANGENTS) == 0)
-			{
-				for (int j = hovered_idx * 3; j < points_count * 3 - 3; j += 3)
-				{
-					points[j + 0] = points[j + 3];
-					points[j + 1] = points[j + 4];
-					points[j + 2] = points[j + 5];
-				}
-			}
-			else
-			{
-				for (int j = hovered_idx; j < points_count - 1; ++j)
-				{
-					points[j] = points[j + 1];
-				}
-			}
-		}
-
-        ImGui::EndChildFrame();
-        ImGui::RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, inner_bb.Min.y), label);
+        // ImGui::SetCursorScreenPos(inner_bb.Min);
+        //
+        // ImGui::InvisibleButton("bg", inner_bb.Max - inner_bb.Min);
+        //
+		// if (ImGui::IsItemActive() && ImGui::IsMouseDoubleClicked(0) && new_count)
+		// {
+		// 	ImVec2 mp = ImGui::GetMousePos();
+		// 	ImVec2 new_p = invTransform(mp);
+        //
+		// 	ImVec2* points = (ImVec2*)values;
+		// 	if ((flags & (int)CurveEditorFlags::NO_TANGENTS) == 0)
+		// 	{
+		// 		points[points_count * 3 + 0] = ImVec2(-0.2f, 0);
+		// 		points[points_count * 3 + 1] = new_p;
+		// 		points[points_count * 3 + 2] = ImVec2(0.2f, 0);;
+		// 		++*new_count;
+        //
+		// 		auto compare = [](const void* a, const void* b) -> int
+		// 		{
+		// 			float fa = (((const ImVec2*)a) + 1)->x;
+		// 			float fb = (((const ImVec2*)b) + 1)->x;
+		// 			return fa < fb ? -1 : (fa > fb) ? 1 : 0;
+		// 		};
+        //
+		// 		qsort(values, points_count + 1, sizeof(ImVec2) * 3, compare);
+        //
+		// 	}
+		// 	else
+		// 	{
+		// 		points[points_count] = new_p;
+		// 		++*new_count;
+        //
+		// 		auto compare = [](const void* a, const void* b) -> int
+		// 		{
+		// 			float fa = ((const ImVec2*)a)->x;
+		// 			float fb = ((const ImVec2*)b)->x;
+		// 			return fa < fb ? -1 : (fa > fb) ? 1 : 0;
+		// 		};
+        //
+		// 		qsort(values, points_count + 1, sizeof(ImVec2), compare);
+		// 	}
+		// }
+        //
+		// if (hovered_idx >= 0 && ImGui::IsMouseDoubleClicked(0) && new_count && points_count > 2)
+		// {
+		// 	ImVec2* points = (ImVec2*)values;
+		// 	--*new_count;
+		// 	if ((flags & (int)CurveEditorFlags::NO_TANGENTS) == 0)
+		// 	{
+		// 		for (int j = hovered_idx * 3; j < points_count * 3 - 3; j += 3)
+		// 		{
+		// 			points[j + 0] = points[j + 3];
+		// 			points[j + 1] = points[j + 4];
+		// 			points[j + 2] = points[j + 5];
+		// 		}
+		// 	}
+		// 	else
+		// 	{
+		// 		for (int j = hovered_idx; j < points_count - 1; ++j)
+		// 		{
+		// 			points[j] = points[j + 1];
+		// 		}
+		// 	}
+		// }
+        //
+        // ImGui::EndChildFrame();
+        // ImGui::RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, inner_bb.Min.y), label);
         
-		return *changed_idx == -1;
+		return changedIdx;
 	}
 }}

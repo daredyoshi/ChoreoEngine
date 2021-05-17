@@ -166,7 +166,9 @@ bool FloatControllerEdit(
 
     if (ImGui::Button("*", ImVec2(square_sz, square_sz)))
     {
-        controllersBeingEdited.push_back({ {controller}, true });
+        CurveEditorData newControllerBeingEdited;
+        newControllerBeingEdited.floatControllers = {{controller}};
+        controllersBeingEdited.push_back(newControllerBeingEdited);
     }
     // }
 
