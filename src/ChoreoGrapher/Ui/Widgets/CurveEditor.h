@@ -18,11 +18,17 @@ struct CurveEditorData{
     ImU32 curveEditorFlags; 
     bool open{1};
 
+    // use this to re-frame the gridStart and Range values
+    bool reset{true};
     // grid settings
     float gridStartT{0};
     float gridStartVal{0};
+    // how wide and high the view is
     float timeRange{1.0};
-    float valueRange{0.0};
+    float valueRange{2.0};
+
+    int windowWidth{300};
+    int windowHeight{100};
 
     // is panning with mouse?
     bool isPanning;

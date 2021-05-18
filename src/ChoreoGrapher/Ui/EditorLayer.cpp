@@ -39,10 +39,12 @@ void EditorLayer::onAttach() {
     ChoreoApp::CameraComponent& cam = m_cameraEntity.addComponent<ChoreoApp::CameraComponent>(m_scene->shared_from_this());
 
     ChoreoApp::Ref<ChoreoApp::FloatController> newController {ChoreoApp::CreateRef<ChoreoApp::AnimatedFloatController>(m_scene->shared_from_this(), "FOV")  };
+    newController->removeKeyFromIdx(0);
     newController->addKey(ChoreoApp::CreateRef<ChoreoApp::FloatKey>(0, 45.0f));
     newController->addKey(ChoreoApp::CreateRef<ChoreoApp::FloatKey>(12, 0.8f));
     newController->addKey(ChoreoApp::CreateRef<ChoreoApp::FloatKey>(24, 1.8f));
     newController->addKey(ChoreoApp::CreateRef<ChoreoApp::FloatKey>(48, 0.2f));
+
     cam.camera.setPerspectiveFOV(newController);
 
     // m_secondCamera = m_scene->createEntity("Second Camera Entity");

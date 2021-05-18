@@ -34,6 +34,8 @@ public:
     virtual std::vector<Ref<FloatKey>> getKeys() =0;
 
     virtual void addKey(Ref<FloatKey> key) =0;
+    virtual void removeKeyFromIdx(unsigned int idx) = 0;
+
 
     const std::string& getLabel() const { return m_label; }
     void setLabel(const std::string& label) { m_label = label; }
@@ -61,6 +63,7 @@ public:
     virtual std::vector<Ref<Key<float>>> getKeys() override { return {{ m_key }}; };
 
     virtual void addKey(Ref<Key<float>> key)override { m_key = key; };
+    virtual void removeKeyFromIdx(unsigned int idx) override {  (void)idx;} ;
 
     virtual void setValAtTime(const Time& t, float val) override{(void)t; this->m_key->setVal(val);}
 
@@ -88,6 +91,7 @@ public:
     virtual Ref<FloatKey> getKeyFromTime(const Time& t) override;
 
     virtual void addKey(Ref<FloatKey> key) override { m_keys.push_back(key);m_dirty=true; };
+    virtual void removeKeyFromIdx(unsigned int idx) override {  m_keys.erase(m_keys.begin() + idx);} ;
 
     unsigned int getPreviousKeyIdx(const Time& t) const;
 

@@ -22,8 +22,10 @@ void drawControllerEditorWindows(std::vector<Widgets::CurveEditorData>& curveEdi
             else{
                 sprintf(buf, "%s Controller ###ControllerEditor%d", curveEditorData.floatControllers[0]->getLabel().c_str(), idx);
             }
+
+
             ImGui::SetNextWindowPos(ImVec2(base_pos.x + 100, base_pos.y + 300), ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowSize(ImVec2(300, 500), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize(ImVec2(curveEditorData.windowHeight, curveEditorData.windowWidth), ImGuiCond_FirstUseEver);
             if (!ImGui::Begin(buf, &curveEditorData.open)){
                 ImGui::End();
             }

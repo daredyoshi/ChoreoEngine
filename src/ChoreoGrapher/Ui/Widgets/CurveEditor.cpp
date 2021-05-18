@@ -32,6 +32,59 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
             ImGui::EndChildFrame();
 			return -1;
 		}
+
+        // reframe everything
+        if(curveEditorData.reset){
+            // find min and max key vals for gridStartVal and valueRange
+            curveEditorData.gridStartT = curveEditorData.floatControllers[0]->getKeyFromIdx(0)->getTick();
+            curveEditorData.gridStartVal = curveEditorData.floatControllers[0]->getKeyFromIdx(0)->getVal();
+
+            curveEditorData.timeRange = curveEditorData.gridStartT + 1.0;
+            curveEditorData.valueRange= curveEditorData.gridStartVal + 1.0;
+            // have to do this first because the code I copied from is using
+            // start and range instead of start and end *facepalm*
+            for(auto& controller : curveEditorData.floatControllers){
+                for(auto& key : controller->getKeys()){
+                    uint32_t t = key->getTick();
+                    float v = key->getVal(); 
+                    if(t < curveEditorData.gridStartT){
+                        curveEditorData.gridStartT = t;
+                    }
+                    if(v < curveEditorData.gridStartVal){
+                        curveEditorData.gridStartVal = v;
+                    }
+                }
+            }
+            // now that we KNOW the start time and val we can calucate the range
+            for(auto& controller : curveEditorData.floatControllers){
+                for(auto& key : controller->getKeys()){
+                    uint32_t t = key->getTick();
+                    float v = key->getVal(); 
+                    if (t > curveEditorData.gridStartT + curveEditorData.timeRange){
+                        curveEditorData.timeRange = t - curveEditorData.gridStartT;
+                    }
+                    if (v > curveEditorData.gridStartVal+ curveEditorData.valueRange){
+                        curveEditorData.valueRange= v - curveEditorData.gridStartVal;
+                    }
+                }
+            }
+
+
+            // add some padding for shits and giggles
+            float timePadding = curveEditorData.timeRange / 10.0f;
+            float valuePadding = curveEditorData.valueRange / 10.0f;
+            CE_TRACE("time padding {0}", timePadding);
+            
+            curveEditorData.gridStartT -= timePadding;
+            curveEditorData.gridStartVal -= valuePadding;
+
+            curveEditorData.timeRange += timePadding;
+            curveEditorData.valueRange += valuePadding;
+
+            
+
+            curveEditorData.reset = false;
+        }
 		
 		// ImVec2 points_min(FLT_MAX, FLT_MAX);
 		// ImVec2 points_max(-FLT_MAX, -FLT_MAX);
@@ -52,6 +105,7 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 		// points_max.y = ImMax(points_max.y, points_min.y + 0.0001f);
 
 		// if (flags & (int)CurveEditorFlags::RESET) window->StateStorage.Clear();
+
 
 		// float curveEditorData.gridStartT = window->StateStorage.GetFloat((ImGuiID)StorageValues::FROM_X, points_min.x);
 		// float curveEditorData.gridStartVal = window->StateStorage.GetFloat((ImGuiID)StorageValues::FROM_Y, points_min.y);
@@ -255,7 +309,7 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 				}
                 // don't draw a line the first time
                 // TODO replace this with evaluating controller for x number of segs
-                if(!keyIdx)
+                if(keyIdx > 0)
 				    window->DrawList->AddLine(transform(pPrev), transform(p), ImGui::GetColorU32(ImGuiCol_PlotLines), 1.0f);
                 ImGui::PopID();
                 pPrev = p;
@@ -443,8 +497,8 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 		// 	}
 		// }
         //
-        // ImGui::EndChildFrame();
-        // ImGui::RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, inner_bb.Min.y), label);
+        ImGui::EndChildFrame();
+        ImGui::RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, inner_bb.Min.y), label);
         
 		return changedIdx;
 	}
