@@ -12,10 +12,31 @@ namespace Widgets{
 
 typedef int CurveEditorFlags;    // -> enum ImGuiControllerEditFlags_  // Flags: for ColorEdit4(), ColorPicker4() etc.
 
+struct CurveEditorData;
+int CurveEditor(const char* label, CurveEditorData& curveEditorData);
+
+enum CurveEditorFlags_
+{
+
+    CurveEditorFlags_DisplayTicks            = 1 << 1,  // [Display]      // ColorEdit, ColorPicker: input and output data in HSV format.
+    CurveEditorFlags_DisplayFrames           = 1 << 2,  // [Display]      // ColorEdit, ColorPicker: input and output data in RGB format.
+    CurveEditorFlags_DisplaySeconds          = 1 << 3,  // [Display]      // ColorEdit, ColorPicker: input and output data in HSV format.
+
+    CurveEditorFlags_SnapTicks               = 1 << 4,  // [Snap]      // ColorEdit, ColorPicker: input and output data in HSV format.
+    CurveEditorFlags_SnapFrames              = 1 << 5,  // [Snap]      // ColorEdit, ColorPicker: input and output data in RGB format.
+    CurveEditorFlags_SnapSeconds             = 1 << 6,  // [Snap]      // ColorEdit, ColorPicker: input and output data in HSV format.
+    
+	CurveEditorFlags_ShowGrid = 1 << 7, 
+    
+    CurveEditor__OptionsDefault            = CurveEditorFlags_DisplayFrames | CurveEditorFlags_ShowGrid
+};
+
+// this has everything the curve editor window needs
 struct CurveEditorData{
-    std::vector<ChoreoApp::Ref<ChoreoApp::FloatController>> floatControllers;
-    unsigned int lastEditedKey;
-    ImU32 curveEditorFlags; 
+    std::vector<ChoreoApp::Ref<ChoreoApp::FloatController>> floatControllers{};
+
+    int lastEditedKey{-1};
+    CurveEditorFlags flags{CurveEditor__OptionsDefault}; 
     bool open{1};
 
     // use this to re-frame the gridStart and Range values
@@ -31,7 +52,7 @@ struct CurveEditorData{
     int windowHeight{100};
 
     // is panning with mouse?
-    bool isPanning;
+    bool isPanning{false};
     float panStartT{0};
     float panStartVal{0};
 
@@ -44,12 +65,6 @@ struct CurveEditorData{
 
 };
 
-int CurveEditor(const char* label, CurveEditorData& curveEditorData);
-
-enum CurveEditorFlags_
-{
-	CurveEditorFlags_ShowGrid = 1 << 1, 
-};
 // bool BeginResizablePopup(const char* str_id, const ImVec2& size_on_first_use);
 // void HSplitter(const char* str_id, ImVec2* size);
 // void VSplitter(const char* str_id, ImVec2* size);

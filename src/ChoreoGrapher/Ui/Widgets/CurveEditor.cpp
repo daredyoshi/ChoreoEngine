@@ -1,6 +1,7 @@
 
 #include "CurveEditor.h"
 #include "imgui.h"
+#include <memory>
 
 namespace ChoreoGrapher{
 namespace Widgets{
@@ -9,6 +10,10 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 
         int changedIdx{-1};
         ImVec2 editorSize = ImGui::GetContentRegionAvail();
+
+        ImU32 currentTimeColor = ImGui::ColorConvertFloat4ToU32({0.8f, 0.2f, 0.2f, 1.0f});
+        ImU32 notInFrameRangeFillColor = ImGui::ColorConvertFloat4ToU32({0.1f, 0.1f, 0.1f, 0.5f});
+
 		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
 		// editorSize.x = editorSize.x < 0 ? ImGui::CalcItemWidth() + (style.FramePadding.x * 2) : editorSize.x;
@@ -34,6 +39,8 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 		}
 
 		const ImRect inner_bb = window->InnerClipRect;
+        int bb_width = inner_bb.Max.x - inner_bb.Min.x;
+        int bb_height = inner_bb.Max.y - inner_bb.Min.y;
 		const ImRect frame_bb(inner_bb.Min - style.FramePadding, inner_bb.Max + style.FramePadding);
 
         // reframe everything
@@ -123,6 +130,7 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
         float valueRange = (inner_bb.Max.y - inner_bb.Min.y) * curveEditorData.valuesPerPixel;
 
 
+
 		auto transform = [&](const ImVec2& pos) -> ImVec2
 		{
 			float x = (pos.x - curveEditorData.gridStartT) / tickRange;
@@ -190,15 +198,43 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 			curveEditorData.panStartVal = curveEditorData.gridStartVal;
 		}
 
+        // GET TIME INFO ASSUMING ALL CONTROLLERS ARE IN SAME SCENE BOI
+        int tpf = ChoreoApp::Time::getTicksPerFrame();
+        int fps = ChoreoApp::Time::getFramesPerSecond();
+
+        float displayFrameRange =  tickRange/ (float)tpf;
+        float displaySecondRange =  tickRange/ ( (float)tpf * (float)fps );
+     
+        float displaySpacing{1.0f}; 
+        float displayRange{tickRange};
+
+        if (curveEditorData.flags & CurveEditorFlags_DisplayFrames) {
+            displaySpacing = tpf;
+            displayRange = displayFrameRange;
+        }
+        else if (curveEditorData.flags & CurveEditorFlags_DisplaySeconds){
+            displaySpacing = tpf * fps;
+            displayRange = displaySecondRange;
+        }
+
+        std::weak_ptr<ChoreoApp::Scene> firstScene = curveEditorData.floatControllers[0]->getScene();
+
+        uint32_t currentTick{firstScene.lock()->getTimeLine().getCurrentTime().getTick()};
+        uint32_t startTick{firstScene.lock()->getTimeLine().getStartTime().getTick()};
+        uint32_t endTick{firstScene.lock()->getTimeLine().getEndTime().getTick()};
+        float displayTime{(float)currentTick / displaySpacing};
+
+
+
         // DRAW GRID
-		if (curveEditorData.curveEditorFlags & CurveEditorFlags_ShowGrid)
+		if (curveEditorData.flags & CurveEditorFlags_ShowGrid)
 		{
 			int exp;
-			frexp(tickRange / 5, &exp);
+			frexp(tickRange/ 5, &exp);
 			float step_x = (float)ldexp(1.0, exp);
-			int cell_cols = int(tickRange / step_x);
+			int cell_cols = int(tickRange/ step_x);
 
-			float x = step_x * int(curveEditorData.gridStartT / step_x);
+			float x = step_x * int(curveEditorData.gridStartVal / step_x);
 			for (int i = -1; i < cell_cols + 2; ++i)
 			{
 				ImVec2 a = transform({ x + i * step_x, curveEditorData.gridStartVal });
@@ -207,11 +243,11 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 				char buf[64];
 				if (exp > 0)
 				{
-					ImFormatString(buf, sizeof(buf), " %d", int(x + i * step_x));
+					ImFormatString(buf, sizeof(buf), " %d", int(( x + i * step_x  )/ displaySpacing));
 				}
 				else
 				{
-					ImFormatString(buf, sizeof(buf), " %f", x + i * step_x);
+					ImFormatString(buf, sizeof(buf), " %f", ( x + i * step_x  )/ displaySpacing);
 				}
 				window->DrawList->AddText(b, 0x55000000, buf);
 			}
@@ -239,6 +275,47 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 			}
 		}
 
+        // draw the current time with red line
+        int exp;
+        frexp(displayRange / 5, &exp);
+        float step_x = ldexp(1.0f, exp);
+        int cell_cols = (float)bb_width / 100.0 > 3.0f ? bb_width / 100.0 : 3;
+        int step = (float)tickRange / (float)cell_cols;
+        {
+            ImVec2 a = transform( { (float)currentTick, curveEditorData.gridStartVal} );
+            ImVec2 b = transform(  { (float)currentTick, curveEditorData.gridStartVal + valueRange});
+            window->DrawList->AddLine(a, b, currentTimeColor, 2.0f);
+
+            char buf[64];
+            if (exp > 0)
+            {
+                ImFormatString(buf, sizeof(buf), " %d", int(displayTime));
+            }
+            else
+            {
+                ImFormatString(buf, sizeof(buf), " %f", displayTime);
+            }
+            window->DrawList->AddText(b, currentTimeColor, buf);
+        }
+
+        // shade the parts of the timeline that are not in the framerange
+        if((int)startTick > curveEditorData.gridStartT)
+        {
+            ImVec2 a = transform( { curveEditorData.gridStartT, curveEditorData.gridStartVal} );
+            ImVec2 b = transform( { static_cast<float>(startTick),curveEditorData.gridStartVal + valueRange});
+            window->DrawList->AddRectFilled(a, b, notInFrameRangeFillColor);
+        }
+        if((int)endTick < curveEditorData.gridStartT + tickRange)
+        {
+            ImVec2 a = transform({ curveEditorData.gridStartT + tickRange, curveEditorData.gridStartVal});
+            ImVec2 b = transform({  static_cast<float>(endTick),curveEditorData.gridStartVal + valueRange });
+            window->DrawList->AddRectFilled(a, b, notInFrameRangeFillColor);
+        }
+
+        // clear the lastEdited key if clicking in empty part of graph
+        if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()){
+            curveEditorData.lastEditedKey = -1; 
+        }
 
         for (auto& controller : curveEditorData.floatControllers){
             unsigned int keyIdx{0};
@@ -249,7 +326,8 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
             for (auto& key: controller->getKeys()){
                 ImVec2 p { static_cast<float>(key->getTick()), key->eval() };
                     
-                auto handlePoint = [&](ImVec2& _p, unsigned int idx) -> bool
+                // maybe put this somewhere else?
+                auto handlePoint = [&](ImVec2& _p, uint32_t keyID) -> bool
                 {
                     static const float SIZE = 3;
 
@@ -257,13 +335,15 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
                     ImVec2 pos = transform(_p);
 
                     ImGui::SetCursorScreenPos(pos - ImVec2(SIZE, SIZE));
-                    ImGui::PushID(idx);
+                    ImGui::PushID(key->getID());
                     ImGui::InvisibleButton("", ImVec2(2 * curveEditorData.handleRadius, 2 * curveEditorData.handleRadius));
 
-                    bool is_selected = curveEditorData.lastEditedKey && curveEditorData.lastEditedKey == idx;
-                    float thickness = is_selected ? 2.0f : 1.0f;
+                    bool isSelected = curveEditorData.lastEditedKey && curveEditorData.lastEditedKey == static_cast<int>(keyID);
+
+                    float thickness = isSelected ? 2.0f : 1.0f;
                     ImU32 col = ImGui::IsItemActive() || 
-                        ImGui::IsItemHovered() ? ImGui::GetColorU32(ImGuiCol_PlotLinesHovered) : 
+                        ImGui::IsItemHovered() || 
+                        isSelected ? ImGui::GetColorU32(ImGuiCol_PlotLinesHovered) : 
                         ImGui::GetColorU32(ImGuiCol_PlotLines);
 
                     window->DrawList->AddLine(pos + ImVec2(-SIZE, 0), pos + ImVec2(0, SIZE), col, thickness);
@@ -271,20 +351,22 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
                     window->DrawList->AddLine(pos + ImVec2(SIZE, 0), pos + ImVec2(0, -SIZE), col, thickness);
                     window->DrawList->AddLine(pos + ImVec2(-SIZE, 0), pos + ImVec2(0, -SIZE), col, thickness);
 
-                    if (ImGui::IsItemHovered()) hovered_idx = idx;
+                    // if (ImGui::IsItemHovered()) hovered_idx = idx;
 
                     bool changed = false;
                     if (ImGui::IsItemActive() && ImGui::IsMouseClicked(0))
                     {
-                        if (curveEditorData.lastEditedKey) curveEditorData.lastEditedKey = idx;
+                        // if(!ImGui::IsMouseDragging(0))
+                        curveEditorData.lastEditedKey = keyID;
                         curveEditorData.pointStartT = pos.x;
                         curveEditorData.pointStartVal = pos.y;
+                        // CE_TRACE("last edited key {0}", idx);
                     }
 
                     if (ImGui::IsItemHovered() || (ImGui::IsItemActive() && ImGui::IsMouseDragging(0)))
                     {
                         char tmp[64];
-                        ImFormatString(tmp, sizeof(tmp), "%0.2f, %0.2f", p.x, p.y);
+                        ImFormatString(tmp, sizeof(tmp), "%0.2f, %0.2f", p.x / displaySpacing, p.y);
                         window->DrawList->AddText({ pos.x, pos.y - ImGui::GetTextLineHeight() }, 0xff000000, tmp);
                     }
 
@@ -298,70 +380,99 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
                         _p = v;
                         changed = true;
                     }
+
                     ImGui::PopID();
 
                     ImGui::SetCursorScreenPos(cursor_pos);
                     return changed;
                 };
 
-                ImGui::PushID(keyIdx);
-				if (handlePoint(p, 1))
+                ImGui::PushID(key->getID());
+				if (handlePoint(p, key->getID()))
 				{
                     key->setVal(p.y);
-                    controller->dirty();
+                    ChoreoApp::Time& t = key->getTime(); 
+                    if(p.x >=0.0f)
+                        t.setTick(p.x);
+                    else
+                        t.setTick(0);
                     
-					// if (p.x <= pPrev.x) p.x = pPrev.x + 0.001f;
-					// if (point_idx < points_count - 2 && p.x >= points[2].x)
-					// {
-					// 	p.x = points[2].x - 0.001f;
-					// }
-					// points[1] = p;
 					changedIdx= keyIdx;
 				}
+
+                // no use drawing samples that are not in the graph
+                uint32_t firstTick = curveEditorData.gridStartT > 0.0f ? curveEditorData.gridStartT : 0 ; 
+                if(firstTick < startTick){
+                    firstTick = startTick;
+                }
+                uint32_t lastTick{static_cast<uint32_t>(curveEditorData.gridStartT + tickRange)};
+                if(lastTick > endTick){
+                    lastTick = endTick;
+                }
+                float firstValue{controller->eval(firstTick)};
+                ImVec2 firstP{(float)firstTick, firstValue};
+
+
+                // no use sampling segment if it's not even in the graph
+                ImVec2 prevP{firstP};
+
+
                 // default to a sample every three pixels 
                 uint32_t ticksPerSample = 3;
-                // don't draw a line the first time
-                if(keyIdx > 0){
-                    uint32_t firstTick{controller->getKeyFromIdx(keyIdx-1)->getTick()};
-                    float firstValue{controller->getKeyFromIdx(keyIdx-1)->getVal()};
-                    ImVec2 firstP{(float)firstTick, firstValue};
 
-                    // uint32_t lastTick{controller->getKeyFromIdx(keyIdx)->getTick()};
-                    // uint32_t lastSample = 0;
+                for(uint32_t sampleTick{firstTick}; sampleTick<lastTick; sampleTick+=ticksPerSample){
 
-                    // no use sampling segment if it's not even in the graph
-                    ImVec2 prevP{firstP};
-                    // if(!(lastTick < curveEditorData.gridStartT)){
+                    // don't sample same tick twice 
+                    ChoreoApp::Time t;
+                    t.setTick(sampleTick);
+                    controller->dirty();
+                    float v = controller->eval(t);
 
-                        uint32_t firstSample = 0;
-                        // no use drawing samples that are not in the graph
-                        if(firstTick < curveEditorData.gridStartT){
-                            firstTick = curveEditorData.gridStartT; 
-                        }
-                        // if(lastTick > curveEditorData.gridStartT + tickRange){
-                        //     lastTick = curveEditorData.gridStartT + tickRange;
-                        // }
-
-
-                        for(uint32_t sampleTick{firstTick}; sampleTick<curveEditorData.gridStartT + tickRange; ++sampleTick){
-
-                            // don't sample same tick twice 
-                            ChoreoApp::Time t;
-                            t.setTick(sampleTick);
-                            controller->dirty();
-                            float v = controller->eval(t);
-
-                            ImVec2 sampleP = {(float)sampleTick, v};
-                            window->DrawList->AddLine(transform(prevP), transform(sampleP), ImGui::GetColorU32(ImGuiCol_PlotLines), 1.0f);
-                            prevP = sampleP;
-                        }
-                    // }
+                    ImVec2 sampleP = {(float)sampleTick, v};
+                    window->DrawList->AddLine(transform(prevP), transform(sampleP), ImGui::GetColorU32(ImGuiCol_PlotLines), 1.0f);
+                    prevP = sampleP;
                 }
+                controller->dirty();
+                // }
                 ImGui::PopID();
                 pPrev = p;
                 ++keyIdx;
             }
-        }
+
+            // this might go into the panel instead of the curve editor
+            // swap keys if their time has changed to be greater/less than the next key
+            if(changedIdx >= 0){
+                auto key = controller->getKeyFromIdx(changedIdx);
+                // check if new time is greater than next key
+                ChoreoApp::Time& t = key->getTime(); 
+                if(changedIdx != static_cast<int>( controller->getKeys().size() - 1)){
+                    auto nextT = controller->getKeyFromIdx( changedIdx+1 )->getTime();
+                    if(  nextT.getTick() < t.getTick()){
+                        controller->swapKeys(changedIdx, changedIdx+1); 
+                        ++changedIdx;
+                    }
+                    if(nextT.getTick() == t.getTick()){
+                        nextT.setTick(t.getTick() - 1);
+                        controller->swapKeys(changedIdx, changedIdx+1);
+                        ++changedIdx;
+                    }
+                }
+                if(changedIdx != 0){
+                    auto prevT  = controller->getKeyFromIdx(changedIdx-1)->getTime();
+                    if(prevT.getTick()  > t.getTick()){
+                        controller->swapKeys(changedIdx, changedIdx-1);
+                        --changedIdx;
+                    }
+                    if(prevT.getTick() == t.getTick()){
+                        t.setTick(t.getTick() - 1);
+                        controller->swapKeys(changedIdx, changedIdx-1);
+                        --changedIdx;
+                    }
+                }
+
+                controller->dirty();
+                }
+            }
 			// auto handleTangent = [&](ImVec2& t, const ImVec2& _p, int idx) -> bool
 			// {
 			// 	static const float SIZE = 2;

@@ -1,4 +1,5 @@
 #include "Controller.h"
+#include "UniqueID.h"
 #include "Scene.h"
 #include "Entity.h"
 #include "glm/gtc/quaternion.hpp"
@@ -7,9 +8,10 @@
 
 namespace ChoreoApp{
     FloatController::FloatController(ControllerType t, std::weak_ptr<Scene> scene, const std::string& label)
-        : m_type{t}, m_label{label} {
+        : m_type{t}, m_scene{scene}, m_label{label} {
 
-        m_id = scene.lock()->getID();
+        // m_id = scene.lock()->getID();
+        m_id = UniqueID().id;
     }
 
     StaticFloatController::StaticFloatController(std::weak_ptr<Scene> scene, const std::string& label)
@@ -51,6 +53,10 @@ namespace ChoreoApp{
         return m_keys[0];
     }
 
+    void AnimatedFloatController::swapKeys(uint32_t idxA, uint32_t idxB){
+        std::swap(m_keys[idxA], m_keys[idxB]);
+    }
+
     unsigned int AnimatedFloatController::getPreviousKeyIdx(const Time& t) const {
         CE_CORE_ASSERT(m_keys.size() > 0, "There must ALWAYS be at least one key");
         // check to see if this is single value
@@ -58,15 +64,16 @@ namespace ChoreoApp{
             return 0;
         }
 
-        for(unsigned int i = 1; i < this->m_keys.size(); ++i){
+        for(uint32_t i = 1; i < this->m_keys.size(); ++i){
             Ref<FloatKey> k = this->m_keys[i]; 
             // convert the key to ticks and the time to tcks
             if (k->getTick() >= t.getTick()){
                 return i-1;
             }
         }
-        CE_CORE_ASSERT(false, "Controller did not find keys")
-        return 0;
+        
+        // if no keys are greater than T return the final key
+        return m_keys.size()-1;
     }
 
     float AnimatedFloatController::eval(const Time& t) {

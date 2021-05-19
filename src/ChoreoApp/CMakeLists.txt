@@ -53,6 +53,7 @@ set(
     Application/Scene/Scene.cpp
     Application/Scene/Time.cpp
     Application/Scene/SceneCamera.cpp
+    Application/Scene/UniqueID.cpp
 
     Application/Log.cpp
     

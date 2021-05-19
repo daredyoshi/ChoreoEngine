@@ -36,6 +36,10 @@ public:
     const Time& getStartTime() const { return m_startTime; }
     const Time& getEndTime() const{ return m_endTime; }
 
+    Time& getCurrentTime()  {return m_currentTime;}
+    Time& getStartTime()  { return m_startTime; }
+    Time& getEndTime() { return m_endTime; }
+
     void setCurrentTime(const Time& t) { m_currentTime.setTime(t); }
     void setStartTime(const Time& t) { m_startTime.setTime(t); }
     void setEndTime(const Time& t) { m_endTime.setTime(t); }

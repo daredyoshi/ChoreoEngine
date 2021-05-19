@@ -30,6 +30,7 @@ public:
     virtual Ref<FloatKey> getKeyFromIdx(unsigned int idx) =0;
     // this will get a key at time t if it exists 
     virtual Ref<FloatKey> getKeyFromTime(const Time& t) =0;
+    virtual void swapKeys(uint32_t idxA, uint32_t idxB) =0;
 
     virtual std::vector<Ref<FloatKey>> getKeys() =0;
 
@@ -40,12 +41,15 @@ public:
     const std::string& getLabel() const { return m_label; }
     void setLabel(const std::string& label) { m_label = label; }
 
+    std::weak_ptr<Scene> getScene() const { return m_scene; }
+
     virtual uint32_t getID() const { return m_id; }
     virtual void dirty() =0;
 
 
 private:
     ControllerType m_type;
+    std::weak_ptr<Scene> m_scene;
     std::string m_label{};
     uint32_t m_id;
 };
@@ -57,12 +61,13 @@ public:
 
     float virtual eval(const Time& t) override {(void)t; return this->m_key->eval(); }       
 
-    virtual Ref<Key<float>> getKeyFromTime(const Time& t) override { (void)t;return m_key; }
-    virtual Ref<Key<float>> getKeyFromIdx(const unsigned int idx) override { (void)idx; return m_key; }
+    virtual Ref<FloatKey> getKeyFromTime(const Time& t) override { (void)t;return m_key; }
+    virtual Ref<FloatKey> getKeyFromIdx(const unsigned int idx) override { (void)idx; return m_key; }
+    virtual void swapKeys(uint32_t idxA, uint32_t idxB) override {(void)idxA; (void)idxB;};
 
-    virtual std::vector<Ref<Key<float>>> getKeys() override { return {{ m_key }}; };
+    virtual std::vector<Ref<FloatKey>> getKeys() override { return {{ m_key }}; };
 
-    virtual void addKey(Ref<Key<float>> key)override { m_key = key; };
+    virtual void addKey(Ref<FloatKey> key)override { m_key = key; };
     virtual void removeKeyFromIdx(unsigned int idx) override {  (void)idx;} ;
 
     virtual void setValAtTime(const Time& t, float val) override{(void)t; this->m_key->setVal(val);}
@@ -89,6 +94,7 @@ public:
     
     virtual Ref<FloatKey> getKeyFromIdx(const unsigned int idx) override;  
     virtual Ref<FloatKey> getKeyFromTime(const Time& t) override;
+    virtual void swapKeys(uint32_t idxA, uint32_t idxB) override;
 
     virtual void addKey(Ref<FloatKey> key) override { m_keys.push_back(key);m_dirty=true; };
     virtual void removeKeyFromIdx(unsigned int idx) override {  m_keys.erase(m_keys.begin() + idx);} ;

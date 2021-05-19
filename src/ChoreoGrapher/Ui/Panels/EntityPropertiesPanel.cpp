@@ -112,7 +112,7 @@ namespace ChoreoGrapher{
                     // float perspectiveFOV{ glm::degrees(camera.getPerspectiveFOV()->eval(t))};
                     if(camera.getPerspectiveFOV()->getType() == ChoreoApp::FloatController::ControllerType::Animated){
                         ChoreoApp::Ref<ChoreoApp::FloatController> controller = camera.getPerspectiveFOV();
-                        if(Widgets::FloatControllerEdit(controller, t, m_controllersBeingEdited)){
+                        if(Widgets::FloatControllerEdit(controller, entity->getScene(), m_controllersBeingEdited)){
                             CE_TRACE("edited"); 
                         }
                     }

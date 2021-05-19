@@ -17,7 +17,7 @@ using floatControllerCollectorRef = std::vector<CurveEditorData>&;
 void FloatControllerEditOptionsPopup(ChoreoApp::Ref<ChoreoApp::AnimatedFloatController>& controller, ImGuiColorEditFlags flags=0);
 bool FloatControllerEdit(
         ChoreoApp::Ref<ChoreoApp::FloatController>& controller,
-        const ChoreoApp::Time& t, 
+        const std::weak_ptr<ChoreoApp::Scene> scene,
         floatControllerCollectorRef controllersBeingEdited,
         ImGuiControllerEditFlags flags = 0);
 

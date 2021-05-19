@@ -2,6 +2,7 @@
 
 #include <array>
 #include "Time.h"
+#include "UniqueID.h"
 #include "capch.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
@@ -17,21 +18,25 @@ namespace ChoreoApp{
 template<typename T_returnType>
 class Key{
 public:
-    Key() = default;
+    Key() : Key(0, 0.0f) {}
     Key(Time time)
-        : m_time{time} {}
+        : Key(time, 0.0f) {}
     Key(Time time, T_returnType val)
-        : m_time{ time }, m_val{val} {}
+        : m_time{ time }, m_val{val} {
+        m_id = UniqueID().id; 
+    }
 
     T_returnType eval() const { return m_val; }; 
     void setVal(const T_returnType val) { m_val= val; }    
     T_returnType& getVal() { return m_val; }
     Time& getTime() { return m_time; }
-    unsigned int getTick() { return m_time.getTick(); }
+    uint32_t getTick() { return m_time.getTick(); }
+    uint32_t getID() { return m_id; }
 
     operator T_returnType() { return m_val; }
 
 protected:
+    uint32_t m_id;
     Time m_time;
     T_returnType m_val;
 };
