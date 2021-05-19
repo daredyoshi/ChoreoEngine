@@ -24,8 +24,8 @@ struct CurveEditorData{
     float gridStartT{0};
     float gridStartVal{0};
     // how wide and high the view is
-    float timeRange{1.0};
-    float valueRange{2.0};
+    float ticksPerPixel{1.0};
+    float valuesPerPixel{1.0};
 
     int windowWidth{300};
     int windowHeight{100};

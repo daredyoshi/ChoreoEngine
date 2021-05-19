@@ -33,14 +33,17 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 			return -1;
 		}
 
+		const ImRect inner_bb = window->InnerClipRect;
+		const ImRect frame_bb(inner_bb.Min - style.FramePadding, inner_bb.Max + style.FramePadding);
+
         // reframe everything
         if(curveEditorData.reset){
             // find min and max key vals for gridStartVal and valueRange
             curveEditorData.gridStartT = curveEditorData.floatControllers[0]->getKeyFromIdx(0)->getTick();
             curveEditorData.gridStartVal = curveEditorData.floatControllers[0]->getKeyFromIdx(0)->getVal();
 
-            curveEditorData.timeRange = curveEditorData.gridStartT + 1.0;
-            curveEditorData.valueRange= curveEditorData.gridStartVal + 1.0;
+            float gridEndT{curveEditorData.gridStartT};
+            float gridEndVal{curveEditorData.gridStartVal};
             // have to do this first because the code I copied from is using
             // start and range instead of start and end *facepalm*
             for(auto& controller : curveEditorData.floatControllers){
@@ -50,41 +53,39 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
                     if(t < curveEditorData.gridStartT){
                         curveEditorData.gridStartT = t;
                     }
+                    else if (t > gridEndT){
+                        gridEndT = t;
+                    }
                     if(v < curveEditorData.gridStartVal){
                         curveEditorData.gridStartVal = v;
                     }
-                }
-            }
-            // now that we KNOW the start time and val we can calucate the range
-            for(auto& controller : curveEditorData.floatControllers){
-                for(auto& key : controller->getKeys()){
-                    uint32_t t = key->getTick();
-                    float v = key->getVal(); 
-                    if (t > curveEditorData.gridStartT + curveEditorData.timeRange){
-                        curveEditorData.timeRange = t - curveEditorData.gridStartT;
-                    }
-                    if (v > curveEditorData.gridStartVal+ curveEditorData.valueRange){
-                        curveEditorData.valueRange= v - curveEditorData.gridStartVal;
+                    else if (v > gridEndVal){
+                        gridEndVal = v;
                     }
                 }
             }
+
+            float timeRange = gridEndT - curveEditorData.gridStartT;
+            float valueRange= gridEndVal - curveEditorData.gridStartVal;
 
 
             // add some padding for shits and giggles
-            float timePadding = curveEditorData.timeRange / 10.0f;
-            float valuePadding = curveEditorData.valueRange / 10.0f;
-            CE_TRACE("time padding {0}", timePadding);
+            float timePadding = timeRange / 10.0f;
+            float valuePadding = valueRange / 10.0f;
             
             curveEditorData.gridStartT -= timePadding;
             curveEditorData.gridStartVal -= valuePadding;
 
-            curveEditorData.timeRange += timePadding;
-            curveEditorData.valueRange += valuePadding;
-
+            timeRange += timePadding;
+            valueRange += valuePadding;
             
+             
+            curveEditorData.ticksPerPixel = timeRange / ( inner_bb.Max.x - inner_bb.Min.x) ;
+            curveEditorData.valuesPerPixel = valueRange / ( inner_bb.Max.x - inner_bb.Min.x) ;
 
             curveEditorData.reset = false;
         }
+
 		
 		// ImVec2 points_min(FLT_MAX, FLT_MAX);
 		// ImVec2 points_max(-FLT_MAX, -FLT_MAX);
@@ -109,20 +110,23 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 
 		// float curveEditorData.gridStartT = window->StateStorage.GetFloat((ImGuiID)StorageValues::FROM_X, points_min.x);
 		// float curveEditorData.gridStartVal = window->StateStorage.GetFloat((ImGuiID)StorageValues::FROM_Y, points_min.y);
-		// float curveEditorData.timeRange = window->StateStorage.GetFloat((ImGuiID)StorageValues::WIDTH, points_max.x - points_min.x);
-		// float curveEditorData.valueRange = window->StateStorage.GetFloat((ImGuiID)StorageValues::HEIGHT, points_max.y - points_min.y);
+		// float timeRange = window->StateStorage.GetFloat((ImGuiID)StorageValues::WIDTH, points_max.x - points_min.x);
+		// float valueRange = window->StateStorage.GetFloat((ImGuiID)StorageValues::HEIGHT, points_max.y - points_min.y);
 		// window->StateStorage.SetFloat((ImGuiID)StorageValues::FROM_X, curveEditorData.gridStartT);
 		// window->StateStorage.SetFloat((ImGuiID)StorageValues::FROM_Y, curveEditorData.gridStartVal);
-		// window->StateStorage.SetFloat((ImGuiID)StorageValues::WIDTH, curveEditorData.timeRange);
-		// window->StateStorage.SetFloat((ImGuiID)StorageValues::HEIGHT, curveEditorData.valueRange);
+		// window->StateStorage.SetFloat((ImGuiID)StorageValues::WIDTH, timeRange);
+		// window->StateStorage.SetFloat((ImGuiID)StorageValues::HEIGHT, valueRange);
 
-		const ImRect inner_bb = window->InnerClipRect;
-		const ImRect frame_bb(inner_bb.Min - style.FramePadding, inner_bb.Max + style.FramePadding);
+
+        // so that resizing doesn't rescale the graph
+        float tickRange = ( inner_bb.Max.x - inner_bb.Min.x) * curveEditorData.ticksPerPixel;
+        float valueRange = (inner_bb.Max.y - inner_bb.Min.y) * curveEditorData.valuesPerPixel;
+
 
 		auto transform = [&](const ImVec2& pos) -> ImVec2
 		{
-			float x = (pos.x - curveEditorData.gridStartT) / curveEditorData.timeRange;
-			float y = (pos.y - curveEditorData.gridStartVal) / curveEditorData.valueRange;
+			float x = (pos.x - curveEditorData.gridStartT) / tickRange;
+			float y = (pos.y - curveEditorData.gridStartVal) / valueRange;
 
 			return ImVec2(
 				inner_bb.Min.x * (1 - x) + inner_bb.Max.x * x,
@@ -136,23 +140,69 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 			float y = (inner_bb.Max.y - pos.y) / (inner_bb.Max.y - inner_bb.Min.y);
 
 			return ImVec2(
-				curveEditorData.gridStartT + curveEditorData.timeRange * x,
-				curveEditorData.gridStartVal + curveEditorData.valueRange * y
+				curveEditorData.gridStartT + tickRange * x,
+				curveEditorData.gridStartVal + valueRange * y
 			);
 		};
 
+        // GRAPH NAVIGATION
+		if (ImGui::GetIO().MouseWheel != 0 && ImGui::IsWindowHovered())
+		{
+			float scale = powf(2, -ImGui::GetIO().MouseWheel);
+            // TODO add something here to offset the position to center around the scal
+            ImVec2 mousePos = ImGui::GetMousePos(); 
+            ImVec2 windowSize = ImGui::GetWindowSize();
+            ImVec2 windowPos = ImGui::GetWindowPos();
+            float relativeWindowPosX = (( mousePos.x - windowPos.x) / windowSize.x) ;
+            float relativeWindowPosY = (1 - ( mousePos.y  - windowPos.y ) / windowSize.y) ;
+            if(scale >= 1.0){
+                curveEditorData.gridStartT -= tickRange * (relativeWindowPosX);
+                curveEditorData.gridStartVal -= valueRange * (relativeWindowPosY);
+
+            }
+            else{
+                curveEditorData.gridStartT += tickRange * (relativeWindowPosX) * scale;
+                curveEditorData.gridStartVal += valueRange * (relativeWindowPosY) * scale;
+
+            }
+            curveEditorData.ticksPerPixel *= scale;
+            curveEditorData.valuesPerPixel *= scale;
+            tickRange = ( inner_bb.Max.x - inner_bb.Min.x) * curveEditorData.ticksPerPixel;
+            valueRange = (inner_bb.Max.y - inner_bb.Min.y) * curveEditorData.valuesPerPixel;
+		}
+		if (ImGui::IsMouseReleased(2))
+		{
+            curveEditorData.isPanning = false;
+		}
+		if (curveEditorData.isPanning)
+		{
+			ImVec2 drag_offset = ImGui::GetMouseDragDelta(2);
+			curveEditorData.gridStartT = curveEditorData.panStartT;
+			curveEditorData.gridStartVal = curveEditorData.panStartVal;
+			curveEditorData.gridStartT -= drag_offset.x * tickRange / (inner_bb.Max.x - inner_bb.Min.x);
+			curveEditorData.gridStartVal += drag_offset.y * valueRange / (inner_bb.Max.y - inner_bb.Min.y);
+		}
+
+		else if (ImGui::IsMouseDragging(2) && ImGui::IsWindowHovered())
+		{
+            curveEditorData.isPanning = true;
+			curveEditorData.panStartT   = curveEditorData.gridStartT;
+			curveEditorData.panStartVal = curveEditorData.gridStartVal;
+		}
+
+        // DRAW GRID
 		if (curveEditorData.curveEditorFlags & CurveEditorFlags_ShowGrid)
 		{
 			int exp;
-			frexp(curveEditorData.timeRange / 5, &exp);
+			frexp(tickRange / 5, &exp);
 			float step_x = (float)ldexp(1.0, exp);
-			int cell_cols = int(curveEditorData.timeRange / step_x);
+			int cell_cols = int(tickRange / step_x);
 
 			float x = step_x * int(curveEditorData.gridStartT / step_x);
 			for (int i = -1; i < cell_cols + 2; ++i)
 			{
 				ImVec2 a = transform({ x + i * step_x, curveEditorData.gridStartVal });
-				ImVec2 b = transform({ x + i * step_x, curveEditorData.gridStartVal + curveEditorData.valueRange });
+				ImVec2 b = transform({ x + i * step_x, curveEditorData.gridStartVal + valueRange });
 				window->DrawList->AddLine(a, b, 0x55000000);
 				char buf[64];
 				if (exp > 0)
@@ -166,15 +216,15 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 				window->DrawList->AddText(b, 0x55000000, buf);
 			}
 
-			frexp(curveEditorData.valueRange / 5, &exp);
+			frexp(valueRange / 5, &exp);
 			float step_y = (float)ldexp(1.0, exp);
-			int cell_rows = int(curveEditorData.valueRange / step_y);
+			int cell_rows = int(valueRange / step_y);
 
 			float y = step_y * int(curveEditorData.gridStartVal / step_y);
 			for (int i = -1; i < cell_rows + 2; ++i)
 			{
 				ImVec2 a = transform({ curveEditorData.gridStartT, y + i * step_y });
-				ImVec2 b = transform({ curveEditorData.gridStartT + curveEditorData.timeRange, y + i * step_y });
+				ImVec2 b = transform({ curveEditorData.gridStartT + tickRange, y + i * step_y });
 				window->DrawList->AddLine(a, b, 0x55000000);
 				char buf[64];
 				if (exp > 0)
@@ -189,47 +239,6 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 			}
 		}
 
-		if (ImGui::GetIO().MouseWheel != 0 && ImGui::IsWindowHovered())
-		{
-			float scale = powf(2, -ImGui::GetIO().MouseWheel);
-            // TODO add something here to offset the position to center around the scal
-            ImVec2 mousePos = ImGui::GetMousePos(); 
-            ImVec2 windowSize = ImGui::GetWindowSize();
-            ImVec2 windowPos = ImGui::GetWindowPos();
-            float relativeWindowPosX = (( mousePos.x - windowPos.x) / windowSize.x) ;
-            float relativeWindowPosY = (1 - ( mousePos.y  - windowPos.y ) / windowSize.y) ;
-            if(scale >= 1.0){
-                curveEditorData.gridStartT -= curveEditorData.timeRange * (relativeWindowPosX);
-                curveEditorData.gridStartVal -= curveEditorData.valueRange * (relativeWindowPosY);
-
-            }
-            else{
-                curveEditorData.gridStartT += curveEditorData.timeRange * (relativeWindowPosX) * scale;
-                curveEditorData.gridStartVal += curveEditorData.valueRange * (relativeWindowPosY) * scale;
-
-            }
-            curveEditorData.timeRange *= scale;
-            curveEditorData.valueRange *= scale;
-		}
-		if (ImGui::IsMouseReleased(2))
-		{
-            curveEditorData.isPanning = false;
-		}
-		if (curveEditorData.isPanning)
-		{
-			ImVec2 drag_offset = ImGui::GetMouseDragDelta(2);
-			curveEditorData.gridStartT = curveEditorData.panStartT;
-			curveEditorData.gridStartVal = curveEditorData.panStartVal;
-			curveEditorData.gridStartT -= drag_offset.x * curveEditorData.timeRange / (inner_bb.Max.x - inner_bb.Min.x);
-			curveEditorData.gridStartVal += drag_offset.y * curveEditorData.valueRange / (inner_bb.Max.y - inner_bb.Min.y);
-		}
-
-		else if (ImGui::IsMouseDragging(2) && ImGui::IsWindowHovered())
-		{
-            curveEditorData.isPanning = true;
-			curveEditorData.panStartT   = curveEditorData.gridStartT;
-			curveEditorData.panStartVal = curveEditorData.gridStartVal;
-		}
 
         for (auto& controller : curveEditorData.floatControllers){
             unsigned int keyIdx{0};
@@ -299,6 +308,8 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 				if (handlePoint(p, 1))
 				{
                     key->setVal(p.y);
+                    controller->dirty();
+                    
 					// if (p.x <= pPrev.x) p.x = pPrev.x + 0.001f;
 					// if (point_idx < points_count - 2 && p.x >= points[2].x)
 					// {
@@ -307,10 +318,45 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 					// points[1] = p;
 					changedIdx= keyIdx;
 				}
+                // default to a sample every three pixels 
+                uint32_t ticksPerSample = 3;
                 // don't draw a line the first time
-                // TODO replace this with evaluating controller for x number of segs
-                if(keyIdx > 0)
-				    window->DrawList->AddLine(transform(pPrev), transform(p), ImGui::GetColorU32(ImGuiCol_PlotLines), 1.0f);
+                if(keyIdx > 0){
+                    uint32_t firstTick{controller->getKeyFromIdx(keyIdx-1)->getTick()};
+                    float firstValue{controller->getKeyFromIdx(keyIdx-1)->getVal()};
+                    ImVec2 firstP{(float)firstTick, firstValue};
+
+                    // uint32_t lastTick{controller->getKeyFromIdx(keyIdx)->getTick()};
+                    // uint32_t lastSample = 0;
+
+                    // no use sampling segment if it's not even in the graph
+                    ImVec2 prevP{firstP};
+                    // if(!(lastTick < curveEditorData.gridStartT)){
+
+                        uint32_t firstSample = 0;
+                        // no use drawing samples that are not in the graph
+                        if(firstTick < curveEditorData.gridStartT){
+                            firstTick = curveEditorData.gridStartT; 
+                        }
+                        // if(lastTick > curveEditorData.gridStartT + tickRange){
+                        //     lastTick = curveEditorData.gridStartT + tickRange;
+                        // }
+
+
+                        for(uint32_t sampleTick{firstTick}; sampleTick<curveEditorData.gridStartT + tickRange; ++sampleTick){
+
+                            // don't sample same tick twice 
+                            ChoreoApp::Time t;
+                            t.setTick(sampleTick);
+                            controller->dirty();
+                            float v = controller->eval(t);
+
+                            ImVec2 sampleP = {(float)sampleTick, v};
+                            window->DrawList->AddLine(transform(prevP), transform(sampleP), ImGui::GetColorU32(ImGuiCol_PlotLines), 1.0f);
+                            prevP = sampleP;
+                        }
+                    // }
+                }
                 ImGui::PopID();
                 pPrev = p;
                 ++keyIdx;
