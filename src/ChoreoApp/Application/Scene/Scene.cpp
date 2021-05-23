@@ -77,11 +77,18 @@ namespace ChoreoApp {
     }
 
     void Scene::setTime(const Time& t){
+        // controllers referencing the scene time
+        // will not update correctly if the scene time
+        // does not update first
         m_timeLine.setCurrentTime(t);
         onTimeChanged();
     }
 
     void Scene::onTimeChanged(){
+        m_registry.view<CameraComponent>().each([=](auto entity, auto& cameraComponent){
+            (void)entity;
+            cameraComponent.camera.setTime(getTime()); 
+        });
         dirtyAllControllers(); 
     }
 
@@ -90,11 +97,12 @@ namespace ChoreoApp {
             (void)entity;
             xformComponent.xform->dirty(); 
         });
-
         m_registry.view<CameraComponent>().each([=](auto entity, auto& cameraComponent){
             (void)entity;
-            cameraComponent.camera.dirty(); 
+            cameraComponent.camera.dirtyAllControllers(); 
+            cameraComponent.camera.update();
         });
+
 
     }
 
@@ -115,7 +123,7 @@ namespace ChoreoApp {
             });
         }
 
-        Camera* mainCamera = nullptr;
+        SceneCamera* mainCamera = nullptr;
         glm::mat4 cameraXform;
         {
             auto view = m_registry.view<XformComponent, CameraComponent>();
@@ -131,6 +139,9 @@ namespace ChoreoApp {
 
         if(mainCamera){
             ChoreoApp::Renderer2D::beginScene(*mainCamera, cameraXform);
+
+            // ensure correct transform is being returned
+            mainCamera->dirtyAllControllers();
             auto group = m_registry.group<XformComponent>(entt::get<SpriteRendererComponent>);
             for (auto entity: group){
 

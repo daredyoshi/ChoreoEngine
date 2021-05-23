@@ -432,12 +432,12 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
                     window->DrawList->AddLine(transform(prevP), transform(sampleP), ImGui::GetColorU32(ImGuiCol_PlotLines), 1.0f);
                     prevP = sampleP;
                 }
-                controller->dirty();
                 // }
                 ImGui::PopID();
                 pPrev = p;
                 ++keyIdx;
             }
+
 
             // this might go into the panel instead of the curve editor
             // swap keys if their time has changed to be greater/less than the next key
@@ -468,9 +468,6 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
                         controller->swapKeys(changedIdx, changedIdx-1);
                         --changedIdx;
                     }
-                }
-
-                controller->dirty();
                 }
             }
 			// auto handleTangent = [&](ImVec2& t, const ImVec2& _p, int idx) -> bool
@@ -654,6 +651,9 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
 		// 	}
 		// }
         //
+        // redirty all the controllers so that future evaluators get them at the right time
+        }
+
         ImGui::EndChildFrame();
         ImGui::RenderText(ImVec2(frame_bb.Max.x + style.ItemInnerSpacing.x, inner_bb.Min.y), label);
         

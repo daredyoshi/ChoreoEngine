@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include "SceneCamera.h"
 #include "glm/ext/matrix_clip_space.hpp"
+#include "glm/trigonometric.hpp"
 #include <glm/glm.hpp>
 
 namespace ChoreoApp {
@@ -46,12 +47,14 @@ namespace ChoreoApp {
         // create and cache a copy of time or faster processing
         t_cache = t;
         if(force)
-            dirty();
+            dirtyAllControllers();
         recalculateProjection();
     }
     void SceneCamera::recalculateProjection(){
         if (m_projectionType == ProjectionType::Perspective){
-            m_projectionMatrix = glm::perspective(m_perspectiveFOV->eval(t_cache), m_aspectRatio, m_perspectiveNearClip->eval(t_cache), m_perspectiveFarClip->eval(t_cache));
+            m_projectionMatrix = glm::perspective(glm::radians(m_perspectiveFOV->eval(t_cache)), 
+            m_aspectRatio, m_perspectiveNearClip->eval(t_cache), 
+            m_perspectiveFarClip->eval(t_cache));
         }
         else{
             float orthoLeft = -m_orthographicSize->eval(t_cache) * m_aspectRatio * 0.5f ;
@@ -64,7 +67,15 @@ namespace ChoreoApp {
         }
     }
 
-    void SceneCamera::dirty(){
+    void SceneCamera::addOnDirtyParentCallback(Ref<FloatController> controller){
+        std::string name{"CA_dirtyParentController"};
+        controller->addOnDirtyCallback(name, 
+                std::function<void()>(std::bind(&SceneCamera::update, this))
+        );
+    }
+
+    void SceneCamera::dirtyAllControllers(){
+        // these controllers call dirty  when they are dirtied
         m_orthographicSize->dirty();
         m_orthographicNearClip->dirty();
         m_orthographicFarClip->dirty();
@@ -72,5 +83,14 @@ namespace ChoreoApp {
         m_perspectiveFOV->dirty();
         m_perspectiveNearClip->dirty();
         m_perspectiveFarClip->dirty();
+
+    }
+
+    void SceneCamera::setTime(Time& t){
+        t_cache = t;
+    }
+
+    void SceneCamera::update(){
+        recalculateProjection();
     }
 }

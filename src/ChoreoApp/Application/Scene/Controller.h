@@ -5,6 +5,7 @@
 #include "glm/fwd.hpp"
 #include "glm/glm.hpp"
 #include <memory>
+#include <unordered_map>
 
 namespace ChoreoApp{
 
@@ -44,14 +45,17 @@ public:
     std::weak_ptr<Scene> getScene() const { return m_scene; }
 
     virtual uint32_t getID() const { return m_id; }
-    virtual void dirty() =0;
+    virtual void dirty();
 
+    virtual void addOnDirtyCallback(std::string& callbackName, std::function<void()> callback);
 
 private:
     ControllerType m_type;
     std::weak_ptr<Scene> m_scene;
     std::string m_label{};
     uint32_t m_id;
+    // these are called whenever the controller is diried
+    std::unordered_map<std::string, std::function<void()>> m_onDirtyCallbacks {};
 };
 
 class StaticFloatController : public FloatController{ 
@@ -72,8 +76,6 @@ public:
 
     virtual void setValAtTime(const Time& t, float val) override{(void)t; this->m_key->setVal(val);}
 
-    virtual void dirty() override {};
-
 protected:
     Ref<FloatKey> m_key{CreateRef<FloatKey>()};
 };
@@ -82,7 +84,7 @@ protected:
 class AnimatedFloatController : public FloatController{
 protected:
     std::vector<Ref<FloatKey>> m_keys;
-    float m_cache;
+    float m_cache{0.0f};
     bool m_dirty{true};
 
 public:
@@ -103,7 +105,7 @@ public:
 
     float virtual eval(const Time& t) override ;
     virtual void setValAtTime(const Time& t, float val)override;
-    virtual void dirty() override { m_dirty = true; }
+    virtual void dirty() override;
 };
 
 class XformController {

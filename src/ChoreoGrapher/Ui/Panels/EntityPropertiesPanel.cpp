@@ -121,11 +121,11 @@ namespace ChoreoGrapher{
                     // }
                     float perspectiveNearClip{ camera.getPerspectiveNearClip()->eval(t)};
                     if (ImGui::DragFloat("Vertical NearClip", &perspectiveNearClip)){
-                        camera.setPerspectiveNearClip(perspectiveNearClip, m_context->getTime());
+                        // camera.setPerspectiveNearClip(perspectiveNearClip, m_context->getTime());
                     }
                     float perspectiveFarClip{ camera.getPerspectiveFarClip()->eval(t)};
                     if (ImGui::DragFloat("Vertical FarClip", &perspectiveFarClip)){
-                        camera.setPerspectiveFarClip(perspectiveFarClip, m_context->getTime());
+                        // camera.setPerspectiveFarClip(perspectiveFarClip, m_context->getTime());
                     }
                 }
 

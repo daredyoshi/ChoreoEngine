@@ -280,6 +280,7 @@ int TimeLineSlider(ChoreoApp::TimeLine& timeline, int flags){
         window->StateStorage.SetInt((ImGuiID)StorageValues::TO_T, toTick);
     }
 
+    // else if (ImGui::IsMouseDragging(2) && ImGui::IsWindowHovered())
     else if (ImGui::IsMouseDragging(2) && ImGui::IsWindowHovered())
     {
         window->StateStorage.SetBool((ImGuiID)StorageValues::IS_PANNING, true);

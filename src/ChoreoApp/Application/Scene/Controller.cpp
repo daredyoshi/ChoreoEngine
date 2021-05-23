@@ -7,11 +7,27 @@
 #include <memory>
 
 namespace ChoreoApp{
+
     FloatController::FloatController(ControllerType t, std::weak_ptr<Scene> scene, const std::string& label)
         : m_type{t}, m_scene{scene}, m_label{label} {
 
         // m_id = scene.lock()->getID();
         m_id = UniqueID().id;
+    }
+
+    void FloatController::addOnDirtyCallback(std::string& callbackName, std::function<void()> callback){
+        if(m_onDirtyCallbacks.find(callbackName) == m_onDirtyCallbacks.end()){
+            m_onDirtyCallbacks[callbackName] = callback;
+        }
+        else{
+            CE_WARN("Callback key already exists new callback has not been added!");
+        }
+    }
+
+    void FloatController::dirty(){
+        for (auto& fn : m_onDirtyCallbacks){
+            fn.second();
+        }
     }
 
     StaticFloatController::StaticFloatController(std::weak_ptr<Scene> scene, const std::string& label)
@@ -27,6 +43,12 @@ namespace ChoreoApp{
         m_keys.push_back(CreateRef<FloatKey>());            
     }
 
+    void AnimatedFloatController::dirty(){
+        FloatController::dirty();
+        // this must come last because the diry callbacks
+        // might undirty the controller
+        m_dirty = true;
+    }
 
     Ref<FloatKey> AnimatedFloatController::getKeyFromIdx(const unsigned int idx) {
         return this->m_keys[idx]; 
@@ -77,10 +99,10 @@ namespace ChoreoApp{
     }
 
     float AnimatedFloatController::eval(const Time& t) {
-        if(m_keys.size() ==0){
-            return float{};
-        }
         if(m_dirty){
+            if(m_keys.size() ==0){
+                return float{};
+            }
             unsigned int idx = getPreviousKeyIdx(t);
 
             // default to stepped interpolation
