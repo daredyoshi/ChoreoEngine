@@ -192,18 +192,13 @@ int TimeLineSlider(ChoreoApp::TimeLine& timeline, int flags){
         // float tick = i * step_x * displaySpacing;
         float tick = fromTick + (i * step);
 
-        ImVec2 a = transform( tick, 0);
-        ImVec2 b = transform( tick, textHeight);
+        int snappedTick = int(tick / displaySpacing) * displaySpacing;
+
+        ImVec2 a = transform( snappedTick, 0);
+        ImVec2 b = transform( snappedTick, textHeight);
         window->DrawList->AddLine(a, b, 0x55000000);
         char buf[12];
-        if (exp > 0)
-        {
-            ImFormatString(buf, sizeof(buf), " %d", int(tick / displaySpacing));
-        }
-        else
-        {
-            ImFormatString(buf, sizeof(buf), " %f", tick / displaySpacing);
-        }
+        ImFormatString(buf, sizeof(buf), " %d", int(snappedTick / displaySpacing));
         window->DrawList->AddText(b, 0x55000000, buf);
     }
     // draw the current time with red line

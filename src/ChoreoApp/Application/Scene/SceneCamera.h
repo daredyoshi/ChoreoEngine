@@ -21,7 +21,7 @@ namespace ChoreoApp {
 
         // PERSPECTIVE 
         Ref<FloatController> getPerspectiveFOV() { return m_perspectiveFOV; }
-        void setPerspectiveFOV(Ref<FloatController> val) { addOnDirtyParentCallback(val); m_perspectiveFOV = val; }
+        void setPerspectiveFOV(Ref<FloatController> val) { addOnDirtyRecalculateProjectionCallback(val); m_perspectiveFOV = val; }
         // void setPerspectiveFOV(float val, const Time& t){ m_perspectiveFOV->setValAtTime(t, val); recalculateProjection(t); }
         Ref<FloatController> getPerspectiveNearClip() { return m_perspectiveNearClip; }
         // void setPerspectiveNearClip(float val,const Time& t){ m_perspectiveNearClip->setValAtTime(t, val); recalculateProjection(t); }
@@ -48,8 +48,7 @@ namespace ChoreoApp {
 
     private:
         std::weak_ptr<Scene> m_scene;
-        void addOnDirtyParentCallback(Ref<FloatController> controller);
-        void recalculateProjection(const Time& t, bool force=true);
+        void addOnDirtyRecalculateProjectionCallback(Ref<FloatController> controller);
         void recalculateProjection();
         ProjectionType m_projectionType = ProjectionType::Perspective;
         Ref<FloatController> m_orthographicSize    ;  

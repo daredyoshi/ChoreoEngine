@@ -50,6 +50,7 @@ set(
 
     Application/Scene/Entity.cpp
     Application/Scene/Controller.cpp
+    Application/Scene/Key.cpp
     Application/Scene/Scene.cpp
     Application/Scene/Time.cpp
     Application/Scene/SceneCamera.cpp

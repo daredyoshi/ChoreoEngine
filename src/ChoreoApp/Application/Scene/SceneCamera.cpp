@@ -17,7 +17,7 @@ namespace ChoreoApp {
         m_perspectiveNearClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( 0.001f, "Near Clip"));
         m_perspectiveFarClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( 1000.0f, "Far Clipe"));
 
-        recalculateProjection(t_cache);
+        recalculateProjection();
     }
 
     // void SceneCamera::setOrthographic(float size, float nearClip, float farClip){
@@ -40,13 +40,6 @@ namespace ChoreoApp {
         recalculateProjection();
     }
 
-    void SceneCamera::recalculateProjection(const Time& t, bool force){
-        // create and cache a copy of time or faster processing
-        t_cache = t;
-        if(force)
-            dirtyAllControllers();
-        recalculateProjection();
-    }
     void SceneCamera::recalculateProjection(){
         if (m_projectionType == ProjectionType::Perspective){
             m_projectionMatrix = glm::perspective(glm::radians(m_perspectiveFOV->eval(t_cache)), 
@@ -64,27 +57,16 @@ namespace ChoreoApp {
         }
     }
 
-    void SceneCamera::addOnDirtyParentCallback(Ref<FloatController> controller){
+    void SceneCamera::addOnDirtyRecalculateProjectionCallback(Ref<FloatController> controller){
         std::string name{"CA_dirtyParentController"};
         controller->addOnDirtyCallback(name, 
                 std::function<void()>(std::bind(&SceneCamera::update, this))
         );
     }
 
-    void SceneCamera::dirtyAllControllers(){
-        // these controllers call dirty  when they are dirtied
-        m_orthographicSize->dirty();
-        m_orthographicNearClip->dirty();
-        m_orthographicFarClip->dirty();
-
-        m_perspectiveFOV->dirty();
-        m_perspectiveNearClip->dirty();
-        m_perspectiveFarClip->dirty();
-
-    }
-
     void SceneCamera::setTime(Time& t){
         t_cache = t;
+        recalculateProjection();
     }
 
     void SceneCamera::update(){

@@ -15,13 +15,12 @@
 
 namespace ChoreoApp{
 
-template<typename T_returnType>
-class Key{
+class FloatKey{
 public:
-    Key() : Key(0, 0.0f) {}
-    Key(Time time)
-        : Key(time, 0.0f) {}
-    Key(Time time, T_returnType val)
+    FloatKey() : FloatKey(0, 0.0f) {}
+    FloatKey(Time time)
+        : FloatKey(time, 0.0f) {}
+    FloatKey(Time time, float val)
         : m_time{ time }, m_val{val} {
         m_id = UniqueID().id; 
     }
@@ -35,24 +34,29 @@ public:
         Bezier = 3
     };
 
-    T_returnType eval() const { return m_val; }; 
-    void setVal(const T_returnType val) { m_val= val; }    
-    T_returnType& getVal() { return m_val; }
+    float eval() const { return m_val; }; 
+    void setVal(const float val);
+    float& getVal() { return m_val; }
     Time& getTime() { return m_time; }
     uint32_t getTick() { return m_time.getTick(); }
     uint32_t getID() { return m_id; }
     KeyInterpolationType getToNextKeyInterpolationType() const { return m_toNextKeyInterpolationType; }
 
-    operator T_returnType() { return m_val; }
+    operator float() { return m_val; }
+
+    void addOnSetValCallback(std::string& callbackName, std::function<void()> callback);
+
 
 protected:
-    KeyInterpolationType m_toNextKeyInterpolationType;
+    KeyInterpolationType m_toNextKeyInterpolationType{KeyInterpolationType::Static};
     uint32_t m_id;
     Time m_time;
-    T_returnType m_val;
+    float m_val;
+
+private:
+    std::unordered_map<std::string, std::function<void()>> m_onSetValCallbacks {};
 };
 
-using FloatKey = Key<float>;
 
 //
 // class Mat4XformKey : public XformKey{

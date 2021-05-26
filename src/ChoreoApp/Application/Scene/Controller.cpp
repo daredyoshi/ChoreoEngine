@@ -36,6 +36,7 @@ namespace ChoreoApp{
     StaticFloatController::StaticFloatController(float val, const std::string& label)
         : FloatController(FloatController::ControllerType::Static, label) {
             m_key->setVal(val);
+            setTicksPerSample(1000000);
     }
 
     AnimatedFloatController::AnimatedFloatController(const std::string& label, Time& startTime, Time& endTime )
@@ -59,13 +60,28 @@ namespace ChoreoApp{
 
 
     void AnimatedFloatController::cacheTimeRange(){
-        m_cache.resize(( m_endTime.getTick() - m_startTime.getTick() ) / m_ticksPerSample); 
-        for(uint32_t tick{0}; tick<m_endTime.getTick()/ m_ticksPerSample; ++tick){
-            Ref<FloatKey> k = getPreviousKey(tick);
+        m_cache.resize(( m_endTime.getTick() - m_startTime.getTick() ) / getTicksPerSample()); 
+
+        for(uint32_t tickIdx{0}; tickIdx<m_endTime.getTick()/ getTicksPerSample(); ++tickIdx){
+            Ref<FloatKey> k = getPreviousKey(tickIdx * getTicksPerSample());
             if(k->getToNextKeyInterpolationType() == FloatKey::KeyInterpolationType::Static){
-                m_cache[tick] = k->eval();
+                m_cache[tickIdx] = k->eval();
             }
         }
+    }
+
+    void AnimatedFloatController::addOnSetValDirtyControllerCallback(Ref<FloatKey> key){
+        std::string name{"CA_dirtyParentController"};
+        key->addOnSetValCallback(name, 
+                std::function<void()>(std::bind(&AnimatedFloatController::dirty, this))
+        );
+
+    }
+
+    void AnimatedFloatController::addKey(Ref<FloatKey> key){
+        addOnSetValDirtyControllerCallback(key);
+        m_keys.push_back(key);
+        m_dirty=true;
     }
 
     void AnimatedFloatController::swapKeys(uint32_t idxA, uint32_t idxB){
@@ -73,10 +89,16 @@ namespace ChoreoApp{
     }
 
     Ref<FloatKey> AnimatedFloatController::getPreviousKey(const Time& t) const {
-        return m_keys[getPreviousKeyIdx(t)];
+        return getPreviousKey(t.getTick());
+    } 
+    Ref<FloatKey> AnimatedFloatController::getPreviousKey(uint32_t tick) const {
+        return m_keys[getPreviousKeyIdx(tick)];
     }
 
     unsigned int AnimatedFloatController::getPreviousKeyIdx(const Time& t) const {
+        return getPreviousKeyIdx(t.getTick());
+    } 
+    unsigned int AnimatedFloatController::getPreviousKeyIdx(uint32_t tick) const {
         CE_CORE_ASSERT(m_keys.size() > 0, "There must ALWAYS be at least one key");
         // check to see if this is single value
         if ( this->m_keys.size() == 1){
@@ -86,7 +108,7 @@ namespace ChoreoApp{
         for(uint32_t i = 1; i < this->m_keys.size(); ++i){
             Ref<FloatKey> k = this->m_keys[i]; 
             // convert the key to ticks and the time to tcks
-            if (k->getTick() >= t.getTick()){
+            if (k->getTick() >= tick){
                 return i-1;
             }
         }
@@ -102,7 +124,7 @@ namespace ChoreoApp{
         }
 
         // it's fine to use int division
-        return m_cache[t.getTick() / m_ticksPerSample];
+        return m_cache[t.getTick() / getTicksPerSample()];
     }       
 
     void AnimatedFloatController::setValAtTime(const Time& t, float val){

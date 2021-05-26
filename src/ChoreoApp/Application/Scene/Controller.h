@@ -27,6 +27,9 @@ public:
     virtual uint32_t getID() const { return m_id; }
     virtual ControllerType getType() const  { return m_type; }
 
+    uint32_t getTicksPerSample() const { return m_ticksPerSample; }
+    void setTicksPerSample(uint32_t tps) { m_ticksPerSample = tps; dirty(); }
+
     // these are the pure virtuals 
     float virtual eval(const Time& t) = 0;
 
@@ -50,7 +53,10 @@ public:
 
     virtual void addOnDirtyCallback(std::string& callbackName, std::function<void()> callback);
 
+
+
 private:
+    uint32_t m_ticksPerSample{3}; // TODO update this to default to the ticks per frame with a marco 
     ControllerType m_type;
     std::string m_label{};
     uint32_t m_id;
@@ -87,7 +93,6 @@ protected:
 class AnimatedFloatController : public FloatController{
 protected:
     std::vector<Ref<FloatKey>> m_keys;
-    int m_ticksPerSample{30}; // TODO update this to default to the ticks per frame with a marco 
     Time& m_startTime;
     Time& m_endTime;
     std::vector<float> m_cache{0.0f};
@@ -103,13 +108,17 @@ public:
     Ref<FloatKey> getPreviousKey(const Time& t) const override;
     unsigned int getPreviousKeyIdx(const Time& t) const override;
     virtual void swapKeys(uint32_t idxA, uint32_t idxB) override;
-    virtual void addKey(Ref<FloatKey> key) override { m_keys.push_back(key);m_dirty=true; };
+    virtual void addKey(Ref<FloatKey> key) override;
     virtual void removeKeyFromIdx(const unsigned int idx) override {  m_keys.erase(m_keys.begin() + idx);} ;
     virtual Ref<FloatKey> getKeyFromIdx(const uint32_t idx) const override { return m_keys[idx]; }
 
     virtual void setValAtTime(const Time& t, float val)override;
     virtual void dirty() override;
+
 private:
+    Ref<FloatKey> getPreviousKey(uint32_t tick) const; 
+    unsigned int getPreviousKeyIdx(uint32_t tick) const ;
+    void addOnSetValDirtyControllerCallback(Ref<FloatKey> controller);
     void cacheTimeRange();
     void assertAtLeastOneKeyExists();
 };

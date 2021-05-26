@@ -89,22 +89,8 @@ namespace ChoreoApp {
             (void)entity;
             cameraComponent.camera.setTime(getTime()); 
         });
-        dirtyAllControllers(); 
     }
 
-    void Scene::dirtyAllControllers(){
-        m_registry.view<XformComponent>().each([=](auto entity, auto& xformComponent){
-            (void)entity;
-            xformComponent.xform->dirty(); 
-        });
-        m_registry.view<CameraComponent>().each([=](auto entity, auto& cameraComponent){
-            (void)entity;
-            cameraComponent.camera.dirtyAllControllers(); 
-            cameraComponent.camera.update();
-        });
-
-
-    }
 
     void Scene::onUpdate(Timestep ts){
         (void)ts;
@@ -141,7 +127,6 @@ namespace ChoreoApp {
             ChoreoApp::Renderer2D::beginScene(*mainCamera, cameraXform);
 
             // ensure correct transform is being returned
-            mainCamera->dirtyAllControllers();
             auto group = m_registry.group<XformComponent>(entt::get<SpriteRendererComponent>);
             for (auto entity: group){
 

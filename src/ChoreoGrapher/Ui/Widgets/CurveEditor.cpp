@@ -1,5 +1,6 @@
 
 #include "CurveEditor.h"
+#include "Application/Scene/Controller.h"
 #include "imgui.h"
 #include <memory>
 
@@ -371,6 +372,7 @@ int CurveEditor(const ChoreoApp::Scene& scene, const char* label, CurveEditorDat
                     if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0))
                     {
                         pos.x = curveEditorData.pointStartT;
+                        // for snapping to the frames (temp!!)
                         pos.y = curveEditorData.pointStartVal;
                         pos += ImGui::GetMouseDragDelta();
                         ImVec2 v = invTransform(pos);
@@ -398,44 +400,44 @@ int CurveEditor(const ChoreoApp::Scene& scene, const char* label, CurveEditorDat
 					changedIdx= keyIdx;
 				}
 
-                // no use drawing samples that are not in the graph
-                uint32_t firstTick = curveEditorData.gridStartT > 0.0f ? curveEditorData.gridStartT : 0 ; 
-                if(firstTick < startTick){
-                    firstTick = startTick;
-                }
-                uint32_t lastTick{static_cast<uint32_t>(curveEditorData.gridStartT + tickRange)};
-                if(lastTick > endTick){
-                    lastTick = endTick;
-                }
-                float firstValue{controller->eval(firstTick)};
-                ImVec2 firstP{(float)firstTick, firstValue};
-
-
-                // no use sampling segment if it's not even in the graph
-                ImVec2 prevP{firstP};
-
-
-                // default to a sample every three pixels 
-                uint32_t ticksPerSample = 3;
-
-                for(uint32_t sampleTick{firstTick}; sampleTick<lastTick; sampleTick+=ticksPerSample){
-
-                    // don't sample same tick twice 
-                    ChoreoApp::Time t;
-                    t.setTick(sampleTick);
-                    controller->dirty();
-                    float v = controller->eval(t);
-
-                    ImVec2 sampleP = {(float)sampleTick, v};
-                    window->DrawList->AddLine(transform(prevP), transform(sampleP), ImGui::GetColorU32(ImGuiCol_PlotLines), 1.0f);
-                    prevP = sampleP;
-                }
                 // }
                 ImGui::PopID();
-                pPrev = p;
                 ++keyIdx;
             }
 
+            // DRAW THE CONTROLLER VALUE LINES
+            //
+            // no use drawing samples that are not in the graph
+            uint32_t firstTick = curveEditorData.gridStartT > 0.0f ? curveEditorData.gridStartT : 0 ; 
+            if(firstTick < startTick){
+                firstTick = startTick;
+            }
+            uint32_t lastTick{static_cast<uint32_t>(curveEditorData.gridStartT + tickRange)};
+            if(lastTick > endTick){
+                lastTick = endTick;
+            }
+            float firstValue{controller->eval(firstTick)};
+            ImVec2 firstP{(float)firstTick, firstValue};
+
+
+            // no use sampling segment if it's not even in the graph
+            ImVec2 prevP{firstP};
+
+
+            uint32_t ticksPerSample = controller->getTicksPerSample();
+
+            
+            for(uint32_t sampleTick{firstTick}; sampleTick<lastTick; sampleTick+=ticksPerSample){
+
+                // don't sample same tick twice 
+                ChoreoApp::Time t;
+                t.setTick(sampleTick);
+                float v = controller->eval(t);
+
+                ImVec2 sampleP = {static_cast<float>(sampleTick), v};
+                window->DrawList->AddLine(transform(prevP), transform(sampleP), ImGui::GetColorU32(ImGuiCol_PlotLines), 1.0f);
+                prevP = sampleP;
+            }
 
             // this might go into the panel instead of the curve editor
             // swap keys if their time has changed to be greater/less than the next key
