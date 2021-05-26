@@ -48,7 +48,7 @@ public:
 
 
 protected:
-    KeyInterpolationType m_toNextKeyInterpolationType{KeyInterpolationType::Static};
+    KeyInterpolationType m_toNextKeyInterpolationType{KeyInterpolationType::Linear};
     uint32_t m_id;
     Time m_time;
     float m_val;

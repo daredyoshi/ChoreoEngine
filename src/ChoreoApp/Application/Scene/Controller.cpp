@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
+#include <cmath>
 #include <memory>
 
 namespace ChoreoApp{
@@ -63,10 +64,35 @@ namespace ChoreoApp{
         m_cache.resize(( m_endTime.getTick() - m_startTime.getTick() ) / getTicksPerSample()); 
 
         for(uint32_t tickIdx{0}; tickIdx<m_endTime.getTick()/ getTicksPerSample(); ++tickIdx){
-            Ref<FloatKey> k = getPreviousKey(tickIdx * getTicksPerSample());
-            if(k->getToNextKeyInterpolationType() == FloatKey::KeyInterpolationType::Static){
-                m_cache[tickIdx] = k->eval();
+            uint32_t tick = tickIdx * getTicksPerSample();
+            uint32_t previousKeyIdx = getPreviousKeyIdx(tick);
+
+            Ref<FloatKey>& prevKey = m_keys[previousKeyIdx];
+            
+            if(prevKey->getToNextKeyInterpolationType() == FloatKey::KeyInterpolationType::Static){
+                m_cache[tickIdx] = prevKey->eval();
             }
+            else if(prevKey->getToNextKeyInterpolationType() == FloatKey::KeyInterpolationType::Linear){
+                if(previousKeyIdx != static_cast<uint32_t>(m_keys.size() - 1)){
+
+                    Ref<FloatKey>& nextKey = m_keys[previousKeyIdx + 1]; 
+                    uint32_t prevKeyTick = prevKey->getTick();
+                    uint32_t nextKeyTick = nextKey->getTick();
+
+                    float prevKeyVal = prevKey->getVal();
+                    float nextKeyVal = nextKey->getVal();
+
+                    double blend = float(tick - prevKeyTick) / float(nextKeyTick - prevKeyTick);
+
+                     
+                    // manual lerp interpolation because we're still cpp 17
+                    m_cache[tickIdx] = (prevKeyVal * (1.0 - blend)) + (nextKeyVal * blend); ;
+
+                }
+                else{
+                    m_cache[tickIdx] = prevKey->eval();
+                }
+            }        
         }
     }
 
@@ -95,10 +121,10 @@ namespace ChoreoApp{
         return m_keys[getPreviousKeyIdx(tick)];
     }
 
-    unsigned int AnimatedFloatController::getPreviousKeyIdx(const Time& t) const {
+    uint32_t AnimatedFloatController::getPreviousKeyIdx(const Time& t) const {
         return getPreviousKeyIdx(t.getTick());
     } 
-    unsigned int AnimatedFloatController::getPreviousKeyIdx(uint32_t tick) const {
+    uint32_t AnimatedFloatController::getPreviousKeyIdx(uint32_t tick) const {
         CE_CORE_ASSERT(m_keys.size() > 0, "There must ALWAYS be at least one key");
         // check to see if this is single value
         if ( this->m_keys.size() == 1){

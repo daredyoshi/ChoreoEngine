@@ -106,7 +106,7 @@ public:
     std::vector<Ref<FloatKey>> getKeys() override { return m_keys;}
     
     Ref<FloatKey> getPreviousKey(const Time& t) const override;
-    unsigned int getPreviousKeyIdx(const Time& t) const override;
+    uint32_t getPreviousKeyIdx(const Time& t) const override;
     virtual void swapKeys(uint32_t idxA, uint32_t idxB) override;
     virtual void addKey(Ref<FloatKey> key) override;
     virtual void removeKeyFromIdx(const unsigned int idx) override {  m_keys.erase(m_keys.begin() + idx);} ;
@@ -117,7 +117,7 @@ public:
 
 private:
     Ref<FloatKey> getPreviousKey(uint32_t tick) const; 
-    unsigned int getPreviousKeyIdx(uint32_t tick) const ;
+    uint32_t getPreviousKeyIdx(uint32_t tick) const ;
     void addOnSetValDirtyControllerCallback(Ref<FloatKey> controller);
     void cacheTimeRange();
     void assertAtLeastOneKeyExists();
