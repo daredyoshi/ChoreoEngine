@@ -5,7 +5,7 @@
 namespace ChoreoGrapher{
 namespace Panels{
 
-void drawControllerEditorWindows(std::vector<Widgets::CurveEditorData>& curveEditorDatas){
+void drawControllerEditorWindows(const ChoreoApp::Scene& scene, std::vector<Widgets::CurveEditorData>& curveEditorDatas){
     int idx{0};
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
     const ImVec2 base_pos = viewport->Pos;
@@ -29,7 +29,7 @@ void drawControllerEditorWindows(std::vector<Widgets::CurveEditorData>& curveEdi
             if (!ImGui::Begin(buf, &curveEditorData.open)){
                 ImGui::End();
             }
-            int changedIdx = Widgets::CurveEditor(buf, curveEditorData);
+            int changedIdx = Widgets::CurveEditor(scene, buf, curveEditorData);
 
             ImGui::End();
         }

@@ -13,7 +13,7 @@ namespace ChoreoApp {
         enum class ProjectionType { Perspective = 0, Orthographic = 1 };
 
 
-        SceneCamera(std::weak_ptr<Scene> scene);
+        SceneCamera();
         virtual ~SceneCamera() override {};
 
         void setViewportSize(const uint32_t width,const uint32_t height);

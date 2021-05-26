@@ -72,7 +72,7 @@ namespace ChoreoApp {
         auto& tagComponent { entity.addComponent<TagComponent>(name) };
         tagComponent.tag = name.empty() ? "Entity" : name;
 
-        entity.addComponent<XformComponent>(shared_from_this(), (name + " Xform Controller"));
+        entity.addComponent<XformComponent>((name + " Xform Controller"));
         return entity;
     }
 

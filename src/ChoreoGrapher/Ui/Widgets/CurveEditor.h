@@ -1,5 +1,6 @@
 #pragma once
 #include "Application/Log.h"
+#include "Application/Scene/Scene.h"
 #include "imgui.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
@@ -13,7 +14,7 @@ namespace Widgets{
 typedef int CurveEditorFlags;    // -> enum ImGuiControllerEditFlags_  // Flags: for ColorEdit4(), ColorPicker4() etc.
 
 struct CurveEditorData;
-int CurveEditor(const char* label, CurveEditorData& curveEditorData);
+int CurveEditor(const ChoreoApp::Scene& scene, const char* label, CurveEditorData& curveEditorData);
 
 enum CurveEditorFlags_
 {

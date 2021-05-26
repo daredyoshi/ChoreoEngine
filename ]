@@ -98,7 +98,6 @@ namespace ChoreoApp{
     float AnimatedFloatController::eval(const Time& t) {
         if(m_dirty){
             cacheTimeRange();
-            m_dirty=false;
         }
 
         // it's fine to use int division
@@ -113,19 +112,20 @@ namespace ChoreoApp{
         m_dirty=true;
     }
 
-    XformController::XformController(XformControllerType t, const std::string& label)
+    XformController::XformController(XformControllerType t, std::weak_ptr<Scene> scene, const std::string& label)
         : m_type{t}, m_label{label} {
 
+        m_scene = scene; 
 
-        m_id = UniqueID().id;
+        m_id = m_scene.lock()->getID();
 
-        m_xPosController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(0.0f, "X Position"));     
-        m_yPosController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(0.0f, "Y Position"));     
-        m_zPosController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(0.0f, "Z Position"));     
+        m_xPosController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.0f, "X Position"));     
+        m_yPosController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.0f, "Y Position"));     
+        m_zPosController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.0f, "Z Position"));     
                                                                                                                   
-        m_xScaleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( 1.0f, "X Scale"));   
-        m_yScaleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( 1.0f, "Y Scale"));   
-        m_zScaleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( 1.0f, "Z Scale"));   
+        m_xScaleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1.0f, "X Scale"));   
+        m_yScaleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1.0f, "Y Scale"));   
+        m_zScaleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1.0f, "Z Scale"));   
     }
 
     void XformController::dirty() {
@@ -167,12 +167,12 @@ namespace ChoreoApp{
         m_dirty = true;
     }
 
-    EulerXformController::EulerXformController(const std::string& label)
-        : XformController(XformController::XformControllerType::Euler, label) {
+    EulerXformController::EulerXformController(std::weak_ptr<Scene> scene, const std::string& label)
+        : XformController(XformController::XformControllerType::Euler, scene, label) {
 
-        m_xAngleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( 0.0f, "X Angle"));
-        m_yAngleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( 0.0f, "Y Angle"));
-        m_zAngleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( 0.0f, "Z Angle"));
+        m_xAngleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.0f, "X Angle"));
+        m_yAngleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.0f, "Y Angle"));
+        m_zAngleController = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.0f, "Z Angle"));
     }
 
     glm::mat4 EulerXformController::eval(const Time& t) {

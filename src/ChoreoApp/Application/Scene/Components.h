@@ -28,10 +28,10 @@ namespace ChoreoApp{
 
         // XformComponent() = default;
         XformComponent(const XformComponent&) = default;
-        XformComponent(std::weak_ptr<Scene> scene, const std::string& label="No Name"){
+        XformComponent(const std::string& label="No Name"){
             // XformComponent(scene, glm::mat4{0}, label);
             Scope<Time> t = CreateScope<Time>(0);
-            xform =  {CreateRef<EulerXformController>(scene, label)};
+            xform =  {CreateRef<EulerXformController>(label)};
         }
 
     };
@@ -43,8 +43,7 @@ namespace ChoreoApp{
 
         // CameraComponent() = default;
         CameraComponent(const CameraComponent&) = default;
-        CameraComponent(std::weak_ptr<Scene> scene)
-            : camera{scene} {}
+        CameraComponent() = default;
     };
 
     struct NativeScriptComponent{

@@ -5,6 +5,7 @@
 
 namespace ChoreoGrapher { 
     using floatControllerCollectorRef = std::vector<Widgets::CurveEditorData>&;
+
     class EntityPropertiesPanel {
     public:
         EntityPropertiesPanel(

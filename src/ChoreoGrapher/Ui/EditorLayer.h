@@ -46,7 +46,7 @@ private:
     // panels
     ChoreoApp::Ref<ChoreoApp::Scene> m_scene{ChoreoApp::CreateRef<ChoreoApp::Scene>()};
 
-    std::vector<Widgets::CurveEditorData> m_floatControllers{};
+    std::vector<Widgets::CurveEditorData> m_floatControllers;
 
     SceneHierarchyPanel m_sceneHeirarchyPanel{m_scene};
     EntityPropertiesPanel m_entityPropertiesPanel{m_scene, m_floatControllers};

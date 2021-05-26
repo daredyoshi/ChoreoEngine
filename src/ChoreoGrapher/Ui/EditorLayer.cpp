@@ -11,6 +11,8 @@
 
 namespace ChoreoGrapher{
 
+
+
 void EditorLayer::onAttach() {
     CE_PROFILE_FUNCTION();
     // temporary until a preferences menu is created
@@ -36,10 +38,13 @@ void EditorLayer::onAttach() {
     // primary camera
     m_cameraEntity = m_scene->createEntity("Camera Entity");
     ChoreoApp::XformComponent& xform = m_cameraEntity.getComponent<ChoreoApp::XformComponent>();
-    ChoreoApp::CameraComponent& cam = m_cameraEntity.addComponent<ChoreoApp::CameraComponent>(m_scene->shared_from_this());
+    ChoreoApp::CameraComponent& cam = m_cameraEntity.addComponent<ChoreoApp::CameraComponent>();
 
-    ChoreoApp::Ref<ChoreoApp::FloatController> newController {ChoreoApp::CreateRef<ChoreoApp::AnimatedFloatController>(m_scene->shared_from_this(), "FOV")  };
-    newController->removeKeyFromIdx(0);
+    ChoreoApp::Ref<ChoreoApp::FloatController> newController {ChoreoApp::CreateRef<ChoreoApp::AnimatedFloatController>(
+            "FOV", 
+            m_scene->getTimeLine().getStartTime(), 
+            m_scene->getTimeLine().getEndTime())  
+    };
     newController->addKey(ChoreoApp::CreateRef<ChoreoApp::FloatKey>(0, 45.0f));
     newController->addKey(ChoreoApp::CreateRef<ChoreoApp::FloatKey>(12, 0.8f));
     newController->addKey(ChoreoApp::CreateRef<ChoreoApp::FloatKey>(24, 1.8f));
@@ -225,7 +230,7 @@ void EditorLayer::onImGuiRender()
     m_sceneHeirarchyPanel.onImGuiRender();
     m_entityPropertiesPanel.onImGuiRender();
     m_timelinePanel.onImGuiRender();
-    Panels::drawControllerEditorWindows(m_floatControllers);
+    Panels::drawControllerEditorWindows(*m_scene.get(),  m_floatControllers);
     ImGui::ShowDemoWindow();
 
     // viewoprt

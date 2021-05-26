@@ -7,7 +7,7 @@
 
 namespace ChoreoGrapher{
 namespace Panels{
-void drawControllerEditorWindows(std::vector<Widgets::CurveEditorData>& curveEditorData);
+void drawControllerEditorWindows(const ChoreoApp::Scene& scene, std::vector<Widgets::CurveEditorData>& curveEditorData);
 
 }
 }

@@ -14,10 +14,12 @@ typedef int ImGuiControllerEditFlags;    // -> enum ImGuiControllerEditFlags_  /
 
 using floatControllerCollectorRef = std::vector<CurveEditorData>&;
 
-void FloatControllerEditOptionsPopup(ChoreoApp::Ref<ChoreoApp::AnimatedFloatController>& controller, ImGuiColorEditFlags flags=0);
+void FloatControllerEditOptionsPopup(
+        ChoreoApp::Ref<ChoreoApp::AnimatedFloatController>& controller, 
+        ImGuiColorEditFlags flags=0);
 bool FloatControllerEdit(
         ChoreoApp::Ref<ChoreoApp::FloatController>& controller,
-        const std::weak_ptr<ChoreoApp::Scene> scene,
+        ChoreoApp::Scene& scene,
         floatControllerCollectorRef controllersBeingEdited,
         ImGuiControllerEditFlags flags = 0);
 

@@ -7,18 +7,15 @@
 #include <glm/glm.hpp>
 
 namespace ChoreoApp {
-    SceneCamera::SceneCamera(std::weak_ptr<Scene> scene) 
+    SceneCamera::SceneCamera() 
         : Camera() {
-        m_scene = scene; 
-
-
-        m_orthographicSize = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 10.0f, "Ortho Size"));
-        m_orthographicNearClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, -1.0f, "Near Clip"));
-        m_orthographicFarClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1.0f, "Far Clip"));
+        m_orthographicSize = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( 10.0f, "Ortho Size"));
+        m_orthographicNearClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( -1.0f, "Near Clip"));
+        m_orthographicFarClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( 1.0f, "Far Clip"));
                                                                                                              
-        m_perspectiveFOV = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, glm::radians(45.0f), "FOV"));
-        m_perspectiveNearClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 0.001f, "Near Clip"));
-        m_perspectiveFarClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>(m_scene, 1000.0f, "Far Clipe"));
+        m_perspectiveFOV = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( glm::radians(45.0f), "FOV"));
+        m_perspectiveNearClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( 0.001f, "Near Clip"));
+        m_perspectiveFarClip = std::static_pointer_cast<FloatController>(CreateRef<StaticFloatController>( 1000.0f, "Far Clipe"));
 
         recalculateProjection(t_cache);
     }

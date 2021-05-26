@@ -1,9 +1,11 @@
 
 #include "ControllerEdit.h"
+#include "Application/Scene/Controller.h"
 #include "ChoreoApp.h"
 #include "MessageBox.h"
 #include "imgui.h"
 #include <memory>
+#include <vector>
 
 namespace ChoreoGrapher{
 namespace Widgets{
@@ -118,7 +120,7 @@ void FloatControllerEditOptionsPopup(ChoreoApp::Ref<ChoreoApp::FloatController>&
 
 bool FloatControllerEdit(
         ChoreoApp::Ref<ChoreoApp::FloatController>& controller, 
-        const std::weak_ptr<ChoreoApp::Scene> scene,
+        ChoreoApp::Scene& scene,
         floatControllerCollectorRef controllersBeingEdited,
         ImGuiControllerEditFlags flags){
 
@@ -153,7 +155,7 @@ bool FloatControllerEdit(
     const ImVec2 pos = window->DC.CursorPos;
     ImGuiWindow* picker_active_window = NULL;
 
-    float val = controller->eval(scene.lock()->getTime());
+    float val = controller->eval(scene.getTime());
     static const char* fmt {"%0.3f"};
 
     ImGui::SetNextItemWidth(w_inputs);
@@ -166,12 +168,12 @@ bool FloatControllerEdit(
 
     if (ImGui::Button("*", ImVec2(square_sz, square_sz)))
     {
-        CurveEditorData newControllerBeingEdited{};
-        newControllerBeingEdited.floatControllers = {{controller}};
+        std::vector<ChoreoApp::Ref<ChoreoApp::FloatController>> floatControllers{{controller}};
+        CurveEditorData newControllerBeingEdited{floatControllers};
         controllersBeingEdited.push_back(newControllerBeingEdited);
     }
-    // }
 
+    // }
 
     // Convert back
     if (value_changed && picker_active_window == NULL)

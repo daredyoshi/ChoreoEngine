@@ -26,16 +26,27 @@ public:
         m_id = UniqueID().id; 
     }
 
+    enum class KeyInterpolationType{
+        Static = 0,
+        Linear = 1,
+        Cubic = 2,
+        // handles are created automatically
+        // on eval if they don't exist
+        Bezier = 3
+    };
+
     T_returnType eval() const { return m_val; }; 
     void setVal(const T_returnType val) { m_val= val; }    
     T_returnType& getVal() { return m_val; }
     Time& getTime() { return m_time; }
     uint32_t getTick() { return m_time.getTick(); }
     uint32_t getID() { return m_id; }
+    KeyInterpolationType getToNextKeyInterpolationType() const { return m_toNextKeyInterpolationType; }
 
     operator T_returnType() { return m_val; }
 
 protected:
+    KeyInterpolationType m_toNextKeyInterpolationType;
     uint32_t m_id;
     Time m_time;
     T_returnType m_val;

@@ -20,38 +20,38 @@ public:
         Animated = 1,
         Script = 2
     };
-    FloatController(ControllerType t, std::weak_ptr<Scene> scene, const std::string& label="No Name");
+    FloatController(ControllerType t, const std::string& label="No Name");
+
+    const std::string& getLabel() const { return m_label; }
+    void setLabel(const std::string& label) { m_label = label; }
+    virtual uint32_t getID() const { return m_id; }
     virtual ControllerType getType() const  { return m_type; }
 
+    // these are the pure virtuals 
     float virtual eval(const Time& t) = 0;
+
+    virtual std::vector<Ref<FloatKey>> getKeys() =0;
+
+    // this will get a key at time t if it exists 
+    virtual Ref<FloatKey> getPreviousKey(const Time& t) const=0;
+    virtual uint32_t getPreviousKeyIdx(const Time& t) const =0;
+    virtual void swapKeys(uint32_t idxA, uint32_t idxB) =0;
+    virtual void addKey(Ref<FloatKey> key) =0;
+    virtual void removeKeyFromIdx(const unsigned int idx) = 0;
+    virtual Ref<FloatKey> getKeyFromIdx(const uint32_t idx) const=0;
+
     // if a key exists at time t, this will set it, otherwise
     // it will only set the cached value which will be cleared on
     // slidertime change
     virtual void setValAtTime(const Time& t, float val) = 0;
-    virtual Ref<FloatKey> getKeyFromIdx(unsigned int idx) =0;
-    // this will get a key at time t if it exists 
-    virtual Ref<FloatKey> getKeyFromTime(const Time& t) =0;
-    virtual void swapKeys(uint32_t idxA, uint32_t idxB) =0;
 
-    virtual std::vector<Ref<FloatKey>> getKeys() =0;
-
-    virtual void addKey(Ref<FloatKey> key) =0;
-    virtual void removeKeyFromIdx(unsigned int idx) = 0;
-
-
-    const std::string& getLabel() const { return m_label; }
-    void setLabel(const std::string& label) { m_label = label; }
-
-    std::weak_ptr<Scene> getScene() const { return m_scene; }
-
-    virtual uint32_t getID() const { return m_id; }
+    // this will force update the cache
     virtual void dirty();
 
     virtual void addOnDirtyCallback(std::string& callbackName, std::function<void()> callback);
 
 private:
     ControllerType m_type;
-    std::weak_ptr<Scene> m_scene;
     std::string m_label{};
     uint32_t m_id;
     // these are called whenever the controller is diried
@@ -60,21 +60,24 @@ private:
 
 class StaticFloatController : public FloatController{ 
 public:
-    StaticFloatController(std::weak_ptr<Scene> scene, const std::string& label="No Name");
-    StaticFloatController(std::weak_ptr<Scene> scene, float val, const std::string& label="No Name" );
+    StaticFloatController(const std::string& label="No Name");
+    StaticFloatController(float val, const std::string& label="No Name" );
 
     float virtual eval(const Time& t) override {(void)t; return this->m_key->eval(); }       
 
-    virtual Ref<FloatKey> getKeyFromTime(const Time& t) override { (void)t;return m_key; }
-    virtual Ref<FloatKey> getKeyFromIdx(const unsigned int idx) override { (void)idx; return m_key; }
-    virtual void swapKeys(uint32_t idxA, uint32_t idxB) override {(void)idxA; (void)idxB;};
-
     virtual std::vector<Ref<FloatKey>> getKeys() override { return {{ m_key }}; };
 
+
+    virtual Ref<FloatKey> getPreviousKey(const Time& t)const override { (void)t;return m_key; }
+    virtual uint32_t getPreviousKeyIdx(const Time& t)const override { (void)t;return 0; }
+    virtual void swapKeys(uint32_t idxA, uint32_t idxB) override {(void)idxA; (void)idxB;};
     virtual void addKey(Ref<FloatKey> key)override { m_key = key; };
     virtual void removeKeyFromIdx(unsigned int idx) override {  (void)idx;} ;
+    virtual Ref<FloatKey> getKeyFromIdx(uint32_t idx) const override { (void) idx; return m_key; }
 
     virtual void setValAtTime(const Time& t, float val) override{(void)t; this->m_key->setVal(val);}
+
+    virtual void dirty() override {};
 
 protected:
     Ref<FloatKey> m_key{CreateRef<FloatKey>()};
@@ -84,28 +87,31 @@ protected:
 class AnimatedFloatController : public FloatController{
 protected:
     std::vector<Ref<FloatKey>> m_keys;
-    float m_cache{0.0f};
+    int m_ticksPerSample{30}; // TODO update this to default to the ticks per frame with a marco 
+    Time& m_startTime;
+    Time& m_endTime;
+    std::vector<float> m_cache{0.0f};
     bool m_dirty{true};
 
 public:
-    AnimatedFloatController(std::weak_ptr<Scene> scene,const std::string& label );
-
-    std::vector<Ref<FloatKey>> getKeys() override {
-        return m_keys;
-    }
-    
-    virtual Ref<FloatKey> getKeyFromIdx(const unsigned int idx) override;  
-    virtual Ref<FloatKey> getKeyFromTime(const Time& t) override;
-    virtual void swapKeys(uint32_t idxA, uint32_t idxB) override;
-
-    virtual void addKey(Ref<FloatKey> key) override { m_keys.push_back(key);m_dirty=true; };
-    virtual void removeKeyFromIdx(unsigned int idx) override {  m_keys.erase(m_keys.begin() + idx);} ;
-
-    unsigned int getPreviousKeyIdx(const Time& t) const;
+    AnimatedFloatController(const std::string& label, Time& startTime, Time& endTime );
 
     float virtual eval(const Time& t) override ;
+
+    std::vector<Ref<FloatKey>> getKeys() override { return m_keys;}
+    
+    Ref<FloatKey> getPreviousKey(const Time& t) const override;
+    unsigned int getPreviousKeyIdx(const Time& t) const override;
+    virtual void swapKeys(uint32_t idxA, uint32_t idxB) override;
+    virtual void addKey(Ref<FloatKey> key) override { m_keys.push_back(key);m_dirty=true; };
+    virtual void removeKeyFromIdx(const unsigned int idx) override {  m_keys.erase(m_keys.begin() + idx);} ;
+    virtual Ref<FloatKey> getKeyFromIdx(const uint32_t idx) const override { return m_keys[idx]; }
+
     virtual void setValAtTime(const Time& t, float val)override;
     virtual void dirty() override;
+private:
+    void cacheTimeRange();
+    void assertAtLeastOneKeyExists();
 };
 
 class XformController {
@@ -116,7 +122,7 @@ public:
         Script = 2
     };
 
-    XformController(XformControllerType t, std::weak_ptr<Scene> scene,const std::string& label="No Name");
+    XformController(XformControllerType t, const std::string& label="No Name");
 
     virtual XformControllerType getType() const  { return m_type; }
 
@@ -147,7 +153,6 @@ protected:
     std::string m_label;
     glm::mat4 m_cache;
     bool m_dirty;
-    std::weak_ptr<Scene> m_scene;
 
     Ref<FloatController> m_xPosController  ;
     Ref<FloatController> m_yPosController  ;
@@ -161,7 +166,7 @@ protected:
 
 class EulerXformController : public XformController{
 public:
-    EulerXformController(std::weak_ptr<Scene> scene,const std::string& label="No Name" );
+    EulerXformController(const std::string& label="No Name" );
 
     virtual glm::mat4 eval(const Time& t) override;
     virtual void setFromMat4(const glm::mat4& xform, Time& t) override;

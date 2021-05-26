@@ -6,7 +6,7 @@
 namespace ChoreoGrapher{
 namespace Widgets{
 
-int CurveEditor(const char* label, CurveEditorData& curveEditorData){
+int CurveEditor(const ChoreoApp::Scene& scene, const char* label, CurveEditorData& curveEditorData){
 
         int changedIdx{-1};
         ImVec2 editorSize = ImGui::GetContentRegionAvail();
@@ -217,11 +217,9 @@ int CurveEditor(const char* label, CurveEditorData& curveEditorData){
             displayRange = displaySecondRange;
         }
 
-        std::weak_ptr<ChoreoApp::Scene> firstScene = curveEditorData.floatControllers[0]->getScene();
-
-        uint32_t currentTick{firstScene.lock()->getTimeLine().getCurrentTime().getTick()};
-        uint32_t startTick{firstScene.lock()->getTimeLine().getStartTime().getTick()};
-        uint32_t endTick{firstScene.lock()->getTimeLine().getEndTime().getTick()};
+        uint32_t currentTick{scene.getTimeLine().getCurrentTime().getTick()};
+        uint32_t startTick{scene.getTimeLine().getStartTime().getTick()};
+        uint32_t endTick{scene.getTimeLine().getEndTime().getTick()};
         float displayTime{(float)currentTick / displaySpacing};
 
 
