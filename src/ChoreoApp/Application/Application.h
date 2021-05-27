@@ -42,6 +42,7 @@ namespace ChoreoApp{
         float m_lastFrameTime;
 
 
+
         static Application* s_instance;
     };
 

@@ -1,6 +1,10 @@
 
 #include "ControllerEdit.h"
+#include "Application/Application.h"
+#include "Application/Renderer/Texture.h"
 #include "Application/Scene/Controller.h"
+#include "Ui/Icons.h"
+#include "ChoreGrapher.h"
 #include "ChoreoApp.h"
 #include "MessageBox.h"
 #include "imgui.h"
@@ -166,12 +170,16 @@ bool FloatControllerEdit(
     ImGui::SameLine(0, style.ItemInnerSpacing.x);
     window->DC.CursorPos.x = pos.x + w_inputs;
 
-    if (ImGui::Button("*", ImVec2(square_sz, square_sz)))
+    ChoreoGrapherApplication& app = static_cast<ChoreoGrapherApplication&>(ChoreoApp::Application::get());
+    uint32_t texId =  app.getIcons().curveEditorIcon->getId();
+
+    if (ImGui::ImageButton((void*)(uintptr_t)(texId), {25, 25}))
     {
         std::vector<ChoreoApp::Ref<ChoreoApp::FloatController>> floatControllers{{controller}};
         CurveEditorData newControllerBeingEdited{floatControllers};
         controllersBeingEdited.push_back(newControllerBeingEdited);
     }
+    ImGui::Image((void*)(uintptr_t)texId, {100, 100});
 
     // }
 

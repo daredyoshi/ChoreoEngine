@@ -6,6 +6,7 @@
 #include "Panels/TimelinePanel.h"
 #include "Panels/ControllorEditorPanel.h"
 #include <unordered_map>
+#include "Ui/Icons.h"
 #include "imgui.h"
 
 
@@ -23,8 +24,6 @@ public:
     void onAttach() override;
     void onDetach() override;
 
-
-private:
 
     ChoreoApp::Ref<ChoreoApp::Framebuffer> m_framebuffer;
     ChoreoApp::FramebufferSpecification m_framebufferSpec;

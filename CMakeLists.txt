@@ -85,3 +85,16 @@ add_custom_target(
 
 add_dependencies(ChoreoApp copy_font_files)
 add_dependencies(ChoreoGrapher copy_font_files)
+
+# add custom target to copy font files across
+# modify this in the future  to build for different icon sizes
+add_custom_target(
+    copy_icon_files 
+    ${CMAKE_COMMAND}
+    -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets/icons
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/icons
+    COMMENT "Copying icon files" VERBATIM
+    )
+
+add_dependencies(ChoreoGrapher copy_icon_files)
