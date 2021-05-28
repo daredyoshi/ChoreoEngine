@@ -24,6 +24,7 @@ public:
     void onAttach() override;
     void onDetach() override;
 
+private:
 
     ChoreoApp::Ref<ChoreoApp::Framebuffer> m_framebuffer;
     ChoreoApp::FramebufferSpecification m_framebufferSpec;
@@ -39,8 +40,6 @@ public:
 
     glm::vec2 m_viewportSize{ 0.0f, 0.0f };
 
-    // font
-    ImFont* m_font = nullptr; 
 
     // panels
     ChoreoApp::Ref<ChoreoApp::Scene> m_scene{ChoreoApp::CreateRef<ChoreoApp::Scene>()};

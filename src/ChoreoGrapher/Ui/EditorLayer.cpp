@@ -5,6 +5,7 @@
 #include "Application/Scene/Components.h"
 #include "Application/Scene/Controller.h"
 #include "Ui/Panels/ControllorEditorPanel.h"
+#include "ChoreoGrapher.h"
 #include "ChoreoApp.h"
 #include "glm/gtc/type_ptr.hpp"
 
@@ -15,13 +16,6 @@ namespace ChoreoGrapher{
 
 void EditorLayer::onAttach() {
     CE_PROFILE_FUNCTION();
-    // temporary until a preferences menu is created
-    // apologies I have a high-dpi display... just change the size if you don't
-    // std::string fontFile = (ChoreoApp::Application::get().getRootDir() + "assets/fonts/Roboto_Slab/static/RobotoSlab-Regular.ttf");
-    std::string fontFile = (ChoreoApp::Application::get().getRootDir() + "assets/fonts/droid-sans/DroidSans.ttf");
-    // init ImGui things
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    m_font = io.Fonts->AddFontFromFileTTF(fontFile.c_str(), 23);
 
     // temp also 
     m_framebufferSpec.width = 1280;
@@ -138,8 +132,8 @@ void EditorLayer::onEvent(ChoreoApp::Event& e)
 void EditorLayer::onImGuiRender() 
 {
     CE_PROFILE_FUNCTION();
-    ImGui::PushFont(m_font);
-    // ImGui::ShowDemoWindow();
+    ChoreoGrapherApplication& app = static_cast<ChoreoGrapherApplication&>(ChoreoApp::Application::get());
+    ImGui::PushFont(app.getFont());
 
 
     // In 99% case you should be able to just call DockSpaceOverViewport() and ignore all the code below!

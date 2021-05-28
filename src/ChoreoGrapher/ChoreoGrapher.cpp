@@ -1,5 +1,5 @@
 
-#include "ChoreGrapher.h"
+#include "ChoreoGrapher.h"
 // overwrite the application creator to create sandbox
 // entry point is in Application/EntryPoint.h
 #include "Application/EntryPoint.h"
@@ -15,3 +15,12 @@
 ChoreoApp::Application* ChoreoApp::CreateApplication(const std::string& rootDir){
     return new ChoreoGrapher::ChoreoGrapherApplication(rootDir, "ChoreoGrapher");    
 }
+
+namespace ChoreoGrapher{
+void ChoreoGrapherApplication::setFontSize(uint32_t size){
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    m_font = io.Fonts->AddFontFromFileTTF(fontFile.c_str(), size);
+    m_fontSize = size;
+}
+}
+

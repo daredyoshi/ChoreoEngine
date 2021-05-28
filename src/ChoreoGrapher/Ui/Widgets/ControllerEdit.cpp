@@ -4,7 +4,7 @@
 #include "Application/Renderer/Texture.h"
 #include "Application/Scene/Controller.h"
 #include "Ui/Icons.h"
-#include "ChoreGrapher.h"
+#include "ChoreoGrapher.h"
 #include "ChoreoApp.h"
 #include "MessageBox.h"
 #include "imgui.h"
@@ -171,9 +171,10 @@ bool FloatControllerEdit(
     window->DC.CursorPos.x = pos.x + w_inputs;
 
     ChoreoGrapherApplication& app = static_cast<ChoreoGrapherApplication&>(ChoreoApp::Application::get());
-    uint32_t texId =  app.getIcons().curveEditorIcon->getId();
+    uint32_t texId =  app.getIcons().curveEditor->getId();
+    float fontSize = static_cast<float> ( app.getFontSize() );
 
-    if (ImGui::ImageButton((void*)(uintptr_t)(texId), {25, 25}))
+    if (ImGui::ImageButton((void*)(uintptr_t)(texId), {fontSize, fontSize}))
     {
         std::vector<ChoreoApp::Ref<ChoreoApp::FloatController>> floatControllers{{controller}};
         CurveEditorData newControllerBeingEdited{floatControllers};

@@ -32,11 +32,17 @@ enum CurveEditorFlags_
     CurveEditor__OptionsDefault            = CurveEditorFlags_DisplayFrames | CurveEditorFlags_ShowGrid
 };
 
+enum class CurveEditorMode{
+    Move,
+    Add,
+    Remove,
+    NumModes
+};
 // this has everything the curve editor window needs
 struct CurveEditorData{
     std::vector<ChoreoApp::Ref<ChoreoApp::FloatController>> floatControllers{};
 
-    int lastEditedKey{-1};
+    std::vector<uint32_t> selectedKeys{};
     CurveEditorFlags flags{CurveEditor__OptionsDefault}; 
     bool open{1};
 
@@ -57,9 +63,18 @@ struct CurveEditorData{
     float panStartT{0};
     float panStartVal{0};
 
+    bool isSelecting{false};
+    float selStartT{0};
+    float selStartVal{0};
+
     // to reference the currently moving key 
     float pointStartT{0};
     float pointStartVal{0};
+
+    // to reference state of curve editor
+    enum CurveEditorMode mode {CurveEditorMode::Move};
+    bool addMode{false};
+    bool removeMode{false};
 
     //ui stuff
     float handleRadius{4.0f};

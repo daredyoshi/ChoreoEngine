@@ -7,6 +7,56 @@
 namespace ChoreoGrapher{
 namespace Widgets{
 
+void curveEditorResetFraming(CurveEditorData& curveEditorData,const ImRect& inner_bb){
+    // find min and max key vals for gridStartVal and valueRange
+    curveEditorData.gridStartT = curveEditorData.floatControllers[0]->getKeyFromIdx(0)->getTick();
+    curveEditorData.gridStartVal = curveEditorData.floatControllers[0]->getKeyFromIdx(0)->getVal();
+
+    float gridEndT{curveEditorData.gridStartT};
+    float gridEndVal{curveEditorData.gridStartVal};
+    // have to do this first because the code I copied from is using
+    // start and range instead of start and end *facepalm*
+    for(auto& controller : curveEditorData.floatControllers){
+        for(auto& key : controller->getKeys()){
+            uint32_t t = key->getTick();
+            float v = key->getVal(); 
+            if(t < curveEditorData.gridStartT){
+                curveEditorData.gridStartT = t;
+            }
+            else if (t > gridEndT){
+                gridEndT = t;
+            }
+            if(v < curveEditorData.gridStartVal){
+                curveEditorData.gridStartVal = v;
+            }
+            else if (v > gridEndVal){
+                gridEndVal = v;
+            }
+        }
+    }
+
+    float timeRange = gridEndT - curveEditorData.gridStartT;
+    float valueRange= gridEndVal - curveEditorData.gridStartVal;
+
+
+    // add some padding for shits and giggles
+    float timePadding = timeRange / 10.0f;
+    float valuePadding = valueRange / 10.0f;
+    
+    curveEditorData.gridStartT -= timePadding;
+    curveEditorData.gridStartVal -= valuePadding;
+
+    timeRange += timePadding;
+    valueRange += valuePadding;
+    
+     
+    curveEditorData.ticksPerPixel = timeRange / ( inner_bb.Max.x - inner_bb.Min.x) ;
+    curveEditorData.valuesPerPixel = valueRange / ( inner_bb.Max.x - inner_bb.Min.x) ;
+
+    curveEditorData.reset = false;
+
+}
+
 int CurveEditor(const ChoreoApp::Scene& scene, const char* label, CurveEditorData& curveEditorData){
 
         int changedIdx{-1};
@@ -14,6 +64,7 @@ int CurveEditor(const ChoreoApp::Scene& scene, const char* label, CurveEditorDat
 
         ImU32 currentTimeColor = ImGui::ColorConvertFloat4ToU32({0.8f, 0.2f, 0.2f, 1.0f});
         ImU32 notInFrameRangeFillColor = ImGui::ColorConvertFloat4ToU32({0.1f, 0.1f, 0.1f, 0.5f});
+        ImU32 selectionDragColor{ImGui::ColorConvertFloat4ToU32({0.0f, 1.0f, 1.0f, 0.7f})};
 
 		ImGuiContext& g = *GImGui;
 		const ImGuiStyle& style = g.Style;
@@ -46,52 +97,7 @@ int CurveEditor(const ChoreoApp::Scene& scene, const char* label, CurveEditorDat
 
         // reframe everything
         if(curveEditorData.reset){
-            // find min and max key vals for gridStartVal and valueRange
-            curveEditorData.gridStartT = curveEditorData.floatControllers[0]->getKeyFromIdx(0)->getTick();
-            curveEditorData.gridStartVal = curveEditorData.floatControllers[0]->getKeyFromIdx(0)->getVal();
-
-            float gridEndT{curveEditorData.gridStartT};
-            float gridEndVal{curveEditorData.gridStartVal};
-            // have to do this first because the code I copied from is using
-            // start and range instead of start and end *facepalm*
-            for(auto& controller : curveEditorData.floatControllers){
-                for(auto& key : controller->getKeys()){
-                    uint32_t t = key->getTick();
-                    float v = key->getVal(); 
-                    if(t < curveEditorData.gridStartT){
-                        curveEditorData.gridStartT = t;
-                    }
-                    else if (t > gridEndT){
-                        gridEndT = t;
-                    }
-                    if(v < curveEditorData.gridStartVal){
-                        curveEditorData.gridStartVal = v;
-                    }
-                    else if (v > gridEndVal){
-                        gridEndVal = v;
-                    }
-                }
-            }
-
-            float timeRange = gridEndT - curveEditorData.gridStartT;
-            float valueRange= gridEndVal - curveEditorData.gridStartVal;
-
-
-            // add some padding for shits and giggles
-            float timePadding = timeRange / 10.0f;
-            float valuePadding = valueRange / 10.0f;
-            
-            curveEditorData.gridStartT -= timePadding;
-            curveEditorData.gridStartVal -= valuePadding;
-
-            timeRange += timePadding;
-            valueRange += valuePadding;
-            
-             
-            curveEditorData.ticksPerPixel = timeRange / ( inner_bb.Max.x - inner_bb.Min.x) ;
-            curveEditorData.valuesPerPixel = valueRange / ( inner_bb.Max.x - inner_bb.Min.x) ;
-
-            curveEditorData.reset = false;
+            curveEditorResetFraming(curveEditorData, inner_bb);
         }
 
 		
@@ -313,7 +319,7 @@ int CurveEditor(const ChoreoApp::Scene& scene, const char* label, CurveEditorDat
 
         // clear the lastEdited key if clicking in empty part of graph
         if(ImGui::IsMouseClicked(0) && ImGui::IsWindowHovered()){
-            curveEditorData.lastEditedKey = -1; 
+            curveEditorData.selectedKeys.clear(); 
         }
 
         for (auto& controller : curveEditorData.floatControllers){
@@ -337,7 +343,7 @@ int CurveEditor(const ChoreoApp::Scene& scene, const char* label, CurveEditorDat
                     ImGui::PushID(key->getID());
                     ImGui::InvisibleButton("", ImVec2(2 * curveEditorData.handleRadius, 2 * curveEditorData.handleRadius));
 
-                    bool isSelected = curveEditorData.lastEditedKey && curveEditorData.lastEditedKey == static_cast<int>(keyID);
+                    bool isSelected = std::find(curveEditorData.selectedKeys.begin(), curveEditorData.selectedKeys.end(), keyID) != curveEditorData.selectedKeys.end();
 
                     float thickness = isSelected ? 2.0f : 1.0f;
                     ImU32 col = ImGui::IsItemActive() || 
@@ -356,7 +362,7 @@ int CurveEditor(const ChoreoApp::Scene& scene, const char* label, CurveEditorDat
                     if (ImGui::IsItemActive() && ImGui::IsMouseClicked(0))
                     {
                         // if(!ImGui::IsMouseDragging(0))
-                        curveEditorData.lastEditedKey = keyID;
+                        curveEditorData.selectedKeys = std::vector<uint32_t>({keyID});
                         curveEditorData.pointStartT = pos.x;
                         curveEditorData.pointStartVal = pos.y;
                         // CE_TRACE("last edited key {0}", idx);
@@ -470,6 +476,72 @@ int CurveEditor(const ChoreoApp::Scene& scene, const char* label, CurveEditorDat
                     }
                 }
             }
+
+            // DRAW SELECTION
+            if(curveEditorData.mode == CurveEditorMode::Move || curveEditorData.mode == CurveEditorMode::Remove){
+                if (curveEditorData.isSelecting)
+                {
+                    ImVec2 startPos{curveEditorData.selStartT, curveEditorData.selStartVal};
+                    ImVec2 endPos{invTransform(ImGui::GetMousePos())};
+
+                     
+
+                    
+                    float selEndTick = endPos[0] > startTick ? endPos[0] : startTick;
+                    if(selEndTick > startTick + tickRange){
+                        selEndTick = tickRange;
+                    }
+                    float selEndVal = endPos[1] > curveEditorData.gridStartVal ? endPos[1] : curveEditorData.gridStartVal ; 
+                    if(selEndVal > curveEditorData.gridStartVal + valueRange){
+                        selEndVal = valueRange;
+                    } 
+
+                    CE_TRACE("Start pos = {0}, {1}", curveEditorData.selStartT, curveEditorData.selStartVal);
+                    CE_TRACE("End pos = {0}, {1}", selEndTick, selEndVal);
+
+                    if(ImGui::IsMouseDragging(0)){
+                        // clamp the values so they cannot go out of the grid
+                        CE_TRACE("adding rect");
+                        window->DrawList->AddRect(transform({curveEditorData.selStartT, curveEditorData.selStartVal}), transform({selEndTick, selEndVal}), selectionDragColor);
+                    }
+                    // mouse released 
+                    else{
+                        curveEditorData.selectedKeys.clear();
+                        for(auto& key : controller->getKeys()){
+                            float keyVal = key->getVal();
+                            uint32_t keyTick = key->getTick();
+
+                            // sort for easier comparison
+                            uint32_t rangeTestStartTick = curveEditorData.selStartT < static_cast<uint32_t>(selEndTick) ? curveEditorData.selStartT : selEndTick;
+                            uint32_t rangeTestEndTick = curveEditorData.selStartT > static_cast<uint32_t>(selEndTick)? curveEditorData.selStartT : selEndTick;
+
+                            float rangeTestStartVal = curveEditorData.selStartVal < selEndVal ? curveEditorData.selStartVal : selEndVal;
+                            float rangeTestEndVal = curveEditorData.selStartVal > selEndVal ? curveEditorData.selStartVal : selEndVal;
+
+
+                            if(
+                                    keyTick > rangeTestStartTick 
+                                    && keyTick < rangeTestEndTick 
+
+                                    && keyVal > rangeTestStartVal
+                                    && keyVal < rangeTestEndVal){
+                                curveEditorData.selectedKeys.push_back(key->getID());
+                            }
+                        }
+
+                        curveEditorData.isSelecting = false;
+                    }
+                }
+                else if (ImGui::IsMouseDragging(0) && ImGui::IsWindowHovered())
+                {
+                    curveEditorData.isSelecting= true;
+                    ImVec2 startVals{invTransform(ImGui::GetMousePos())} ;
+                    curveEditorData.selStartT = startVals[0];
+                    curveEditorData.selStartVal = startVals[1];
+                }
+
+            }
+
 			// auto handleTangent = [&](ImVec2& t, const ImVec2& _p, int idx) -> bool
 			// {
 			// 	static const float SIZE = 2;
